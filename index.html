@@ -13,7 +13,7 @@
     
     <style>
         /* ==========================================================================
-           JSTORER DESIGN SYSTEM V19.0 - TRUST EDITION
+           JSTORER DESIGN SYSTEM V20.0 - GOLD MASTER EDITION
            ========================================================================== */
         :root {
             --jst-bg-ivory: #fdfaf7; --jst-accent-gold: #c76a3a; --jst-onyx: #111827;
@@ -160,7 +160,6 @@
             </div>
 
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:30px;">
-                
                 <div style="background:white; padding:25px; border-radius:20px; border:1px solid #f1f5f9; box-shadow:0 10px 30px -10px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
                     <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
                         <div style="width:45px; height:45px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--jst-slate);">JP</div>
@@ -208,7 +207,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <div style="text-align:center; margin-top:3rem;">
@@ -285,13 +283,21 @@
 
             <div class="cart-step" id="step-2">
                 <button onclick="goToStep(1)" style="background:none; border:none; font-weight:700; color:var(--jst-slate); cursor:pointer; display:flex; align-items:center; gap:8px; margin-bottom:1.5rem;"><i class="fas fa-arrow-left"></i> Volver a productos</button>
-                <h3 style="font-family:var(--font-accent); margin-bottom:1.5rem;">¿A dónde te lo enviamos?</h3>
+                <h3 style="font-family:var(--font-accent); margin-bottom:1.5rem;">Datos de Entrega</h3>
                 
                 <input type="text" id="form-name" class="premium-input" placeholder="Tu nombre" oninput="validateForm()">
-                <input type="text" id="form-address" class="premium-input" placeholder="Dirección / Distrito" oninput="validateForm()">
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <input type="tel" id="form-phone" class="premium-input" placeholder="Celular" oninput="validateForm()">
-                    <input type="number" id="form-km" class="premium-input" placeholder="Distancia (KM)" oninput="refreshSummary()">
+                <input type="text" id="form-address" class="premium-input" placeholder="Dirección exacta de entrega" oninput="validateForm()">
+                <input type="tel" id="form-phone" class="premium-input" placeholder="Celular para coordinar" oninput="validateForm()">
+                
+                <div style="position:relative; margin-bottom:5px;">
+                    <input type="number" id="form-km" class="premium-input" placeholder="Distancia (KM)" oninput="refreshSummary()" style="padding-right:50px;">
+                    <button onclick="calculateGPSDistance()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); border:none; background:none; color:var(--jst-accent-gold); cursor:pointer; font-size:1.2rem;" title="Usar mi ubicación actual">
+                        <i class="fas fa-map-marker-alt" id="gps-icon-btn"></i>
+                    </button>
+                </div>
+                
+                <div id="gps-status-msg" style="font-size:0.75rem; color:#94a3b8; margin-bottom:20px; display:flex; align-items:center; gap:5px;">
+                    <i class="fas fa-info-circle"></i> Toca el ícono 📍 si estás en el lugar de entrega ahora.
                 </div>
 
                 <div style="background:#fffbf7; padding:20px; border-radius:15px; border:1px dashed var(--jst-accent-gold); margin-bottom:20px;">
@@ -317,10 +323,8 @@
     <div id="review-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); z-index:9500; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:0.3s;" onclick="closeReviewModal(event)">
         <div style="background:white; width:90%; max-width:500px; padding:30px; border-radius:25px; position:relative; transform:translateY(20px); transition:0.3s;">
             <button onclick="closeReviewModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:1.2rem; cursor:pointer;"><i class="fas fa-times"></i></button>
-            
             <h3 style="font-family:var(--font-accent); text-align:center; margin-bottom:10px;">Tu opinión nos importa</h3>
             <p style="text-align:center; color:#64748b; font-size:0.9rem; margin-bottom:20px;">Ayúdanos a mejorar contándonos tu experiencia.</p>
-            
             <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px; color:#e2e8f0; font-size:1.8rem; cursor:pointer;">
                 <i class="fas fa-star onclick-star" onclick="setStars(1)"></i>
                 <i class="fas fa-star onclick-star" onclick="setStars(2)"></i>
@@ -328,13 +332,10 @@
                 <i class="fas fa-star onclick-star" onclick="setStars(4)"></i>
                 <i class="fas fa-star onclick-star" onclick="setStars(5)"></i>
             </div>
-
             <textarea id="review-text" placeholder="¿Qué te pareció el producto?..." style="width:100%; height:100px; padding:15px; border-radius:15px; border:1px solid #e2e8f0; resize:none; font-family:inherit; margin-bottom:15px; font-size:0.95rem;"></textarea>
-            
             <button onclick="submitReviewWA()" style="width:100%; background:var(--jst-whatsapp); color:white; padding:18px; border:none; border-radius:15px; font-weight:800; cursor:pointer; display:flex; justify-content:center; align-items:center; gap:10px; font-size:1rem;">
                 Enviar Reseña <i class="fab fa-whatsapp"></i>
             </button>
-            <p style="text-align:center; margin-top:10px; font-size:0.75rem; color:#94a3b8;">Al enviar, verificarás tu reseña por WhatsApp.</p>
         </div>
     </div>
 
@@ -362,8 +363,11 @@
         // =========================================================
         const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOKWE4Wyh_N_pt12iDlXx_garwZHFKRcE19DRoKSa2Cb_v3KoSmcQcJXRS2MdrfB7Bso-DqSXdINSt/pub?gid=0&single=true&output=csv";
         
+        // UBICACIÓN JStoreR: Jr. Cuzco 626, Cercado de Lima
+        const STORE_LOCATION = { lat: -12.053850, lng: -77.031550 }; 
+        
         let CATALOG_DB = [];
-        let state_cart = JSON.parse(localStorage.getItem('jst_v19_cart')) || [];
+        let state_cart = JSON.parse(localStorage.getItem('jst_v20_cart')) || [];
         let current_category = "Todas";
         let currentQVId = null;
         const FREE_SHIPPING_THRESHOLD = 500;
@@ -398,40 +402,22 @@
         function parseCSV(csvText) {
             const lines = csvText.split('\n');
             const result = [];
-            
-            // Empezamos en i=1 asumiendo que la fila 0 son los títulos
             for(let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if(!line) continue;
-                
-                // Regex avanzado para CSV que respeta comas dentro de comillas
                 const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
-                
-                // Limpieza básica de comillas
                 const clean = (txt) => txt ? txt.replace(/^"|"$/g, '').trim() : '';
-
                 if(parts.length >= 5) {
-                    // LIMPIEZA DE PRECIO ROBUSTA
-                    // Elimina "S/", "$", comas y espacios antes de convertir a número
                     let priceString = clean(parts[3]);
                     priceString = priceString.replace(/[S/$,\s]/g, ''); 
                     const precio = parseFloat(priceString);
-
-                    const stockVal = parts[6] ? parseInt(clean(parts[6]).replace(/\D/g,'')) : 0; // Limpia el stock también
-
-                    // Solo agregamos si el precio es un número válido
+                    const stockVal = parts[6] ? parseInt(clean(parts[6]).replace(/\D/g,'')) : 0;
                     if(!isNaN(precio)) { 
                         result.push({
-                            id: clean(parts[0]), 
-                            name: clean(parts[1]),
-                            cat: clean(parts[2]),
-                            price: precio,
-                            img: clean(parts[4]),
-                            desc: clean(parts[5]),
+                            id: clean(parts[0]), name: clean(parts[1]), cat: clean(parts[2]),
+                            price: precio, img: clean(parts[4]), desc: clean(parts[5]),
                             stock: isNaN(stockVal) ? 0 : stockVal
                         });
-                    } else {
-                        console.warn(`Fila ${i+1} omitida: Precio inválido ("${parts[3]}")`);
                     }
                 }
             }
@@ -449,7 +435,6 @@
             });
 
             if(filtered.length === 0) { 
-                // Mensaje diferente si la base de datos está vacía vs si el filtro no encuentra nada
                 if(CATALOG_DB.length === 0) {
                      grid.innerHTML = '<div style="grid-column:1/-1; padding:4rem; text-align:center; color:#ef4444; font-weight:bold;">Error: No se han cargado productos del Excel.</div>';
                 } else {
@@ -461,14 +446,10 @@
             grid.innerHTML = filtered.map(p => {
                 const isSoldOut = p.stock <= 0;
                 const isLow = p.stock > 0 && p.stock <= 3;
-                
                 let badge = '';
                 if(isSoldOut) badge = '<div style="position:absolute; top:10px; right:10px; background:#ef4444; color:white; font-size:0.7rem; font-weight:800; padding:5px 10px; border-radius:50px; z-index:2; box-shadow:0 5px 15px rgba(239,68,68,0.3);">AGOTADO</div>';
                 else if(isLow) badge = `<div style="position:absolute; top:10px; right:10px; background:#f59e0b; color:white; font-size:0.7rem; font-weight:800; padding:5px 10px; border-radius:50px; z-index:2; box-shadow:0 5px 15px rgba(245,158,11,0.3);">¡QUEDAN ${p.stock}!</div>`;
-                
-                const btn = isSoldOut 
-                    ? `<button class="btn-add" style="background:#f1f5f9; color:#cbd5e1; cursor:not-allowed;"><i class="fas fa-ban"></i></button>` 
-                    : `<button class="btn-add" onclick="addItemToCart('${p.id}')"><i class="fas fa-plus"></i></button>`;
+                const btn = isSoldOut ? `<button class="btn-add" style="background:#f1f5f9; color:#cbd5e1; cursor:not-allowed;"><i class="fas fa-ban"></i></button>` : `<button class="btn-add" onclick="addItemToCart('${p.id}')"><i class="fas fa-plus"></i></button>`;
 
                 return `
                 <article class="card-item" style="${isSoldOut ? 'opacity:0.7;' : ''}">
@@ -491,9 +472,7 @@
 
         function renderPills() {
             const cats = ["Todas", ...new Set(CATALOG_DB.map(p => p.cat).filter(Boolean))];
-            document.getElementById('category-pills-render').innerHTML = cats.map(c => 
-                `<div class="pill-item ${c===current_category?'active':''}" onclick="setCategory('${c}',this)">${c}</div>`
-            ).join('');
+            document.getElementById('category-pills-render').innerHTML = cats.map(c => `<div class="pill-item ${c===current_category?'active':''}" onclick="setCategory('${c}',this)">${c}</div>`).join('');
         }
 
         function setCategory(c, el) { current_category = c; renderPills(); renderCollection(); }
@@ -527,7 +506,6 @@
         function addItemToCart(id) {
             const prod = CATALOG_DB.find(x => x.id == id);
             if(!prod || prod.stock <= 0) return;
-            
             const item = state_cart.find(x => x.id == id);
             if(item) {
                 if(item.qty < prod.stock) item.qty++;
@@ -535,7 +513,6 @@
             } else {
                 state_cart.push({...prod, qty:1});
             }
-            
             updateCart(); showToast();
             if(document.getElementById('side-cart').classList.contains('open')) renderSuggestions();
         }
@@ -557,7 +534,7 @@
             }
         }
 
-        function updateCart() { localStorage.setItem('jst_v19_cart', JSON.stringify(state_cart)); refreshCartUI(); }
+        function updateCart() { localStorage.setItem('jst_v20_cart', JSON.stringify(state_cart)); refreshCartUI(); }
 
         function refreshCartUI() {
             const count = state_cart.reduce((a,b)=>a+b.qty,0);
@@ -633,14 +610,11 @@
         function refreshSummary() {
             const sub = state_cart.reduce((a,b)=>a+(b.price*b.qty),0);
             const km = parseFloat(document.getElementById('form-km').value) || 0;
-            
             let ship = 0;
             if(sub < FREE_SHIPPING_THRESHOLD) {
                 ship = km > 0 ? Math.max(5, km * 1.90) : 0;
             }
-
             let shipTxt = (sub >= FREE_SHIPPING_THRESHOLD) ? "GRATIS" : (ship===0 ? "Calculando..." : `S/ ${ship.toFixed(2)}`);
-            
             document.getElementById('final-subtotal').innerText = `S/ ${sub.toFixed(2)}`;
             document.getElementById('final-shipping').innerText = shipTxt;
             document.getElementById('final-total').innerText = `S/ ${(sub+ship).toFixed(2)}`;
@@ -670,13 +644,8 @@
             const ship = document.getElementById('final-shipping').innerText;
             const total = document.getElementById('final-total').innerText;
 
-            // MENSAJE WHATSAPP MÁS AMIGABLE
             let msg = `👋 *¡Hola! Quiero hacer un pedido en JstoreR*\n━━━━━━━━━━━━━━━━━━━━\n👤 *Soy:* ${n}\n📍 *Para:* ${a}\n🚚 *Envío:* ${ship} (${km}km)\n━━━━━━━━━━━━━━━━━━━━\n🛍️ *MI PEDIDO:*\n\n`;
-            
-            state_cart.forEach(i => { 
-                msg += `🔹 *${i.name}*\n     ${i.qty} und. x S/ ${i.price.toFixed(2)}\n`; 
-            });
-            
+            state_cart.forEach(i => { msg += `🔹 *${i.name}*\n     ${i.qty} und. x S/ ${i.price.toFixed(2)}\n`; });
             msg += `\n💰 *TOTAL A PAGAR: ${total}*\n\n¿Me confirman si tienen stock? ¡Gracias!`;
             
             state_cart=[]; updateCart();
@@ -693,15 +662,73 @@
             const title = document.getElementById('cart-title');
             if(s===2) { 
                 if(state_cart.length===0) return alert("Agrega productos para continuar"); 
-                cart.classList.add('step-2'); 
-                title.innerText="Confirmar Datos"; 
+                cart.classList.add('step-2'); title.innerText="Confirmar Datos"; 
             } else { 
-                cart.classList.remove('step-2'); 
-                title.innerText="Tu Bolsa"; 
+                cart.classList.remove('step-2'); title.innerText="Tu Bolsa"; 
             }
         }
 
-        // LÓGICA DE RESEÑAS
+        // --- SISTEMA GPS INTELIGENTE ---
+        function calculateGPSDistance() {
+            const btnIcon = document.getElementById('gps-icon-btn');
+            const statusMsg = document.getElementById('gps-status-msg');
+            
+            if (!navigator.geolocation) {
+                alert("Tu dispositivo no soporta geolocalización automática.");
+                return;
+            }
+
+            btnIcon.className = 'fas fa-spinner fa-spin';
+            statusMsg.innerHTML = '<span style="color:var(--jst-accent-gold);">Obteniendo señal satelital...</span>';
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const confirmed = confirm("CONFIRMACIÓN DE UBICACIÓN:\n\n¿La ubicación donde estás ahora mismo es donde recibiras el pedido?\n\n(Acepta para calcular el envío exacto)");
+
+                    if (confirmed) {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+                        const dist = getDistanceFromLatLonInKm(STORE_LOCATION.lat, STORE_LOCATION.lng, userLat, userLng);
+                        
+                        document.getElementById('form-km').value = dist.toFixed(1);
+                        refreshSummary();
+                        btnIcon.className = 'fas fa-check-circle';
+                        btnIcon.style.color = '#10b981';
+                        statusMsg.innerHTML = '<i class="fas fa-check-circle" style="color:#10b981;"></i> <span style="color:#10b981; font-weight:700;">Ubicación verificada por GPS</span>';
+                        
+                        const addrInput = document.getElementById('form-address');
+                        if(addrInput.value === "") { addrInput.value = "(Ubicación actual GPS)"; validateForm(); }
+
+                    } else {
+                        alert("Entendido. Por favor ingresa la distancia (KM) manualmente.");
+                        btnIcon.className = 'fas fa-map-marker-alt';
+                        statusMsg.innerHTML = '<span style="color:#ef4444;">Cálculo cancelado. Ingresa KM manual.</span>';
+                        document.getElementById('form-km').value = "";
+                        document.getElementById('form-km').focus();
+                    }
+                },
+                (error) => {
+                    console.error(error);
+                    alert("Necesitamos permiso de ubicación. Activa el GPS o ingresa KM manualmente.");
+                    btnIcon.className = 'fas fa-map-marker-alt';
+                    statusMsg.innerHTML = '<span style="color:#ef4444;">Error de GPS. Ingresa KM manual.</span>';
+                },
+                { enableHighAccuracy: true }
+            );
+        }
+
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const d = R * c; 
+            return d * 1.25; // Factor de corrección tráfico Lima
+        }
+        function deg2rad(deg) { return deg * (Math.PI / 180); }
+
+        // --- SISTEMA RESEÑAS ---
         function openReviewModal() {
             const m = document.getElementById('review-modal');
             m.style.opacity='1'; m.style.pointerEvents='auto';
@@ -716,13 +743,9 @@
         let starRating = 5;
         function setStars(n) {
             starRating = n;
-            const stars = document.querySelectorAll('.onclick-star');
-            stars.forEach((s,i) => {
-                s.style.color = i < n ? '#f59e0b' : '#e2e8f0';
-            });
+            document.querySelectorAll('.onclick-star').forEach((s,i) => { s.style.color = i < n ? '#f59e0b' : '#e2e8f0'; });
         }
         function initReviewStars() { setStars(5); }
-
         function submitReviewWA() {
             const txt = document.getElementById('review-text').value;
             const msg = `Hola JstoreR, quiero dejar mi reseña verificada de ${starRating} estrellas:\n\n"${txt}"\n\n(Adjuntaré mi foto a continuación)`;
@@ -730,37 +753,23 @@
             closeReviewModal();
         }
 
+        // --- NIEVE ---
         function initSnowEngine() {
             const cvs = document.getElementById('snow-layer'); 
             if(!cvs) return;
             const ctx = cvs.getContext('2d');
             cvs.width=window.innerWidth; cvs.height=window.innerHeight;
-            
-            const p = Array(35).fill().map(()=>({
-                x:Math.random()*cvs.width, 
-                y:Math.random()*cvs.height, 
-                r:Math.random()*2+1, 
-                s:Math.random()*0.5+0.2
-            }));
-            
+            const p = Array(35).fill().map(()=>({x:Math.random()*cvs.width, y:Math.random()*cvs.height, r:Math.random()*2+1, s:Math.random()*0.5+0.2}));
             function d() { 
-                ctx.clearRect(0,0,cvs.width,cvs.height); 
-                ctx.fillStyle="rgba(199, 106, 58, 0.15)";
+                ctx.clearRect(0,0,cvs.width,cvs.height); ctx.fillStyle="rgba(199, 106, 58, 0.15)";
                 p.forEach(f=>{
                     ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fill();
                     f.y+=f.s; f.x+=Math.sin(f.y*0.01)*0.2;
-                    if(f.y>cvs.height) f.y=-5; 
-                    if(f.x>cvs.width) f.x=0;
-                }); 
-                requestAnimationFrame(d); 
-            }
-            d();
+                    if(f.y>cvs.height) f.y=-5; if(f.x>cvs.width) f.x=0;
+                }); requestAnimationFrame(d); 
+            } d();
         }
-
-        window.addEventListener('resize', () => {
-             const cvs = document.getElementById('snow-layer');
-             if(cvs) { cvs.width=window.innerWidth; cvs.height=window.innerHeight; }
-        });
+        window.addEventListener('resize', () => { const cvs = document.getElementById('snow-layer'); if(cvs) { cvs.width=window.innerWidth; cvs.height=window.innerHeight; }});
     </script>
 </body>
 </html>
