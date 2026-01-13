@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS Tracker Profesional</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #map { height: 100vh; width: 100%; }
+
+        /* Panel de información superior */
+        .info-panel {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 400px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .active { background-color: #4CAF50; box-shadow: 0 0 5px #4CAF50; }
+
+        #address { font-weight: bold; color: #2c3e50; display: block; margin-top: 5px; }
+        
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .btn-track {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        .btn-track.stop { background: #dc3545; }
+    </style>
+</head>
+<body>
+
+    <div class="info-panel">
+        <div><span id="status-dot" class="status-dot"></span> <span id="status-text">GPS Inactivo</span></div>
+        <small id="coords">Esperando señal...</small>
+        <span id="address">Presiona el botón para ubicarte</span>
+    </div>
+
+    <div class="controls">
+        <button id="track-btn" class="btn-track" onclick="toggleTracking()">Iniciar Rastreo Real</button>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        var map = L.map('map').setView([0, 0], 2);
+        var userMarker, accuracyCircle;
+        var watchID = null;
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        function toggleTracking() {
+            const btn = document.getElementById('track-btn');
+            
+            if (watchID === null) {
+                startTracking();
+                btn.innerText = "Detener Rastreo";
+                btn.classList.add('stop');
+            } else {
+                stopTracking();
+                btn.innerText = "Iniciar Rastreo Real";
+                btn.classList.remove('stop');
+            }
+        }
+
+        function startTracking() {
+            if (!navigator.geolocation) {
+                alert("Tu navegador no soporta GPS");
+                return;
+            }
+
+            document.getElementById('status-dot').classList.add('active');
+            document.getElementById('status-text').innerText = "Rastreando en vivo...";
+
+            // watchPosition actualiza automáticamente cuando el usuario se mueve
+            watchID = navigator.geolocation.watchPosition(success, error, {
+                enableHighAccuracy: true, // Usa el sensor GPS real
+                timeout: 10000,
+                maximumAge: 0
+            });
+        }
+
+        function stopTracking() {
+            navigator.geolocation.clearWatch(watchID);
+            watchID = null;
+            document.getElementById('status-dot').classList.remove('active');
+            document.getElementById('status-text').innerText = "GPS Pausado";
+        }
+
+        function success(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const accuracy = position.coords.accuracy; // Margen de error en metros
+
+            document.getElementById('coords').innerText = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)} (Error: ${Math.round(accuracy)}m)`;
+
+            // Actualizar Mapa y Marcador
+            if (!userMarker) {
+                userMarker = L.marker([lat, lng]).addTo(map);
+                accuracyCircle = L.circle([lat, lng], { radius: accuracy }).addTo(map);
+                map.setView([lat, lng], 17);
+            } else {
+                userMarker.setLatLng([lat, lng]);
+                accuracyCircle.setLatLng([lat, lng]).setRadius(accuracy);
+            }
+
+            // Mover el mapa suavemente si el usuario se sale del centro
+            map.panTo([lat, lng]);
+
+            // Obtener dirección física (Reverse Geocoding)
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+                .then(response => response.json())
+                .then(data => {
+                    const address = data.display_name;
+                    document.getElementById('address').innerText = address;
+                    userMarker.bindPopup(`<b>Tu ubicación:</b><br>${address}`).openPopup();
+                })
+                .catch(err => console.log("Error obteniendo dirección: ", err));
+        }
+
+        function error(err) {
+            console.warn('ERROR(' + err.code + '): ' + err.message);
+        }
+    </script>
+</body>
+</html>
