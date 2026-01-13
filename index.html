@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#fdfaf7">
     
-    <title>JstoreR Elite · Global Curated Gallery</title>
-    <meta name="description" content="Galería exclusiva de artículos de lujo. Envíos VIP a todo el Perú.">
+    <title>JstoreR · Tienda Oficial</title>
+    <meta name="description" content="Los mejores productos con envío seguro a todo el Perú.">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         /* ==========================================================================
-           JSTORER DESIGN SYSTEM V17.5 - FINAL RELEASE
+           JSTORER DESIGN SYSTEM V19.0 - TRUST EDITION
            ========================================================================== */
         :root {
             --jst-bg-ivory: #fdfaf7; --jst-accent-gold: #c76a3a; --jst-onyx: #111827;
@@ -23,7 +23,7 @@
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: var(--font-main); background-color: var(--jst-bg-ivory); color: var(--jst-onyx); overflow-x: hidden; min-height: 100vh; }
+        body { font-family: var(--font-main); background-color: var(--jst-bg-ivory); color: var(--jst-onyx); overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
 
         /* LOADER */
         #app-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--jst-bg-ivory); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
@@ -55,7 +55,7 @@
         .pill-item.active { background: var(--jst-accent-gold); color: white; border-color: var(--jst-accent-gold); transform: scale(1.05); }
 
         /* GRID */
-        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; padding: 2rem; max-width: 1440px; margin: auto; }
+        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; padding: 2rem; max-width: 1440px; margin: auto; flex: 1; }
         .card-item { background: white; border-radius: 28px; padding: 20px; border: 1px solid rgba(0,0,0,0.02); transition: var(--transition-smooth); display: flex; flex-direction: column; position: relative; }
         .card-item:hover { transform: translateY(-15px); box-shadow: 0 30px 60px -12px rgba(199, 106, 58, 0.18); }
         .card-img-container { width: 100%; aspect-ratio: 1; border-radius: 20px; overflow: hidden; background: #f8fafc; margin-bottom: 20px; cursor: pointer; position: relative; }
@@ -115,7 +115,7 @@
 
     <div id="app-loader">
         <div class="loader-spinner"></div>
-        <h3 style="font-family:var(--font-accent); color:var(--jst-onyx);">Cargando Colección...</h3>
+        <h3 style="font-family:var(--font-accent); color:var(--jst-onyx);">Cargando Tienda...</h3>
     </div>
 
     <canvas id="snow-layer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:5; opacity:0.4;"></canvas>
@@ -126,7 +126,7 @@
                 <img src="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png" class="logo-img" alt="Logo">
                 <div style="line-height:1;">
                     <span style="display:block; font-family:var(--font-accent); font-weight:900; font-size:1.6rem;">JstoreR</span>
-                    <span style="font-size:0.6rem; text-transform:uppercase; letter-spacing:3px; color:var(--jst-accent-gold); font-weight:800;">Elite Selection</span>
+                    <span style="font-size:0.6rem; text-transform:uppercase; letter-spacing:3px; color:var(--jst-accent-gold); font-weight:800;">Tienda Oficial</span>
                 </div>
             </a>
             <div class="cart-trigger" onclick="toggleCart(true)">
@@ -138,37 +138,140 @@
 
     <main>
         <section class="hero-v10">
-            <span style="text-transform:uppercase; letter-spacing:5px; font-weight:800; font-size:0.75rem; color:var(--jst-accent-gold); margin-bottom:1rem; display:block;">Colección 2026</span>
-            <h1>Curaduría que desafía el tiempo</h1>
-            <div class="search-wrapper"><i class="fas fa-search search-icon"></i><input type="text" id="master-search" class="search-input" placeholder="Buscar pieza de colección..." oninput="handleSmartFilter()"></div>
+            <span style="text-transform:uppercase; letter-spacing:5px; font-weight:800; font-size:0.75rem; color:var(--jst-accent-gold); margin-bottom:1rem; display:block;">Novedades 2026</span>
+            <h1>Date el gusto que mereces</h1>
+            <div class="search-wrapper"><i class="fas fa-search search-icon"></i><input type="text" id="master-search" class="search-input" placeholder="¿Qué estás buscando hoy?" oninput="handleSmartFilter()"></div>
             <div class="pills-container-wrapper"><div class="pills-flex" id="category-pills-render"></div></div>
         </section>
 
         <div class="catalog-container" id="main-grid"></div>
 
-        <section style="padding:4rem 2rem; text-align:center; background:#fff; margin-top:4rem;">
-            <i class="fas fa-star" style="color:gold;"></i><i class="fas fa-star" style="color:gold;"></i><i class="fas fa-star" style="color:gold;"></i><i class="fas fa-star" style="color:gold;"></i><i class="fas fa-star" style="color:gold;"></i>
-            <p style="font-style:italic; margin-top:1rem; color:var(--jst-slate);">"La mejor experiencia de compra online en Perú." - Carlos V.</p>
+        <section style="max-width:1200px; margin:4rem auto; padding:0 2rem;">
+            <div style="text-align:center; margin-bottom:3rem;">
+                <span style="color:var(--jst-accent-gold); font-weight:800; letter-spacing:2px; font-size:0.8rem; text-transform:uppercase;">Social Proof</span>
+                <h2 style="font-family:var(--font-accent); font-size:2.2rem; margin:10px 0;">La Experiencia JstoreR</h2>
+                <div style="display:flex; justify-content:center; align-items:center; gap:10px; color:var(--jst-onyx);">
+                    <div style="font-size:1.2rem; color:#f59e0b;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <span style="font-weight:700;">4.9/5</span>
+                    <span style="color:var(--jst-slate);">(Más de 500 clientes felices)</span>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:30px;">
+                
+                <div style="background:white; padding:25px; border-radius:20px; border:1px solid #f1f5f9; box-shadow:0 10px 30px -10px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                        <div style="width:45px; height:45px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--jst-slate);">JP</div>
+                        <div>
+                            <h4 style="font-size:0.95rem; margin:0;">Juan Pablo M.</h4>
+                            <span style="font-size:0.8rem; color:#10b981;"><i class="fas fa-check-circle"></i> Compra Verificada</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:15px; color:#f59e0b; font-size:0.9rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="color:var(--jst-slate); font-size:0.9rem; line-height:1.6; margin-bottom:15px; flex:1;">"La calidad me sorprendió. Llegó en 2 días a Arequipa y el empaque estaba impecable. Definitivamente volveré a pedir."</p>
+                    <div style="width:100%; height:180px; background:#f8fafc; border-radius:15px; overflow:hidden;">
+                        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80" style="width:100%; height:100%; object-fit:cover; transition:0.5s;">
+                    </div>
+                </div>
+
+                <div style="background:white; padding:25px; border-radius:20px; border:1px solid #f1f5f9; box-shadow:0 10px 30px -10px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                        <div style="width:45px; height:45px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--jst-slate);">AL</div>
+                        <div>
+                            <h4 style="font-size:0.95rem; margin:0;">Ana Lucia R.</h4>
+                            <span style="font-size:0.8rem; color:#10b981;"><i class="fas fa-check-circle"></i> Compra Verificada</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:15px; color:#f59e0b; font-size:0.9rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="color:var(--jst-slate); font-size:0.9rem; line-height:1.6; margin-bottom:15px; flex:1;">"Estaba dudando por ser online, pero la atención por WhatsApp fue A1. El producto es tal cual la foto."</p>
+                    <div style="width:100%; height:180px; background:#f8fafc; border-radius:15px; overflow:hidden;">
+                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                </div>
+
+                <div style="background:white; padding:25px; border-radius:20px; border:1px solid #f1f5f9; box-shadow:0 10px 30px -10px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                        <div style="width:45px; height:45px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--jst-slate);">CR</div>
+                        <div>
+                            <h4 style="font-size:0.95rem; margin:0;">Carlos Ruiz</h4>
+                            <span style="font-size:0.8rem; color:#10b981;"><i class="fas fa-check-circle"></i> Compra Verificada</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:15px; color:#f59e0b; font-size:0.9rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="color:var(--jst-slate); font-size:0.9rem; line-height:1.6; margin-bottom:15px; flex:1;">"Excelente presentación, ideal para regalo. Me salvaron el aniversario. Gracias JstoreR!"</p>
+                     <div style="width:100%; height:180px; background:#f8fafc; border-radius:15px; overflow:hidden; display:flex; align-items:center; justify-content:center; color:#94a3b8; border:2px dashed #e2e8f0;">
+                        <div style="text-align:center;">
+                            <i class="fas fa-camera" style="font-size:2rem; opacity:0.3; margin-bottom:10px;"></i>
+                            <div style="font-size:0.8rem;">Foto del cliente</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div style="text-align:center; margin-top:3rem;">
+                <button onclick="openReviewModal()" style="background:white; border:2px solid var(--jst-onyx); padding:15px 30px; border-radius:50px; font-weight:800; cursor:pointer; transition:0.3s; display:inline-flex; align-items:center; gap:10px; font-size:1rem;">
+                    <i class="fas fa-pen"></i> ¿Ya compraste? Déjanos tu opinión
+                </button>
+            </div>
         </section>
+
+        <footer style="background: white; border-top: 1px solid #f1f5f9; padding: 4rem 2rem 2rem; margin-top: auto;">
+            <div style="max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; text-align: left;">
+                
+                <div>
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+                        <img src="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png" style="height:40px;">
+                        <span style="font-family:var(--font-accent); font-weight:900; font-size:1.4rem;">JstoreR</span>
+                    </div>
+                    <p style="color:var(--jst-slate); font-size:0.9rem; line-height:1.6;">
+                        Redefiniendo la experiencia de compra online en Perú. Calidad, estilo y un servicio que te trata como mereces.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 style="font-family:var(--font-accent); font-size:1.1rem; margin-bottom:15px;">Tu tranquilidad primero</h4>
+                    <ul style="list-style:none; padding:0; color:var(--jst-slate); font-size:0.9rem; line-height:2;">
+                        <li><i class="fas fa-truck-fast" style="color:var(--jst-accent-gold); width:20px;"></i> Envíos a todo el Perú</li>
+                        <li><i class="fas fa-medal" style="color:var(--jst-accent-gold); width:20px;"></i> Garantía de calidad A1</li>
+                        <li><i class="fas fa-shield-alt" style="color:var(--jst-accent-gold); width:20px;"></i> Compra 100% segura</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 style="font-family:var(--font-accent); font-size:1.1rem; margin-bottom:15px;">¿Necesitas ayuda?</h4>
+                    <p style="color:var(--jst-slate); font-size:0.9rem; margin-bottom:10px;">Estamos aquí para asesorarte.</p>
+                    <a href="https://wa.me/51932508670" target="_blank" style="text-decoration:none; color:var(--jst-onyx); font-weight:700; display:flex; align-items:center; gap:8px;">
+                        <i class="fab fa-whatsapp" style="font-size:1.2rem; color:var(--jst-whatsapp);"></i> Escríbenos al WhatsApp
+                    </a>
+                </div>
+            </div>
+
+            <div style="text-align:center; margin-top:4rem; padding-top:2rem; border-top:1px solid #f8fafc; color:#94a3b8; font-size:0.8rem;">
+                &copy; 2026 JstoreR Elite. Todos los derechos reservados.
+            </div>
+        </footer>
     </main>
 
     <aside class="side-cart" id="side-cart">
         <div class="cart-header">
-            <h2 id="cart-title" style="font-family:var(--font-accent); font-size:1.5rem; margin:0;">Mi Selección</h2>
+            <h2 id="cart-title" style="font-family:var(--font-accent); font-size:1.5rem; margin:0;">Tu Bolsa</h2>
             <div onclick="toggleCart(false)" style="cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:#f1f5f9;"><i class="fas fa-times"></i></div>
         </div>
 
         <div class="cart-views-container">
             <div class="cart-step" id="step-1">
                 <div class="shipping-progress-box" id="shipping-progress-box">
-                    <div style="font-size:0.85rem; font-weight:700; color:var(--jst-slate); margin-bottom:8px; display:flex; justify-content:space-between;"><span id="ship-msg-text">Faltan S/ 500 para envío gratis</span><i class="fas fa-truck-fast"></i></div>
+                    <div style="font-size:0.85rem; font-weight:700; color:var(--jst-slate); margin-bottom:8px; display:flex; justify-content:space-between;"><span id="ship-msg-text">Agrega más para envío gratis</span><i class="fas fa-truck-fast"></i></div>
                     <div style="width:100%; height:6px; background:#e2e8f0; border-radius:10px;"><div class="progress-bar-ship" id="ship-progress-bar"></div></div>
                 </div>
 
                 <div id="cart-items-list" style="flex:1;"></div>
                 
                 <div class="suggestions-box" id="suggestions-area" style="display:none;">
-                    <div style="font-size:0.9rem; font-weight:800; color:var(--jst-slate); text-transform:uppercase; margin-bottom:1rem;">Completa tu colección</div>
+                    <div style="font-size:0.9rem; font-weight:800; color:var(--jst-slate); text-transform:uppercase; margin-bottom:1rem;">Te podría gustar</div>
                     <div class="suggestions-scroll" id="suggestions-render"></div>
                 </div>
 
@@ -182,22 +285,22 @@
 
             <div class="cart-step" id="step-2">
                 <button onclick="goToStep(1)" style="background:none; border:none; font-weight:700; color:var(--jst-slate); cursor:pointer; display:flex; align-items:center; gap:8px; margin-bottom:1.5rem;"><i class="fas fa-arrow-left"></i> Volver a productos</button>
-                <h3 style="font-family:var(--font-accent); margin-bottom:1.5rem;">Datos de Entrega</h3>
+                <h3 style="font-family:var(--font-accent); margin-bottom:1.5rem;">¿A dónde te lo enviamos?</h3>
                 
-                <input type="text" id="form-name" class="premium-input" placeholder="Nombre completo" oninput="validateForm()">
-                <input type="text" id="form-address" class="premium-input" placeholder="Dirección de entrega" oninput="validateForm()">
+                <input type="text" id="form-name" class="premium-input" placeholder="Tu nombre" oninput="validateForm()">
+                <input type="text" id="form-address" class="premium-input" placeholder="Dirección / Distrito" oninput="validateForm()">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <input type="tel" id="form-phone" class="premium-input" placeholder="WhatsApp" oninput="validateForm()">
+                    <input type="tel" id="form-phone" class="premium-input" placeholder="Celular" oninput="validateForm()">
                     <input type="number" id="form-km" class="premium-input" placeholder="Distancia (KM)" oninput="refreshSummary()">
                 </div>
 
                 <div style="background:#fffbf7; padding:20px; border-radius:15px; border:1px dashed var(--jst-accent-gold); margin-bottom:20px;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:5px; color:#64748b;"><span>Productos:</span><span id="final-subtotal">S/ 0.00</span></div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:#64748b;"><span>Envío:</span><span id="final-shipping">Calculando...</span></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:#64748b;"><span>Delivery:</span><span id="final-shipping">Calculando...</span></div>
                     <div style="display:flex; justify-content:space-between; font-weight:900; font-size:1.4rem; border-top:1px solid #ddd; padding-top:10px; color:var(--jst-accent-gold);"><span>TOTAL:</span><span id="final-total">S/ 0.00</span></div>
                 </div>
 
-                <button id="btn-wa" class="btn-wa-final" onclick="launchCelebration()"><i class="fab fa-whatsapp" style="font-size:1.4rem;"></i> Confirmar Pedido</button>
+                <button id="btn-wa" class="btn-wa-final" onclick="launchCelebration()"><i class="fab fa-whatsapp" style="font-size:1.4rem;"></i> Pedir por WhatsApp</button>
             </div>
         </div>
     </aside>
@@ -205,9 +308,33 @@
     <div id="celebration-modal">
         <div class="celebration-content">
             <div class="success-icon"><i class="fas fa-check"></i></div>
-            <h2 style="font-family:var(--font-accent); font-size:2rem; margin-bottom:10px;">¡Pedido Exitoso!</h2>
-            <p style="color:var(--jst-slate); font-size:1.1rem;">Tu selección ha sido reservada.<br>Redirigiendo a WhatsApp...</p>
+            <h2 style="font-family:var(--font-accent); font-size:2rem; margin-bottom:10px;">¡Excelente!</h2>
+            <p style="color:var(--jst-slate); font-size:1.1rem;">Tu pedido está listo.<br>Te atendemos por WhatsApp...</p>
             <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+        </div>
+    </div>
+
+    <div id="review-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); z-index:9500; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:0.3s;" onclick="closeReviewModal(event)">
+        <div style="background:white; width:90%; max-width:500px; padding:30px; border-radius:25px; position:relative; transform:translateY(20px); transition:0.3s;">
+            <button onclick="closeReviewModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:1.2rem; cursor:pointer;"><i class="fas fa-times"></i></button>
+            
+            <h3 style="font-family:var(--font-accent); text-align:center; margin-bottom:10px;">Tu opinión nos importa</h3>
+            <p style="text-align:center; color:#64748b; font-size:0.9rem; margin-bottom:20px;">Ayúdanos a mejorar contándonos tu experiencia.</p>
+            
+            <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px; color:#e2e8f0; font-size:1.8rem; cursor:pointer;">
+                <i class="fas fa-star onclick-star" onclick="setStars(1)"></i>
+                <i class="fas fa-star onclick-star" onclick="setStars(2)"></i>
+                <i class="fas fa-star onclick-star" onclick="setStars(3)"></i>
+                <i class="fas fa-star onclick-star" onclick="setStars(4)"></i>
+                <i class="fas fa-star onclick-star" onclick="setStars(5)"></i>
+            </div>
+
+            <textarea id="review-text" placeholder="¿Qué te pareció el producto?..." style="width:100%; height:100px; padding:15px; border-radius:15px; border:1px solid #e2e8f0; resize:none; font-family:inherit; margin-bottom:15px; font-size:0.95rem;"></textarea>
+            
+            <button onclick="submitReviewWA()" style="width:100%; background:var(--jst-whatsapp); color:white; padding:18px; border:none; border-radius:15px; font-weight:800; cursor:pointer; display:flex; justify-content:center; align-items:center; gap:10px; font-size:1rem;">
+                Enviar Reseña <i class="fab fa-whatsapp"></i>
+            </button>
+            <p style="text-align:center; margin-top:10px; font-size:0.75rem; color:#94a3b8;">Al enviar, verificarás tu reseña por WhatsApp.</p>
         </div>
     </div>
 
@@ -221,13 +348,13 @@
                     <h2 id="qv-name">Producto</h2>
                     <div class="qv-price" id="qv-price">S/ 0.00</div>
                     <p id="qv-desc" class="qv-description">...</p>
-                    <button id="qv-btn-add" class="btn-add-qv" onclick="addToCartFromQV()"><span>Agregar a la Colección</span><i class="fas fa-plus"></i></button>
+                    <button id="qv-btn-add" class="btn-add-qv" onclick="addToCartFromQV()"><span>Lo quiero</span><i class="fas fa-plus"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="toast-notify" style="position:fixed; bottom:-100px; left:50%; transform:translateX(-50%); background:var(--jst-onyx); color:white; padding:14px 28px; border-radius:50px; z-index:9000; transition:0.5s; font-weight:700; box-shadow:0 10px 25px rgba(0,0,0,0.2); white-space:nowrap;">Producto añadido</div>
+    <div id="toast-notify" style="position:fixed; bottom:-100px; left:50%; transform:translateX(-50%); background:var(--jst-onyx); color:white; padding:14px 28px; border-radius:50px; z-index:9000; transition:0.5s; font-weight:700; box-shadow:0 10px 25px rgba(0,0,0,0.2); white-space:nowrap;">Agregado al carrito</div>
 
     <script>
         // =========================================================
@@ -236,14 +363,14 @@
         const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOKWE4Wyh_N_pt12iDlXx_garwZHFKRcE19DRoKSa2Cb_v3KoSmcQcJXRS2MdrfB7Bso-DqSXdINSt/pub?gid=0&single=true&output=csv";
         
         let CATALOG_DB = [];
-        let state_cart = JSON.parse(localStorage.getItem('jst_v17_cart')) || [];
+        let state_cart = JSON.parse(localStorage.getItem('jst_v19_cart')) || [];
         let current_category = "Todas";
         let currentQVId = null;
         const FREE_SHIPPING_THRESHOLD = 500;
 
         window.onload = async () => {
             await fetchProducts();
-            renderPills(); renderCollection(); refreshCartUI(); initSnowEngine();
+            renderPills(); renderCollection(); refreshCartUI(); initSnowEngine(); initReviewStars();
             // Efecto de salida del loader
             const loader = document.getElementById('app-loader');
             loader.style.opacity = '0';
@@ -326,7 +453,7 @@
                 if(CATALOG_DB.length === 0) {
                      grid.innerHTML = '<div style="grid-column:1/-1; padding:4rem; text-align:center; color:#ef4444; font-weight:bold;">Error: No se han cargado productos del Excel.</div>';
                 } else {
-                     grid.innerHTML = '<div style="grid-column:1/-1; padding:4rem; text-align:center; color:#94a3b8;">No encontramos coincidencias en la colección.</div>'; 
+                     grid.innerHTML = '<div style="grid-column:1/-1; padding:4rem; text-align:center; color:#94a3b8;">No encontramos lo que buscas... prueba con otra palabra.</div>'; 
                 }
                 return; 
             }
@@ -388,7 +515,7 @@
                 btn.innerHTML = '<span>Agotado</span><i class="fas fa-ban"></i>';
                 btn.style.background = '#e2e8f0'; btn.style.color = '#94a3b8'; btn.style.pointerEvents = 'none';
             } else {
-                btn.innerHTML = '<span>Agregar a la Colección</span><i class="fas fa-plus"></i>';
+                btn.innerHTML = '<span>Lo quiero</span><i class="fas fa-plus"></i>';
                 btn.style.background = 'var(--jst-onyx)'; btn.style.color = '#fff'; btn.style.pointerEvents = 'auto';
             }
             document.getElementById('quick-view-modal').classList.add('active');
@@ -404,7 +531,7 @@
             const item = state_cart.find(x => x.id == id);
             if(item) {
                 if(item.qty < prod.stock) item.qty++;
-                else return alert("Has alcanzado el límite de stock disponible para este artículo.");
+                else return alert("¡Ojo! Ya no quedan más unidades de este producto.");
             } else {
                 state_cart.push({...prod, qty:1});
             }
@@ -423,14 +550,14 @@
             const item = state_cart.find(x => x.id == id);
             const prod = CATALOG_DB.find(x => x.id == id);
             if(item) {
-                if(d > 0 && item.qty >= prod.stock) return alert("No hay más stock disponible.");
+                if(d > 0 && item.qty >= prod.stock) return alert("¡Ups! No hay más stock disponible.");
                 item.qty+=d; 
                 if(item.qty<=0) state_cart = state_cart.filter(x=>x.id!=id); 
                 updateCart(); 
             }
         }
 
-        function updateCart() { localStorage.setItem('jst_v17_cart', JSON.stringify(state_cart)); refreshCartUI(); }
+        function updateCart() { localStorage.setItem('jst_v19_cart', JSON.stringify(state_cart)); refreshCartUI(); }
 
         function refreshCartUI() {
             const count = state_cart.reduce((a,b)=>a+b.qty,0);
@@ -441,7 +568,7 @@
 
             const list = document.getElementById('cart-items-list');
             if(state_cart.length===0) {
-                list.innerHTML = '<div style="text-align:center; padding:3rem; opacity:0.5; display:flex; flex-direction:column; align-items:center;"><i class="fas fa-shopping-basket" style="font-size:2rem; margin-bottom:10px;"></i>Tu colección está vacía.</div>';
+                list.innerHTML = '<div style="text-align:center; padding:3rem; opacity:0.5; display:flex; flex-direction:column; align-items:center;"><i class="fas fa-shopping-basket" style="font-size:2rem; margin-bottom:10px;"></i>Tu bolsa está vacía... ¡Aún!</div>';
                 goToStep(1); 
             } else {
                 list.innerHTML = state_cart.map(i => `
@@ -471,7 +598,7 @@
             bar.style.width = `${pct}%`;
             if(sub >= FREE_SHIPPING_THRESHOLD) { 
                 box.classList.add('unlocked'); 
-                txt.innerHTML = "<span>¡Envío GRATIS desbloqueado!</span>";
+                txt.innerHTML = "<span>¡Genial! Tienes envío GRATIS</span>";
                 txt.style.color = "#10b981";
             } else { 
                 box.classList.remove('unlocked'); 
@@ -543,13 +670,14 @@
             const ship = document.getElementById('final-shipping').innerText;
             const total = document.getElementById('final-total').innerText;
 
-            let msg = `🏛️ *JSTORER ELITE - NUEVO PEDIDO*\n━━━━━━━━━━━━━━━━━━━━\n👤 *Cliente:* ${n}\n📍 *Destino:* ${a}\n📞 *Contacto:* ${p}\n🚚 *Envío:* ${ship} (${km}km)\n━━━━━━━━━━━━━━━━━━━━\n📦 *DETALLE DE LA ORDEN:*\n\n`;
+            // MENSAJE WHATSAPP MÁS AMIGABLE
+            let msg = `👋 *¡Hola! Quiero hacer un pedido en JstoreR*\n━━━━━━━━━━━━━━━━━━━━\n👤 *Soy:* ${n}\n📍 *Para:* ${a}\n🚚 *Envío:* ${ship} (${km}km)\n━━━━━━━━━━━━━━━━━━━━\n🛍️ *MI PEDIDO:*\n\n`;
             
             state_cart.forEach(i => { 
-                msg += `✅ *[${i.id}]* ${i.name}\n     x${i.qty}  —  S/ ${i.price.toFixed(2)}\n`; 
+                msg += `🔹 *${i.name}*\n     ${i.qty} und. x S/ ${i.price.toFixed(2)}\n`; 
             });
             
-            msg += `\n💎 *TOTAL FINAL: ${total}*`;
+            msg += `\n💰 *TOTAL A PAGAR: ${total}*\n\n¿Me confirman si tienen stock? ¡Gracias!`;
             
             state_cart=[]; updateCart();
             window.location.href = `https://wa.me/51932508670?text=${encodeURIComponent(msg)}`;
@@ -566,11 +694,40 @@
             if(s===2) { 
                 if(state_cart.length===0) return alert("Agrega productos para continuar"); 
                 cart.classList.add('step-2'); 
-                title.innerText="Finalizar Pedido"; 
+                title.innerText="Confirmar Datos"; 
             } else { 
                 cart.classList.remove('step-2'); 
-                title.innerText="Mi Selección"; 
+                title.innerText="Tu Bolsa"; 
             }
+        }
+
+        // LÓGICA DE RESEÑAS
+        function openReviewModal() {
+            const m = document.getElementById('review-modal');
+            m.style.opacity='1'; m.style.pointerEvents='auto';
+            m.querySelector('div').style.transform='translateY(0)';
+        }
+        function closeReviewModal(e) {
+            if(e && e.target !== e.currentTarget) return;
+            const m = document.getElementById('review-modal');
+            m.style.opacity='0'; m.style.pointerEvents='none';
+            m.querySelector('div').style.transform='translateY(20px)';
+        }
+        let starRating = 5;
+        function setStars(n) {
+            starRating = n;
+            const stars = document.querySelectorAll('.onclick-star');
+            stars.forEach((s,i) => {
+                s.style.color = i < n ? '#f59e0b' : '#e2e8f0';
+            });
+        }
+        function initReviewStars() { setStars(5); }
+
+        function submitReviewWA() {
+            const txt = document.getElementById('review-text').value;
+            const msg = `Hola JstoreR, quiero dejar mi reseña verificada de ${starRating} estrellas:\n\n"${txt}"\n\n(Adjuntaré mi foto a continuación)`;
+            window.open(`https://wa.me/51932508670?text=${encodeURIComponent(msg)}`, '_blank');
+            closeReviewModal();
         }
 
         function initSnowEngine() {
