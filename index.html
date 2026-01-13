@@ -5,15 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#fdfaf7">
     
-    <title>JstoreR · Tienda Oficial</title>
-    <meta name="description" content="Los mejores productos con envío seguro a todo el Perú.">
+    <title>JstoreR · Elite Selection</title>
+    <meta name="description" content="Galería exclusiva de artículos de lujo. Envíos seguros y verificados a todo el Perú.">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="JstoreR Elite · Catálogo 2026">
+    <meta property="og:description" content="Descubre nuestra colección exclusiva. Envíos a todo el Perú.">
+    <meta property="og:image" content="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png">
+    
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         /* ==========================================================================
-           JSTORER DESIGN SYSTEM V20.0 - GOLD MASTER EDITION
+           JSTORER DESIGN SYSTEM V21.0 - DIAMOND EDITION
            ========================================================================== */
         :root {
             --jst-bg-ivory: #fdfaf7; --jst-accent-gold: #c76a3a; --jst-onyx: #111827;
@@ -25,17 +32,13 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: var(--font-main); background-color: var(--jst-bg-ivory); color: var(--jst-onyx); overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* LOADER */
-        #app-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--jst-bg-ivory); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        .loader-spinner { width: 50px; height: 50px; border: 4px solid rgba(199, 106, 58, 0.2); border-top: 4px solid var(--jst-accent-gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         /* HEADER & HERO */
-        .header-master { position: sticky; top: 0; z-index: 5000; background: rgba(253, 250, 247, 0.88); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-bottom: 1px solid rgba(199, 106, 58, 0.1); }
+        .header-master { position: sticky; top: 0; z-index: 5000; background: rgba(253, 250, 247, 0.92); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-bottom: 1px solid rgba(199, 106, 58, 0.1); }
         .nav-container { max-width: 1440px; margin: auto; display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; }
         .logo-box { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
-        .logo-img { height: 60px; filter: drop-shadow(0 4px 10px rgba(199, 106, 58, 0.2)); }
-        .cart-trigger { position: relative; cursor: pointer; background: var(--jst-white); padding: 14px; border-radius: 50%; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05); }
+        .logo-img { height: 60px; filter: drop-shadow(0 4px 10px rgba(199, 106, 58, 0.15)); }
+        .cart-trigger { position: relative; cursor: pointer; background: var(--jst-white); padding: 14px; border-radius: 50%; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05); transition: 0.3s; }
+        .cart-trigger:hover { transform: scale(1.05); }
         .badge-count { position: absolute; top: -5px; right: -5px; background: var(--jst-onyx); color: white; min-width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; }
 
         .hero-v10 { padding: 8rem 2rem 2rem; text-align: center; max-width: 1100px; margin: auto; animation: heroFadeIn 1.5s ease; }
@@ -54,8 +57,17 @@
         .pill-item { background: white; border: 1px solid rgba(199, 106, 58, 0.1); padding: 12px 28px; border-radius: 50px; font-size: 0.9rem; font-weight: 700; color: var(--jst-slate); white-space: nowrap; cursor: pointer; transition: 0.4s; }
         .pill-item.active { background: var(--jst-accent-gold); color: white; border-color: var(--jst-accent-gold); transform: scale(1.05); }
 
-        /* GRID */
-        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; padding: 2rem; max-width: 1440px; margin: auto; flex: 1; }
+        /* GRID (MEJORADO PARA MÓVILES PEQUEÑOS) */
+        .catalog-container { 
+            display: grid; 
+            /* Cambio clave: de 320px a 280px para evitar cortes en iPhone SE/Android pequeños */
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 40px; 
+            padding: 2rem; 
+            max-width: 1440px; 
+            margin: auto; 
+            flex: 1; 
+        }
         .card-item { background: white; border-radius: 28px; padding: 20px; border: 1px solid rgba(0,0,0,0.02); transition: var(--transition-smooth); display: flex; flex-direction: column; position: relative; }
         .card-item:hover { transform: translateY(-15px); box-shadow: 0 30px 60px -12px rgba(199, 106, 58, 0.18); }
         .card-img-container { width: 100%; aspect-ratio: 1; border-radius: 20px; overflow: hidden; background: #f8fafc; margin-bottom: 20px; cursor: pointer; position: relative; }
@@ -63,6 +75,11 @@
         .card-item:hover img { transform: scale(1.15); }
         .price-tag { font-weight: 900; font-size: 1.6rem; color: var(--jst-onyx); }
         .btn-add { background: var(--jst-accent-gold); color: white; border: none; width: 54px; height: 54px; border-radius: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.3s; }
+
+        /* SKELETON LOADING (NUEVO EFECTO PREMIUM) */
+        .skeleton { background: #e2e8f0; border-radius: 20px; position: relative; overflow: hidden; }
+        .skeleton::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
         /* CARRITO */
         .side-cart { position: fixed; right: -100%; top: 0; width: 100%; max-width: 500px; height: 100%; background: var(--jst-white); z-index: 6000; transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); display: flex; flex-direction: column; box-shadow: -20px 0 80px rgba(0,0,0,0.15); }
@@ -105,20 +122,16 @@
         .btn-wa-final.active { opacity: 1; pointer-events: auto; box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3); }
 
         @media (max-width: 768px) {
-            .catalog-container { grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 1rem; }
+            .catalog-container { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 1rem; }
             .qv-grid { grid-template-columns: 1fr; } .qv-image { height: 250px; min-height: 250px; }
-            .card-info p { display: none; }
+            .card-info p { display: none; } /* Ocultar descripcion en movil para limpieza */
+            .btn-add { width: 40px; height: 40px; font-size: 1rem; border-radius: 12px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="app-loader">
-        <div class="loader-spinner"></div>
-        <h3 style="font-family:var(--font-accent); color:var(--jst-onyx);">Cargando Tienda...</h3>
-    </div>
-
-    <canvas id="snow-layer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:5; opacity:0.4;"></canvas>
+    <div id="app-loader" style="display:none;"></div> <canvas id="gold-dust-layer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:5; opacity:0.4;"></canvas>
 
     <header class="header-master" id="navbar">
         <nav class="nav-container">
@@ -144,7 +157,12 @@
             <div class="pills-container-wrapper"><div class="pills-flex" id="category-pills-render"></div></div>
         </section>
 
-        <div class="catalog-container" id="main-grid"></div>
+        <div class="catalog-container" id="main-grid">
+            <div class="skeleton" style="height:400px;"></div>
+            <div class="skeleton" style="height:400px;"></div>
+            <div class="skeleton" style="height:400px;"></div>
+            <div class="skeleton" style="height:400px;"></div>
+        </div>
 
         <section style="max-width:1200px; margin:4rem auto; padding:0 2rem;">
             <div style="text-align:center; margin-bottom:3rem;">
@@ -367,18 +385,16 @@
         const STORE_LOCATION = { lat: -12.053850, lng: -77.031550 }; 
         
         let CATALOG_DB = [];
-        let state_cart = JSON.parse(localStorage.getItem('jst_v20_cart')) || [];
+        // MEJORA V21: Clave persistente para no perder el carrito al actualizar la web
+        let state_cart = JSON.parse(localStorage.getItem('jst_master_cart')) || [];
         let current_category = "Todas";
         let currentQVId = null;
         const FREE_SHIPPING_THRESHOLD = 500;
 
         window.onload = async () => {
+            initGoldDust(); // Polvo de oro en vez de nieve
             await fetchProducts();
-            renderPills(); renderCollection(); refreshCartUI(); initSnowEngine(); initReviewStars();
-            // Efecto de salida del loader
-            const loader = document.getElementById('app-loader');
-            loader.style.opacity = '0';
-            setTimeout(() => loader.style.display = 'none', 500);
+            renderPills(); refreshCartUI(); initReviewStars();
         };
 
         async function fetchProducts() {
@@ -389,13 +405,11 @@
                 const data = await response.text();
                 CATALOG_DB = parseCSV(data);
                 
-                console.log("Productos cargados:", CATALOG_DB.length);
-                if(CATALOG_DB.length === 0) alert("Conectamos con la hoja, pero no se pudieron leer productos. Revisa las columnas del Excel.");
-
+                renderCollection(); // Renderizamos cuando tenemos datos
+                
             } catch (error) { 
                 console.error("Error cargando catálogo:", error);
-                document.querySelector('.loader-spinner').style.borderColor = 'red';
-                document.querySelector('#app-loader h3').innerText = "⚠️ Error: Abre este archivo con un servidor local o súbelo a un hosting. No uses doble clic.";
+                document.getElementById('main-grid').innerHTML = '<div style="grid-column:1/-1; padding:4rem; text-align:center; color:#ef4444;">Hubo un error cargando los productos. Recarga la página.</div>';
             }
         }
 
@@ -436,7 +450,7 @@
 
             if(filtered.length === 0) { 
                 if(CATALOG_DB.length === 0) {
-                     grid.innerHTML = '<div style="grid-column:1/-1; padding:4rem; text-align:center; color:#ef4444; font-weight:bold;">Error: No se han cargado productos del Excel.</div>';
+                     // Si no hay datos, mantenemos skeleton o error
                 } else {
                      grid.innerHTML = '<div style="grid-column:1/-1; padding:4rem; text-align:center; color:#94a3b8;">No encontramos lo que buscas... prueba con otra palabra.</div>'; 
                 }
@@ -534,7 +548,7 @@
             }
         }
 
-        function updateCart() { localStorage.setItem('jst_v20_cart', JSON.stringify(state_cart)); refreshCartUI(); }
+        function updateCart() { localStorage.setItem('jst_master_cart', JSON.stringify(state_cart)); refreshCartUI(); }
 
         function refreshCartUI() {
             const count = state_cart.reduce((a,b)=>a+b.qty,0);
@@ -753,23 +767,25 @@
             closeReviewModal();
         }
 
-        // --- NIEVE ---
-        function initSnowEngine() {
-            const cvs = document.getElementById('snow-layer'); 
+        // --- POLVO DE ORO (MÁS ELEGANTE QUE NIEVE) ---
+        function initGoldDust() {
+            const cvs = document.getElementById('gold-dust-layer'); 
             if(!cvs) return;
             const ctx = cvs.getContext('2d');
             cvs.width=window.innerWidth; cvs.height=window.innerHeight;
-            const p = Array(35).fill().map(()=>({x:Math.random()*cvs.width, y:Math.random()*cvs.height, r:Math.random()*2+1, s:Math.random()*0.5+0.2}));
+            const p = Array(25).fill().map(()=>({x:Math.random()*cvs.width, y:Math.random()*cvs.height, r:Math.random()*1.5+0.5, s:Math.random()*0.3+0.1}));
             function d() { 
-                ctx.clearRect(0,0,cvs.width,cvs.height); ctx.fillStyle="rgba(199, 106, 58, 0.15)";
+                ctx.clearRect(0,0,cvs.width,cvs.height); 
+                ctx.fillStyle="rgba(199, 106, 58, 0.4)"; // Color Gold Accent
                 p.forEach(f=>{
                     ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fill();
-                    f.y+=f.s; f.x+=Math.sin(f.y*0.01)*0.2;
-                    if(f.y>cvs.height) f.y=-5; if(f.x>cvs.width) f.x=0;
+                    f.y-=f.s; // Flota hacia ARRIBA (como polvo mágico), no cae como nieve
+                    f.x+=Math.sin(f.y*0.02)*0.3;
+                    if(f.y<0) f.y=cvs.height; if(f.x>cvs.width) f.x=0;
                 }); requestAnimationFrame(d); 
             } d();
         }
-        window.addEventListener('resize', () => { const cvs = document.getElementById('snow-layer'); if(cvs) { cvs.width=window.innerWidth; cvs.height=window.innerHeight; }});
+        window.addEventListener('resize', () => { const cvs = document.getElementById('gold-dust-layer'); if(cvs) { cvs.width=window.innerWidth; cvs.height=window.innerHeight; }});
     </script>
 </body>
 </html>
