@@ -1,1175 +1,507 @@
 ﻿<!DOCTYPE html>
-<html lang="es" dir="ltr">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="theme-color" content="#111827">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <title>JstoreR · Tienda Oficial | Curaduría de Productos Exclusivos</title>
-    <meta name="description" content="Descubre la selección exclusiva de JstoreR. Envíos verificados a todo el Perú con tecnología GPS. Compra segura por WhatsApp.">
-    <meta name="keywords" content="JstoreR, Tienda Online Perú, Compras Lima, Regalos Exclusivos, Jr Cuzco 626, Delivery GPS">
-    <link rel="canonical" href="https://tienda-jstore-r.vercel.app/">
+    <meta name="theme-color" content="#111827"> <title>JstoreR · Tienda Oficial</title>
+    <meta name="description" content="Galería exclusiva de artículos. Envíos seguros y verificados a todo el Perú.">
     
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="JstoreR Perú">
-    <meta property="og:title" content="JstoreR · Tienda Oficial | Date el gusto que mereces">
-    <meta property="og:description" content="Catálogo actualizado 2026. Los mejores productos con envío directo y seguimiento GPS.">
+    <meta property="og:title" content="JstoreR · Catálogo 2026">
+    <meta property="og:description" content="Descubre nuestra colección exclusiva. Envíos a todo el Perú.">
     <meta property="og:image" content="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png">
-    <meta property="og:url" content="https://tienda-jstore-r.vercel.app/">
-
+    
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png">
-    <link rel="apple-touch-icon" href="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
     <style>
         /* ==========================================================================
-        SECCIÓN DE ESTILOS CSS - ARQUITECTURA "DIAMOND"
-        ==========================================================================
-        */
+           JSTORER DESIGN SYSTEM V23.0 - CORPORATE EDITION
+           ========================================================================== */
         :root {
-            /* Paleta de Colores Corporate */
-            --jst-onyx: #111827;
-            --jst-accent-gold: #c76a3a;
-            --jst-accent-gold-light: #e28a5b;
-            --jst-bg-ivory: #fdfaf7;
-            --jst-white: #ffffff;
-            --jst-slate-dark: #334155;
-            --jst-slate: #64748b;
-            --jst-slate-light: #f1f5f9;
-            --jst-whatsapp-green: #25d366;
-            --jst-error: #ef4444;
-            --jst-success: #10b981;
-
-            /* Tipografías */
-            --font-main: 'Plus Jakarta Sans', sans-serif;
-            --font-display: 'Playfair Display', serif;
-
-            /* Sombras y Efectos */
-            --shadow-sm: 0 4px 10px -2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 25px 60px -12px rgba(199, 106, 58, 0.15);
-            --transition-standard: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-fast: all 0.3s ease;
+            --jst-bg-ivory: #fdfaf7; --jst-accent-gold: #c76a3a; --jst-onyx: #111827;
+            --jst-slate: #64748b; --jst-white: #ffffff; --jst-whatsapp: #25d366;
+            --font-main: 'Plus Jakarta Sans', sans-serif; --font-accent: 'Playfair Display', serif;
+            --transition-smooth: 0.6s cubic-bezier(0.3, 0, 0.2, 1);
         }
 
-        /* RESET GENERAL */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: var(--font-main); background-color: var(--jst-bg-ivory); color: var(--jst-onyx); overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
 
-        html { scroll-behavior: smooth; font-size: 16px; }
+        /* NUEVO: TOP BAR (ANUNCIO SUPERIOR) */
+        .top-announcement-bar { background: var(--jst-onyx); color: white; text-align: center; padding: 10px; font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; position: relative; z-index: 5001; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .top-tag { background: var(--jst-accent-gold); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; }
 
-        body {
-            font-family: var(--font-main);
-            background-color: var(--jst-bg-ivory);
-            color: var(--jst-onyx);
-            line-height: 1.5;
-            overflow-x: hidden;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+        /* HEADER & HERO */
+        .header-master { position: sticky; top: 0; z-index: 5000; background: rgba(253, 250, 247, 0.92); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-bottom: 1px solid rgba(199, 106, 58, 0.1); }
+        .nav-container { max-width: 1440px; margin: auto; display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; }
+        .logo-box { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+        .logo-img { height: 60px; filter: drop-shadow(0 4px 10px rgba(199, 106, 58, 0.15)); }
+        .cart-trigger { position: relative; cursor: pointer; background: var(--jst-white); padding: 14px; border-radius: 50%; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05); transition: 0.3s; }
+        .cart-trigger:hover { transform: scale(1.05); }
+        .badge-count { position: absolute; top: -5px; right: -5px; background: var(--jst-onyx); color: white; min-width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; }
 
-        /* SCROLLBAR PERSONALIZADA */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--jst-bg-ivory); }
-        ::-webkit-scrollbar-thumb { background: var(--jst-slate); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--jst-accent-gold); }
+        .hero-v10 { padding: 6rem 2rem 2rem; text-align: center; max-width: 1100px; margin: auto; animation: heroFadeIn 1.5s ease; }
+        @keyframes heroFadeIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        .hero-v10 h1 { font-family: var(--font-accent); font-size: clamp(2.5rem, 8vw, 4.5rem); line-height: 1.1; margin-bottom: 1.5rem; }
 
-        /* COMPONENTE: BARRA DE ANUNCIOS (TOP BAR) */
-        .announcement-bar {
-            background-color: var(--jst-onyx);
-            color: var(--jst-white);
-            padding: 10px;
-            text-align: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            position: relative;
-            z-index: 6000;
-        }
+        /* SEARCH & PILLS */
+        .search-wrapper { position: relative; max-width: 700px; margin: 3rem auto 1.5rem; }
+        .search-input { width: 100%; padding: 24px 30px 24px 70px; border-radius: 100px; border: 1px solid rgba(0,0,0,0.06); background: white; font-size: 1.1rem; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05); transition: 0.5s; }
+        .search-input:focus { outline: none; border-color: var(--jst-accent-gold); transform: scale(1.02); }
+        .search-icon { position: absolute; left: 30px; top: 50%; transform: translateY(-50%); color: var(--jst-accent-gold); font-size: 1.4rem; pointer-events: none; }
+        
+        .pills-container-wrapper { max-width: 100%; overflow-x: auto; padding: 10px 1.5rem 20px; margin-bottom: 2rem; scrollbar-width: none; }
+        .pills-container-wrapper::-webkit-scrollbar { display: none; }
+        .pills-flex { display: flex; gap: 12px; justify-content: center; width: max-content; margin: auto; }
+        .pill-item { background: white; border: 1px solid rgba(199, 106, 58, 0.1); padding: 12px 28px; border-radius: 50px; font-size: 0.9rem; font-weight: 700; color: var(--jst-slate); white-space: nowrap; cursor: pointer; transition: 0.4s; }
+        .pill-item.active { background: var(--jst-accent-gold); color: white; border-color: var(--jst-accent-gold); transform: scale(1.05); }
 
-        /* COMPONENTE: CABECERA (HEADER) */
-        .main-header {
-            position: sticky;
-            top: 0;
-            z-index: 5000;
-            background: rgba(253, 250, 247, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(199, 106, 58, 0.1);
-            transition: var(--transition-standard);
-        }
+        /* GRID */
+        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 40px; padding: 2rem; max-width: 1440px; margin: auto; flex: 1; }
+        .card-item { background: white; border-radius: 28px; padding: 20px; border: 1px solid rgba(0,0,0,0.02); transition: var(--transition-smooth); display: flex; flex-direction: column; position: relative; }
+        .card-item:hover { transform: translateY(-15px); box-shadow: 0 30px 60px -12px rgba(199, 106, 58, 0.18); }
+        .card-img-container { width: 100%; aspect-ratio: 1; border-radius: 20px; overflow: hidden; background: #f8fafc; margin-bottom: 20px; cursor: pointer; position: relative; }
+        .card-img-container img { width: 100%; height: 100%; object-fit: cover; transition: 1.2s; }
+        .card-item:hover img { transform: scale(1.15); }
+        .price-tag { font-weight: 900; font-size: 1.6rem; color: var(--jst-onyx); }
+        .btn-add { background: var(--jst-accent-gold); color: white; border: none; width: 54px; height: 54px; border-radius: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.3s; }
 
-        .header-container {
-            max-width: 1440px;
-            margin: 0 auto;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        /* NUEVO: FAQ ACORDEÓN (ESTILO CORPORATIVO) */
+        .faq-container { max-width: 800px; margin: 4rem auto; padding: 0 2rem; }
+        .faq-item { background: white; border-radius: 15px; margin-bottom: 10px; border: 1px solid #f1f5f9; overflow: hidden; transition: 0.3s; }
+        .faq-item:hover { border-color: var(--jst-accent-gold); }
+        .faq-question { padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1rem; }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; padding: 0 20px; color: var(--jst-slate); line-height: 1.6; }
+        .faq-item.active .faq-answer { max-height: 200px; padding-bottom: 20px; }
+        .faq-icon { transition: 0.3s; }
+        .faq-item.active .faq-icon { transform: rotate(180deg); color: var(--jst-accent-gold); }
 
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            text-decoration: none;
-            color: inherit;
-        }
+        /* SKELETON LOADING */
+        .skeleton { background: #e2e8f0; border-radius: 20px; position: relative; overflow: hidden; }
+        .skeleton::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
-        .logo-image {
-            height: 55px;
-            width: auto;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
-        }
+        /* CARRITO */
+        .side-cart { position: fixed; right: -100%; top: 0; width: 100%; max-width: 500px; height: 100%; background: var(--jst-white); z-index: 6000; transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); display: flex; flex-direction: column; box-shadow: -20px 0 80px rgba(0,0,0,0.15); }
+        .side-cart.open { right: 0; }
+        .cart-header { padding: 2rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.95); z-index: 10; }
+        .cart-views-container { flex: 1; position: relative; overflow: hidden; display: flex; }
+        .cart-step { min-width: 100%; height: 100%; overflow-y: auto; padding: 2rem; transition: transform 0.5s; display: flex; flex-direction: column; }
+        .side-cart.step-2 .cart-step { transform: translateX(-100%); }
 
-        .brand-text h1 {
-            font-family: var(--font-display);
-            font-size: 1.8rem;
-            font-weight: 900;
-            line-height: 1;
-        }
+        .shipping-progress-box { margin-bottom: 20px; padding: 15px; background: #f8fafc; border-radius: 12px; }
+        .progress-bar-ship { height: 6px; background: var(--jst-accent-gold); width: 0%; border-radius:10px; transition: width 0.5s; }
+        .shipping-progress-box.unlocked .progress-bar-ship { background: #10b981; }
 
-        .brand-tagline {
-            font-size: 0.65rem;
-            color: var(--jst-accent-gold);
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
+        .suggestions-box { margin-top: 2rem; padding-top: 2rem; border-top: 1px dashed #e2e8f0; }
+        .suggestions-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .mini-card { min-width: 140px; background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 10px; cursor: pointer; transition: 0.3s; }
+        
+        /* QUICK VIEW MODAL */
+        #quick-view-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 8000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s; padding: 20px; }
+        #quick-view-modal.active { opacity: 1; pointer-events: auto; }
+        .qv-content { background: white; width: 100%; max-width: 900px; border-radius: 30px; overflow: hidden; position: relative; transform: translateY(30px); transition: 0.5s; max-height: 90vh; overflow-y: auto; }
+        #quick-view-modal.active .qv-content { transform: translateY(0); }
+        .qv-grid { display: grid; grid-template-columns: 1fr 1fr; }
+        .qv-image { background: #f8fafc; height: 100%; min-height: 400px; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .qv-image img { width: 100%; height: 100%; object-fit: contain; max-height: 400px; border-radius: 15px; }
+        .qv-details { padding: 40px; display: flex; flex-direction: column; justify-content: center; }
 
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+        /* CELEBRATION MODAL */
+        #celebration-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 7000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.5s; }
+        #celebration-modal.active { opacity: 1; pointer-events: auto; }
+        .celebration-content { text-align: center; max-width: 400px; padding: 2rem; transform: scale(0.8); transition: 0.5s; }
+        #celebration-modal.active .celebration-content { transform: scale(1); }
+        .success-icon { width: 100px; height: 100px; background: #d1fae5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 2rem; animation: bounceIn 1s infinite alternate; }
+        @keyframes bounceIn { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+        .progress-bar-bg { width: 100%; height: 6px; background: #eee; border-radius: 10px; margin-top: 2rem; overflow: hidden; }
+        .progress-bar-fill { width: 0%; height: 100%; background: var(--jst-whatsapp); transition: width 3s linear; }
 
-        .cart-trigger {
-            background: var(--jst-white);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            position: relative;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition-standard);
-        }
+        .premium-input { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; font-family: inherit; font-size: 0.95rem; margin-bottom: 15px; }
+        .btn-wa-final { width: 100%; padding: 22px; background: var(--jst-whatsapp); color: white; border: none; border-radius: 20px; font-weight: 800; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; opacity: 0.5; pointer-events: none; transition: 0.4s; }
+        .btn-wa-final.active { opacity: 1; pointer-events: auto; box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3); }
 
-        .cart-trigger:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-
-        .cart-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--jst-onyx);
-            color: white;
-            min-width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: 800;
-        }
-
-        /* COMPONENTE: HERO SECTION */
-        .hero-section {
-            padding: 5rem 2rem 3rem;
-            text-align: center;
-            max-width: 1000px;
-            margin: 0 auto;
-            animation: fadeInDown 1s ease-out;
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(199, 106, 58, 0.1);
-            color: var(--jst-accent-gold);
-            padding: 8px 16px;
-            border-radius: 100px;
-            font-weight: 800;
-            font-size: 0.75rem;
-            margin-bottom: 2rem;
-            border: 1px solid rgba(199, 106, 58, 0.2);
-        }
-
-        .hero-title {
-            font-family: var(--font-display);
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
-            margin-bottom: 1.5rem;
-            line-height: 1.1;
-        }
-
-        /* COMPONENTE: BUSCADOR Y FILTROS */
-        .search-container {
-            max-width: 700px;
-            margin: 3rem auto;
-            position: relative;
-        }
-
-        .main-search-input {
-            width: 100%;
-            padding: 24px 35px 24px 75px;
-            border-radius: 100px;
-            border: 1px solid rgba(0,0,0,0.06);
-            background: var(--jst-white);
-            font-size: 1.1rem;
-            font-family: inherit;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition-standard);
-        }
-
-        .main-search-input:focus {
-            outline: none;
-            border-color: var(--jst-accent-gold);
-            transform: scale(1.02);
-        }
-
-        .search-icon-fixed {
-            position: absolute;
-            left: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--jst-accent-gold);
-            font-size: 1.5rem;
-            pointer-events: none;
-        }
-
-        /* CATEGORÍA PILLS */
-        .categories-nav {
-            overflow-x: auto;
-            padding: 1rem 0;
-            margin-bottom: 3rem;
-            scrollbar-width: none;
-        }
-
-        .categories-nav::-webkit-scrollbar { display: none; }
-
-        .pills-wrapper {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            width: max-content;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .pill-btn {
-            background: var(--jst-white);
-            border: 1px solid rgba(0,0,0,0.05);
-            padding: 12px 28px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--jst-slate);
-            cursor: pointer;
-            white-space: nowrap;
-            transition: var(--transition-fast);
-        }
-
-        .pill-btn.active {
-            background: var(--jst-accent-gold);
-            color: white;
-            border-color: var(--jst-accent-gold);
-            box-shadow: 0 5px 15px rgba(199, 106, 58, 0.3);
-        }
-
-        /* COMPONENTE: GRID DE PRODUCTOS */
-        .catalog-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 40px;
-            padding: 0 2rem 5rem;
-            max-width: 1440px;
-            margin: 0 auto;
-            flex: 1;
-        }
-
-        .product-card {
-            background: var(--jst-white);
-            border-radius: 30px;
-            padding: 22px;
-            position: relative;
-            transition: var(--transition-standard);
-            display: flex;
-            flex-direction: column;
-            border: 1px solid rgba(0,0,0,0.02);
-        }
-
-        .product-card:hover {
-            transform: translateY(-12px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .product-image-container {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 20px;
-            overflow: hidden;
-            background: #f8fafc;
-            margin-bottom: 20px;
-            cursor: pointer;
-        }
-
-        .product-image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 1.2s ease;
-        }
-
-        .product-card:hover .product-image-container img {
-            transform: scale(1.1);
-        }
-
-        .product-badge {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            z-index: 10;
-        }
-
-        .badge-new { background: var(--jst-accent-gold); color: white; }
-        .badge-out { background: var(--jst-error); color: white; }
-
-        .product-info h3 { font-size: 1.25rem; margin-bottom: 8px; }
-        .product-category { font-size: 0.7rem; font-weight: 800; color: var(--jst-accent-gold); text-transform: uppercase; letter-spacing: 1px; }
-        .product-desc { color: var(--jst-slate); font-size: 0.85rem; line-height: 1.5; margin-bottom: 20px; height: 3.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-
-        .product-footer {
-            margin-top: auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .price-display { font-size: 1.6rem; font-weight: 900; color: var(--jst-onyx); }
-        .add-to-cart-btn {
-            background: var(--jst-accent-gold);
-            color: white;
-            border: none;
-            width: 55px;
-            height: 55px;
-            border-radius: 18px;
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: var(--transition-fast);
-        }
-
-        .add-to-cart-btn:hover { background: var(--jst-onyx); transform: rotate(90deg); }
-
-        /* COMPONENTE: MAPA INTERACTIVO (LEAFLET INTEGRADO) */
-        #map-wrapper {
-            height: 0;
-            width: 100%;
-            border-radius: 20px;
-            margin: 15px 0;
-            overflow: hidden;
-            transition: height 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-            border: 1px solid var(--jst-slate-light);
-            position: relative;
-        }
-
-        .map-active { height: 280px !important; }
-        #map-element { width: 100%; height: 100%; z-index: 1; }
-
-        /* COMPONENTE: SKELETON LOADERS */
-        .skeleton-loader { background: #eee; border-radius: 20px; position: relative; overflow: hidden; }
-        .skeleton-loader::after {
-            content: "";
-            position: absolute;
-            top: 0; right: 0; bottom: 0; left: 0;
-            transform: translateX(-100%);
-            background-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
-            animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer { 100% { transform: translateX(100%); } }
-
-        /* COMPONENTE: CARRITO LATERAL (SIDEBAR) */
-        .side-panel {
-            position: fixed;
-            right: -100%;
-            top: 0;
-            width: 100%;
-            max-width: 480px;
-            height: 100%;
-            background: var(--jst-white);
-            z-index: 9000;
-            transition: var(--transition-standard);
-            box-shadow: -15px 0 50px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .side-panel.open { right: 0; }
-
-        .panel-header {
-            padding: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--jst-slate-light);
-        }
-
-        .panel-content-flow {
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-            display: flex;
-        }
-
-        .step-container {
-            min-width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            padding: 2rem;
-            transition: var(--transition-standard);
-        }
-
-        .side-panel.step-2 .step-container { transform: translateX(-100%); }
-
-        /* INPUTS PREMIUM */
-        .jst-input {
-            width: 100%;
-            padding: 18px;
-            border-radius: 12px;
-            border: 1px solid var(--jst-slate-light);
-            margin-bottom: 15px;
-            font-family: inherit;
-            font-size: 0.95rem;
-            transition: var(--transition-fast);
-        }
-
-        .jst-input:focus { outline: none; border-color: var(--jst-accent-gold); background: #fffcf9; }
-
-        .wa-final-button {
-            width: 100%;
-            padding: 22px;
-            background: var(--jst-whatsapp-green);
-            color: white;
-            border: none;
-            border-radius: 18px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            opacity: 0.5;
-            pointer-events: none;
-            transition: var(--transition-standard);
-        }
-
-        .wa-final-button.ready { opacity: 1; pointer-events: auto; transform: scale(1.02); box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3); }
-
-        /* FAQ SECCIÓN */
-        .faq-block { max-width: 800px; margin: 4rem auto; padding: 0 2rem; }
-        .faq-item { background: white; border-radius: 15px; margin-bottom: 12px; border: 1px solid #f1f5f9; cursor: pointer; }
-        .faq-header { padding: 22px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; }
-        .faq-body { max-height: 0; overflow: hidden; padding: 0 22px; color: var(--jst-slate); transition: all 0.5s ease; }
-        .faq-item.active .faq-body { max-height: 200px; padding-bottom: 22px; }
-
-        /* RESPONSIVE AJUSTES */
         @media (max-width: 768px) {
-            .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 15px; padding: 1rem; }
-            .hero-title { font-size: 2.8rem; }
-            .product-desc { display: none; }
-            .product-card { padding: 15px; border-radius: 20px; }
-            .add-to-cart-btn { width: 45px; height: 45px; border-radius: 12px; }
-            .price-display { font-size: 1.3rem; }
+            .catalog-container { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 1rem; }
+            .qv-grid { grid-template-columns: 1fr; } .qv-image { height: 250px; min-height: 250px; }
+            .card-info p { display: none; }
+            .btn-add { width: 40px; height: 40px; font-size: 1rem; border-radius: 12px; }
         }
     </style>
 </head>
 <body>
 
-    <canvas id="gold-dust-canvas" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:5; opacity:0.35;"></canvas>
+    <canvas id="gold-dust-layer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:5; opacity:0.4;"></canvas>
 
-    <div class="announcement-bar">
-        <span><i class="fas fa-shipping-fast"></i> Envíos Gratis en compras superiores a S/ 500</span>
+    <div class="top-announcement-bar">
+        <span class="top-tag">OFERTA</span>
+        <span>Envíos GRATIS en pedidos superiores a S/ 500</span>
     </div>
 
-    <header class="main-header" id="dynamic-header">
-        <div class="header-container">
-            <a href="#" class="brand-logo" title="Ir al inicio">
-                <img src="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png" alt="Logo JstoreR" class="logo-image">
-                <div class="brand-text">
-                    <h1>JstoreR</h1>
-                    <span class="brand-tagline">Tienda Oficial</span>
+    <header class="header-master" id="navbar">
+        <nav class="nav-container">
+            <a href="#" class="logo-box">
+                <img src="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png" class="logo-img" alt="Logo">
+                <div style="line-height:1;">
+                    <span style="display:block; font-family:var(--font-accent); font-weight:900; font-size:1.6rem;">JstoreR</span>
+                    <span style="font-size:0.6rem; text-transform:uppercase; letter-spacing:3px; color:var(--jst-accent-gold); font-weight:800;">Tienda Oficial</span>
                 </div>
             </a>
-            
-            <div class="header-actions">
-                <div class="cart-trigger" onclick="handleCartToggle(true)">
-                    <i class="fa-solid fa-bag-shopping" style="font-size: 1.3rem; color: var(--jst-onyx);"></i>
-                    <span id="global-cart-badge" class="cart-count" style="display: none;">0</span>
-                </div>
+            <div class="cart-trigger" onclick="toggleCart(true)">
+                <i class="fas fa-shopping-bag" style="font-size: 1.2rem;"></i>
+                <span id="cart-badge" class="badge-count" style="display:none;">0</span>
             </div>
-        </div>
+        </nav>
     </header>
 
     <main>
-        <section class="hero-section">
-            <div class="hero-badge">
-                <i class="fa-solid fa-crown"></i> Colección Exclusiva 2026
+        <section class="hero-v10">
+            <div style="display:inline-block; border:1px solid var(--jst-accent-gold); padding:5px 15px; border-radius:50px; margin-bottom:1rem; color:var(--jst-accent-gold); font-weight:700; font-size:0.8rem;">
+                <i class="fas fa-clock"></i> Colección Disponible por Tiempo Limitado
             </div>
-            <h2 class="hero-title">El estilo que buscas,<br>en un solo lugar.</h2>
+            <h1>Date el gusto que mereces</h1>
+            <div class="search-wrapper"><i class="fas fa-search search-icon"></i><input type="text" id="master-search" class="search-input" placeholder="¿Qué estás buscando hoy?" oninput="handleSmartFilter()"></div>
+            <div class="pills-container-wrapper"><div class="pills-flex" id="category-pills-render"></div></div>
+        </section>
+
+        <div class="catalog-container" id="main-grid">
+            <div class="skeleton" style="height:400px;"></div>
+            <div class="skeleton" style="height:400px;"></div>
+            <div class="skeleton" style="height:400px;"></div>
+            <div class="skeleton" style="height:400px;"></div>
+        </div>
+
+        <section style="max-width:1200px; margin:4rem auto; padding:0 2rem;">
+            <div style="text-align:center; margin-bottom:3rem;">
+                <span style="color:var(--jst-accent-gold); font-weight:800; letter-spacing:2px; font-size:0.8rem; text-transform:uppercase;">Social Proof</span>
+                <h2 style="font-family:var(--font-accent); font-size:2.2rem; margin:10px 0;">La Experiencia JstoreR</h2>
+                <div style="display:flex; justify-content:center; align-items:center; gap:10px; color:var(--jst-onyx);">
+                    <div style="font-size:1.2rem; color:#f59e0b;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <span style="font-weight:700;">4.9/5</span>
+                    <span style="color:var(--jst-slate);">(Más de 500 clientes felices)</span>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:30px;">
+                <div style="background:white; padding:25px; border-radius:20px; border:1px solid #f1f5f9; box-shadow:0 10px 30px -10px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                        <div style="width:45px; height:45px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--jst-slate);">JP</div>
+                        <div><h4 style="font-size:0.95rem; margin:0;">Juan Pablo M.</h4><span style="font-size:0.8rem; color:#10b981;"><i class="fas fa-check-circle"></i> Compra Verificada</span></div>
+                    </div>
+                    <div style="margin-bottom:15px; color:#f59e0b; font-size:0.9rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="color:var(--jst-slate); font-size:0.9rem; line-height:1.6; margin-bottom:15px; flex:1;">"La calidad me sorprendió. Llegó en 2 días a Arequipa y el empaque estaba impecable. Definitivamente volveré a pedir."</p>
+                    <div style="width:100%; height:180px; background:#f8fafc; border-radius:15px; overflow:hidden;"><img src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?auto=format&fit=crop&w=500&q=80" style="width:100%; height:100%; object-fit:cover; transition:0.5s;"></div>
+                </div>
+                <div style="background:white; padding:25px; border-radius:20px; border:1px solid #f1f5f9; box-shadow:0 10px 30px -10px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                        <div style="width:45px; height:45px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--jst-slate);">AL</div>
+                        <div><h4 style="font-size:0.95rem; margin:0;">Ana Lucia R.</h4><span style="font-size:0.8rem; color:#10b981;"><i class="fas fa-check-circle"></i> Compra Verificada</span></div>
+                    </div>
+                    <div style="margin-bottom:15px; color:#f59e0b; font-size:0.9rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="color:var(--jst-slate); font-size:0.9rem; line-height:1.6; margin-bottom:15px; flex:1;">"Estaba dudando por ser online, pero la atención por WhatsApp fue A1. Llegó exactamente lo que pedí."</p>
+                    <div style="width:100%; height:180px; background:#f8fafc; border-radius:15px; overflow:hidden;"><img src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=500&q=80" style="width:100%; height:100%; object-fit:cover;"></div>
+                </div>
+                <div style="background:white; padding:25px; border-radius:20px; border:1px solid #f1f5f9; box-shadow:0 10px 30px -10px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                        <div style="width:45px; height:45px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--jst-slate);">CR</div>
+                        <div><h4 style="font-size:0.95rem; margin:0;">Carlos Ruiz</h4><span style="font-size:0.8rem; color:#10b981;"><i class="fas fa-check-circle"></i> Compra Verificada</span></div>
+                    </div>
+                    <div style="margin-bottom:15px; color:#f59e0b; font-size:0.9rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="color:var(--jst-slate); font-size:0.9rem; line-height:1.6; margin-bottom:15px; flex:1;">"Excelente presentación, ideal para regalo. Me salvaron el aniversario. Gracias JstoreR!"</p>
+                     <div style="width:100%; height:180px; background:#f8fafc; border-radius:15px; overflow:hidden; display:flex; align-items:center; justify-content:center; color:#94a3b8; border:2px dashed #e2e8f0;"><div style="text-align:center;"><i class="fas fa-camera" style="font-size:2rem; opacity:0.3; margin-bottom:10px;"></i><div style="font-size:0.8rem;">Foto del cliente</div></div></div>
+                </div>
+            </div>
+
+            <div style="text-align:center; margin-top:3rem;">
+                <button onclick="openReviewModal()" style="background:white; border:2px solid var(--jst-onyx); padding:15px 30px; border-radius:50px; font-weight:800; cursor:pointer; transition:0.3s; display:inline-flex; align-items:center; gap:10px; font-size:1rem;">
+                    <i class="fas fa-pen"></i> ¿Ya compraste? Déjanos tu opinión
+                </button>
+            </div>
+        </section>
+
+        <section class="faq-container">
+            <h2 style="font-family:var(--font-accent); text-align:center; margin-bottom:2rem;">Preguntas Frecuentes</h2>
             
-            <div class="search-container">
-                <i class="fa-solid fa-magnifying-glass search-icon-fixed"></i>
-                <input type="text" id="store-search-input" class="main-search-input" placeholder="¿Qué quieres encontrar hoy?" oninput="filterStoreCatalog()">
-            </div>
-
-            <nav class="categories-nav">
-                <div class="pills-wrapper" id="category-pills-render">
-                    </div>
-            </nav>
-        </section>
-
-        <section class="catalog-grid" id="main-product-grid">
-            <div class="skeleton-loader" style="height: 450px;"></div>
-            <div class="skeleton-loader" style="height: 450px;"></div>
-            <div class="skeleton-loader" style="height: 450px;"></div>
-            <div class="skeleton-loader" style="height: 450px;"></div>
-        </section>
-
-        <section style="background: var(--jst-white); padding: 5rem 2rem; border-top: 1px solid var(--jst-slate-light);">
-            <div style="max-width: 1200px; margin: 0 auto;">
-                <div style="text-align: center; margin-bottom: 4rem;">
-                    <span style="color: var(--jst-accent-gold); font-weight: 800; font-size: 0.8rem; letter-spacing: 2px;">CLIENTES SATISFECHOS</span>
-                    <h2 style="font-family: var(--font-display); font-size: 2.5rem; margin-top: 10px;">Opiniones Reales</h2>
-                </div>
-
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;" id="reviews-render">
-                    <div style="background: var(--jst-bg-ivory); padding: 30px; border-radius: 25px; border: 1px solid rgba(0,0,0,0.03);">
-                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-                            <div style="width: 50px; height: 50px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-weight: 800;">MC</div>
-                            <div>
-                                <h4 style="margin: 0; font-size: 1rem;">Mariana C.</h4>
-                                <span style="font-size: 0.75rem; color: var(--jst-success); font-weight: 700;"><i class="fa-solid fa-circle-check"></i> Compra Verificada</span>
-                            </div>
-                        </div>
-                        <div style="color: #f59e0b; margin-bottom: 15px;"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-                        <p style="font-size: 0.95rem; color: var(--jst-slate); line-height: 1.6; margin-bottom: 20px;">"Excelente servicio. Pedí una figura de Zeus y llegó impecable. El delivery calculó exacto el precio por KM. Recomendado."</p>
-                        <div style="width: 100%; height: 200px; border-radius: 15px; overflow: hidden;">
-                            <img src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?auto=format&fit=crop&w=600&q=80" style="width: 100%; height: 100%; object-fit: cover;" alt="Review">
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="text-align: center; margin-top: 4rem;">
-                    <button onclick="openReviewModal()" style="background: var(--jst-onyx); color: white; padding: 18px 40px; border: none; border-radius: 100px; font-weight: 700; cursor: pointer; transition: 0.3s;">
-                        <i class="fa-solid fa-pen-nib"></i> Dejar mi opinión
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <section class="faq-block">
-            <h2 style="font-family: var(--font-display); text-align: center; margin-bottom: 3rem;">Resolviendo tus dudas</h2>
-            
-            <div class="faq-item" onclick="toggleFaqAccordion(this)">
-                <div class="faq-header">¿Cuáles son los métodos de pago? <i class="fa-solid fa-plus faq-indicator"></i></div>
-                <div class="faq-body">Aceptamos transferencias BCP, Interbank y BBVA. También puedes pagar con Yape o Plin. El pago se coordina directamente por WhatsApp una vez verificado tu pedido.</div>
-            </div>
-
-            <div class="faq-item" onclick="toggleFaqAccordion(this)">
-                <div class="faq-header">¿Cómo funciona el delivery por GPS? <i class="fa-solid fa-plus faq-indicator"></i></div>
-                <div class="faq-body">Nuestra web utiliza tecnología satelital para calcular la distancia exacta entre nuestro almacén en Jr. Cuzco 626 y tu ubicación. Esto garantiza un cobro justo y transparente por kilómetro.</div>
-            </div>
-
-            <div class="faq-item" onclick="toggleFaqAccordion(this)">
-                <div class="faq-header">¿Realizan envíos a provincias? <i class="fa-solid fa-plus faq-indicator"></i></div>
-                <div class="faq-body">Sí, realizamos envíos a todo el Perú a través de agencias reconocidas como Shalom y Olva Courier. El costo se calcula según tarifario de la agencia.</div>
-            </div>
-        </section>
-
-        <footer style="background: var(--jst-onyx); color: white; padding: 5rem 2rem 2rem;">
-            <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 50px;">
-                <div>
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
-                        <img src="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png" style="height: 45px; filter: brightness(0) invert(1);">
-                        <h3 style="font-family: var(--font-display); font-size: 1.8rem;">JstoreR</h3>
-                    </div>
-                    <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.8;">Somos especialistas en traer los mejores productos al mejor precio. Confianza y calidad garantizada en cada entrega.</p>
-                </div>
-
-                <div>
-                    <h4 style="font-size: 1.1rem; margin-bottom: 25px; border-left: 3px solid var(--jst-accent-gold); padding-left: 15px;">Contacto Directo</h4>
-                    <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 15px;"><i class="fa-solid fa-location-dot"></i> Jr. Cuzco 626, Cercado de Lima</p>
-                    <a href="https://wa.me/51932508670" style="color: var(--jst-whatsapp-green); text-decoration: none; font-weight: 800; font-size: 1.1rem;"><i class="fa-brands fa-whatsapp"></i> +51 932 508 670</a>
-                </div>
-                
-                <div>
-                    <h4 style="font-size: 1.1rem; margin-bottom: 25px; border-left: 3px solid var(--jst-accent-gold); padding-left: 15px;">Seguridad</h4>
-                    <div style="display: flex; gap: 15px; font-size: 2rem; color: #475569;">
-                        <i class="fa-brands fa-cc-visa"></i>
-                        <i class="fa-brands fa-cc-mastercard"></i>
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-                </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Cómo realizo el pago? <i class="fas fa-chevron-down faq-icon"></i></div>
+                <div class="faq-answer">Aceptamos transferencias BCP, Interbank, BBVA y Yape/Plin. Una vez confirmado tu pedido por WhatsApp, te enviaremos los datos seguros.</div>
             </div>
             
-            <div style="text-align: center; margin-top: 5rem; padding-top: 2rem; border-top: 1px solid #1e293b; color: #475569; font-size: 0.75rem;">
-                &copy; 2026 JstoreR Perú. Todos los derechos reservados. | Diseñado para la excelencia.
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Es seguro el envío a provincia? <i class="fas fa-chevron-down faq-icon"></i></div>
+                <div class="faq-answer">Totalmente. Trabajamos con Shalom y Olva Courier. Todos los paquetes van con código de seguimiento y doble embalaje de protección.</div>
             </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Tienen tienda física? <i class="fas fa-chevron-down faq-icon"></i></div>
+                <div class="faq-answer">Actualmente somos una tienda 100% online con almacén central en Cercado de Lima, lo que nos permite ofrecerte mejores precios al no pagar alquiler de local.</div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Qué pasa si el producto llega dañado? <i class="fas fa-chevron-down faq-icon"></i></div>
+                <div class="faq-answer">Tu satisfacción es primero. Si hay algún inconveniente (que nunca nos ha pasado), te cambiamos el producto o te devolvemos el dinero inmediatamente.</div>
+            </div>
+        </section>
+
+        <footer style="background: white; border-top: 1px solid #f1f5f9; padding: 4rem 2rem 2rem; margin-top: auto;">
+            <div style="max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; text-align: left;">
+                <div>
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+                        <img src="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png" style="height:40px;">
+                        <span style="font-family:var(--font-accent); font-weight:900; font-size:1.4rem;">JstoreR</span>
+                    </div>
+                    <p style="color:var(--jst-slate); font-size:0.9rem; line-height:1.6;">Redefiniendo la experiencia de compra online en Perú. Calidad, estilo y un servicio que te trata como mereces.</p>
+                </div>
+                <div>
+                    <h4 style="font-family:var(--font-accent); font-size:1.1rem; margin-bottom:15px;">Tu tranquilidad primero</h4>
+                    <ul style="list-style:none; padding:0; color:var(--jst-slate); font-size:0.9rem; line-height:2;">
+                        <li><i class="fas fa-truck-fast" style="color:var(--jst-accent-gold); width:20px;"></i> Envíos a todo el Perú</li>
+                        <li><i class="fas fa-medal" style="color:var(--jst-accent-gold); width:20px;"></i> Garantía de calidad A1</li>
+                        <li><i class="fas fa-shield-alt" style="color:var(--jst-accent-gold); width:20px;"></i> Compra 100% segura</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="font-family:var(--font-accent); font-size:1.1rem; margin-bottom:15px;">¿Necesitas ayuda?</h4>
+                    <p style="color:var(--jst-slate); font-size:0.9rem; margin-bottom:10px;">Estamos aquí para asesorarte.</p>
+                    <a href="https://wa.me/51932508670" target="_blank" style="text-decoration:none; color:var(--jst-onyx); font-weight:700; display:flex; align-items:center; gap:8px;">
+                        <i class="fab fa-whatsapp" style="font-size:1.2rem; color:var(--jst-whatsapp);"></i> Escríbenos al WhatsApp
+                    </a>
+                </div>
+            </div>
+            <div style="text-align:center; margin-top:4rem; padding-top:2rem; border-top:1px solid #f8fafc; color:#94a3b8; font-size:0.8rem;">&copy; 2026 JstoreR. Todos los derechos reservados.</div>
         </footer>
     </main>
 
-    <aside class="side-panel" id="side-cart-panel">
-        <div class="panel-header">
-            <h2 id="cart-panel-title" style="font-family: var(--font-display); font-size: 1.6rem;">Tu Bolsa</h2>
-            <div onclick="handleCartToggle(false)" style="cursor: pointer; opacity: 0.5;"><i class="fa-solid fa-xmark fa-xl"></i></div>
+    <aside class="side-cart" id="side-cart">
+        <div class="cart-header">
+            <h2 id="cart-title" style="font-family:var(--font-accent); font-size:1.5rem; margin:0;">Tu Bolsa</h2>
+            <div onclick="toggleCart(false)" style="cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:#f1f5f9;"><i class="fas fa-times"></i></div>
         </div>
 
-        <div class="panel-content-flow">
-            <div class="step-container" id="cart-step-1">
-                <div id="cart-items-wrapper" style="flex: 1;">
-                    </div>
-                
-                <div id="shipping-upsell" style="background: var(--jst-bg-ivory); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px dashed var(--jst-accent-gold);">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 800; margin-bottom: 10px;">
-                        <span id="upsell-text">Faltan S/ 500 para envío gratis</span>
-                        <i class="fa-solid fa-truck"></i>
-                    </div>
-                    <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
-                        <div id="upsell-bar" style="width: 0%; height: 100%; background: var(--jst-accent-gold); transition: width 0.5s;"></div>
-                    </div>
+        <div class="cart-views-container">
+            <div class="cart-step" id="step-1">
+                <div class="shipping-progress-box" id="shipping-progress-box">
+                    <div style="font-size:0.85rem; font-weight:700; color:var(--jst-slate); margin-bottom:8px; display:flex; justify-content:space-between;"><span id="ship-msg-text">Agrega más para envío gratis</span><i class="fas fa-truck-fast"></i></div>
+                    <div style="width:100%; height:6px; background:#e2e8f0; border-radius:10px;"><div class="progress-bar-ship" id="ship-progress-bar"></div></div>
                 </div>
-
-                <div style="padding-top: 20px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.3rem; font-weight: 900;">
-                        <span>Subtotal:</span>
-                        <span id="cart-subtotal-display">S/ 0.00</span>
-                    </div>
-                    <button class="add-to-cart-btn" style="width: 100%; height: auto; padding: 20px; border-radius: 18px; font-size: 1rem; font-weight: 800;" onclick="changeCartStep(2)">
-                        Proceder al Pago <i class="fa-solid fa-arrow-right"></i>
-                    </button>
+                <div id="cart-items-list" style="flex:1;"></div>
+                <div class="suggestions-box" id="suggestions-area" style="display:none;">
+                    <div style="font-size:0.9rem; font-weight:800; color:var(--jst-slate); text-transform:uppercase; margin-bottom:1rem;">Te podría gustar</div>
+                    <div class="suggestions-scroll" id="suggestions-render"></div>
+                </div>
+                <div style="margin-top:auto; padding-top:2rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:800; font-size:1.2rem;"><span>Subtotal:</span><span id="step1-total">S/ 0.00</span></div>
+                    <button style="width:100%; padding:20px; background:var(--jst-onyx); color:white; border:none; border-radius:18px; font-weight:800; font-size:1.1rem; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="goToStep(2)"><span>Continuar Compra</span><i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
 
-            <div class="step-container" id="cart-step-2">
-                <button onclick="changeCartStep(1)" style="background: none; border: none; color: var(--jst-slate); font-weight: 800; cursor: pointer; margin-bottom: 20px;">
-                    <i class="fa-solid fa-chevron-left"></i> Volver a la bolsa
-                </button>
-                
-                <h3 style="margin-bottom: 20px;">Detalles de Entrega</h3>
-                
-                <input type="text" id="cust-name" class="jst-input" placeholder="Nombre completo">
-                <input type="tel" id="cust-phone" class="jst-input" placeholder="Número de celular">
-                
-                <div id="map-wrapper">
-                    <div id="map-element"></div>
+            <div class="cart-step" id="step-2">
+                <button onclick="goToStep(1)" style="background:none; border:none; font-weight:700; color:var(--jst-slate); cursor:pointer; display:flex; align-items:center; gap:8px; margin-bottom:1.5rem;"><i class="fas fa-arrow-left"></i> Volver a productos</button>
+                <h3 style="font-family:var(--font-accent); margin-bottom:1.5rem;">Datos de Entrega</h3>
+                <input type="text" id="form-name" class="premium-input" placeholder="Tu nombre" oninput="validateForm()">
+                <input type="text" id="form-address" class="premium-input" placeholder="Dirección exacta de entrega" oninput="validateForm()">
+                <input type="tel" id="form-phone" class="premium-input" placeholder="Celular para coordinar" oninput="validateForm()">
+                <div style="position:relative; margin-bottom:5px;">
+                    <input type="number" id="form-km" class="premium-input" placeholder="Distancia (KM)" oninput="refreshSummary()" style="padding-right:50px;">
+                    <button onclick="calculateGPSDistance()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); border:none; background:none; color:var(--jst-accent-gold); cursor:pointer; font-size:1.2rem;" title="Usar mi ubicación actual"><i class="fas fa-map-marker-alt" id="gps-icon-btn"></i></button>
                 </div>
-
-                <div style="position: relative;">
-                    <input type="text" id="cust-address" class="jst-input" placeholder="Dirección exacta">
-                    <div onclick="initiateGPSDetection()" style="position: absolute; right: 15px; top: 18px; color: var(--jst-accent-gold); cursor: pointer;">
-                        <i class="fa-solid fa-location-crosshairs fa-lg" id="gps-icon"></i>
-                    </div>
+                <div id="gps-status-msg" style="font-size:0.75rem; color:#94a3b8; margin-bottom:20px; display:flex; align-items:center; gap:5px;"><i class="fas fa-info-circle"></i> Toca el ícono 📍 si estás en el lugar de entrega ahora.</div>
+                <div style="background:#fffbf7; padding:20px; border-radius:15px; border:1px dashed var(--jst-accent-gold); margin-bottom:20px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px; color:#64748b;"><span>Productos:</span><span id="final-subtotal">S/ 0.00</span></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:#64748b;"><span>Delivery:</span><span id="final-shipping">Calculando...</span></div>
+                    <div style="display:flex; justify-content:space-between; font-weight:900; font-size:1.4rem; border-top:1px solid #ddd; padding-top:10px; color:var(--jst-accent-gold);"><span>TOTAL:</span><span id="final-total">S/ 0.00</span></div>
                 </div>
-                
-                <div id="gps-info-bar" style="font-size: 0.75rem; color: var(--jst-slate); margin-bottom: 20px; padding: 0 10px;">
-                    <i class="fa-solid fa-info-circle"></i> Toca el ícono 🎯 para calcular tu envío automáticamente.
-                </div>
-
-                <div style="background: #f8fafc; padding: 20px; border-radius: 15px; margin-bottom: 25px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--jst-slate); font-size: 0.9rem;">
-                        <span>Productos:</span><span id="summary-sub">S/ 0.00</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: var(--jst-slate); font-size: 0.9rem;">
-                        <span>Envío (KM):</span><span id="summary-ship">...</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 1.5rem; color: var(--jst-accent-gold); border-top: 1px solid #e2e8f0; padding-top: 12px;">
-                        <span>TOTAL:</span><span id="summary-total">S/ 0.00</span>
-                    </div>
-                </div>
-
-                <button id="final-checkout-btn" class="wa-final-button" onclick="executeOrderProcess()">
-                    <i class="fa-brands fa-whatsapp fa-xl"></i> Enviar Pedido a WhatsApp
-                </button>
+                <button id="btn-wa" class="btn-wa-final" onclick="launchCelebration()"><i class="fab fa-whatsapp" style="font-size:1.4rem;"></i> Pedir por WhatsApp</button>
             </div>
         </div>
     </aside>
 
-    <div id="review-modal-box" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:10000; display:none; align-items:center; justify-content:center;">
-        <div style="background:white; width:90%; max-width:500px; padding:40px; border-radius:30px; position:relative;">
-            <div onclick="closeReviewModal()" style="position:absolute; top:20px; right:20px; cursor:pointer;"><i class="fa-solid fa-xmark fa-xl"></i></div>
-            <h3 style="text-align:center; font-family: var(--font-display); font-size:1.8rem; margin-bottom:30px;">Tu experiencia</h3>
-            
-            <div style="display:flex; justify-content:center; gap:10px; margin-bottom:30px; color:#e2e8f0; font-size:2rem; cursor:pointer;" id="star-rating-box">
-                <i class="fa-solid fa-star star-click" data-val="1"></i>
-                <i class="fa-solid fa-star star-click" data-val="2"></i>
-                <i class="fa-solid fa-star star-click" data-val="3"></i>
-                <i class="fa-solid fa-star star-click" data-val="4"></i>
-                <i class="fa-solid fa-star star-click" data-val="5"></i>
-            </div>
+    <div id="celebration-modal"><div class="celebration-content"><div class="success-icon"><i class="fas fa-check"></i></div><h2 style="font-family:var(--font-accent); font-size:2rem; margin-bottom:10px;">¡Excelente!</h2><p style="color:var(--jst-slate); font-size:1.1rem;">Tu pedido está listo.<br>Te atendemos por WhatsApp...</p><div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div></div></div>
 
-            <textarea id="review-comment" placeholder="Cuéntanos qué te pareció el producto y la entrega..." class="jst-input" style="height:120px; resize:none;"></textarea>
-            
-            <button onclick="sendReviewToWA()" style="width:100%; background:var(--jst-whatsapp-green); color:white; border:none; padding:20px; border-radius:15px; font-weight:800; cursor:pointer;">
-                Enviar Reseña por WhatsApp
-            </button>
+    <div id="review-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); z-index:9500; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:0.3s;" onclick="closeReviewModal(event)">
+        <div style="background:white; width:90%; max-width:500px; padding:30px; border-radius:25px; position:relative; transform:translateY(20px); transition:0.3s;">
+            <button onclick="closeReviewModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:1.2rem; cursor:pointer;"><i class="fas fa-times"></i></button>
+            <h3 style="font-family:var(--font-accent); text-align:center; margin-bottom:10px;">Tu opinión nos importa</h3>
+            <p style="text-align:center; color:#64748b; font-size:0.9rem; margin-bottom:20px;">Ayúdanos a mejorar contándonos tu experiencia.</p>
+            <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px; color:#e2e8f0; font-size:1.8rem; cursor:pointer;"><i class="fas fa-star onclick-star" onclick="setStars(1)"></i><i class="fas fa-star onclick-star" onclick="setStars(2)"></i><i class="fas fa-star onclick-star" onclick="setStars(3)"></i><i class="fas fa-star onclick-star" onclick="setStars(4)"></i><i class="fas fa-star onclick-star" onclick="setStars(5)"></i></div>
+            <textarea id="review-text" placeholder="¿Qué te pareció el producto?..." style="width:100%; height:100px; padding:15px; border-radius:15px; border:1px solid #e2e8f0; resize:none; font-family:inherit; margin-bottom:15px; font-size:0.95rem;"></textarea>
+            <button onclick="submitReviewWA()" style="width:100%; background:var(--jst-whatsapp); color:white; padding:18px; border:none; border-radius:15px; font-weight:800; cursor:pointer; display:flex; justify-content:center; align-items:center; gap:10px; font-size:1rem;">Enviar Reseña <i class="fab fa-whatsapp"></i></button>
         </div>
     </div>
 
+    <div id="quick-view-modal" onclick="closeQuickView(event)"><div class="qv-content" onclick="event.stopPropagation()"><button class="qv-close" onclick="closeQuickView()"><i class="fas fa-times"></i></button><div class="qv-grid"><div class="qv-image"><img id="qv-img" src="" alt=""></div><div class="qv-details"><span id="qv-cat" class="qv-category">CATEGORÍA</span><h2 id="qv-name">Producto</h2><div class="qv-price" id="qv-price">S/ 0.00</div><p id="qv-desc" class="qv-description">...</p><button id="qv-btn-add" class="btn-add-qv" onclick="addToCartFromQV()"><span>Lo quiero</span><i class="fas fa-plus"></i></button></div></div></div></div>
+    <div id="toast-notify" style="position:fixed; bottom:-100px; left:50%; transform:translateX(-50%); background:var(--jst-onyx); color:white; padding:14px 28px; border-radius:50px; z-index:9000; transition:0.5s; font-weight:700; box-shadow:0 10px 25px rgba(0,0,0,0.2); white-space:nowrap;">Agregado al carrito</div>
+
     <script>
-        /* ==========================================================================
-        NÚCLEO DE LA APLICACIÓN - JSTORER ENGINE
-        ==========================================================================
-        */
+        // CONFIGURACIÓN
+        const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOKWE4Wyh_N_pt12iDlXx_garwZHFKRcE19DRoKSa2Cb_v3KoSmcQcJXRS2MdrfB7Bso-DqSXdINSt/pub?gid=0&single=true&output=csv";
+        const STORE_LOCATION = { lat: -12.053850, lng: -77.031550 }; 
+        let CATALOG_DB = [];
+        let state_cart = JSON.parse(localStorage.getItem('jst_master_cart')) || [];
+        let current_category = "Todas";
+        let currentQVId = null;
+        const FREE_SHIPPING_THRESHOLD = 500;
 
-        // CONFIGURACIÓN MAESTRA
-        const DB_SHEET_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOKWE4Wyh_N_pt12iDlXx_garwZHFKRcE19DRoKSa2Cb_v3KoSmcQcJXRS2MdrfB7Bso-DqSXdINSt/pub?gid=0&single=true&output=csv";
-        const HQ_LOCATION = { lat: -12.053850, lng: -77.031550 }; // Jr. Cuzco 626
-        const FREE_SHIP_LIMIT = 500;
-        const KM_RATE = 1.95;
+        window.onload = async () => { initGoldDust(); await fetchProducts(); renderPills(); refreshCartUI(); initReviewStars(); };
 
-        // ESTADO GLOBAL
-        let GLOBAL_CATALOG = [];
-        let SHOPPING_CART = JSON.parse(localStorage.getItem('jst_master_cart')) || [];
-        let currentCategory = "Todas";
-        let mapInstance = null;
-        let userMarker = null;
-        let accuracyCircle = null;
-        let currentKM = 0;
-        let currentRating = 5;
-
-        // --- INICIALIZACIÓN ---
-        window.onload = async () => {
-            renderGoldDust();
-            await synchronizeData();
-            updateUIState();
-            setupEventListeners();
-        };
-
-        async function synchronizeData() {
+        // LÓGICA DE DATOS
+        async function fetchProducts() {
             try {
-                const response = await fetch(DB_SHEET_CSV);
-                const csvData = await response.text();
-                GLOBAL_CATALOG = parseCSVContent(csvData);
-                renderCategoryPills();
-                renderProductCatalog();
-            } catch (error) {
-                console.error("Error Sync:", error);
+                const response = await fetch(GOOGLE_SHEET_URL);
+                if (!response.ok) throw new Error("Error de conexión");
+                const data = await response.text();
+                CATALOG_DB = parseCSV(data);
+                renderCollection();
+            } catch (error) { 
+                console.error("Error:", error);
+                document.getElementById('main-grid').innerHTML = '<div style="grid-column:1/-1; padding:4rem; text-align:center; color:#ef4444;">Error cargando productos.</div>';
             }
         }
-
-        function parseCSVContent(csv) {
-            const lines = csv.split('\n');
-            const data = [];
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n');
+            const result = [];
             for(let i = 1; i < lines.length; i++) {
-                const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                if(row.length < 5) continue;
-                const clean = (str) => str.replace(/^"|"$/g, '').trim();
-                data.push({
-                    id: clean(row[0]),
-                    name: clean(row[1]),
-                    category: clean(row[2]),
-                    price: parseFloat(clean(row[3]).replace(/[^\d.]/g, '')),
-                    img: clean(row[4]),
-                    description: clean(row[5]) || "Producto de alta calidad seleccionado por JstoreR.",
-                    stock: parseInt(clean(row[6])) || 0
-                });
-            }
-            return data;
-        }
-
-        // --- RENDERIZADO DE UI ---
-        function renderProductCatalog() {
-            const grid = document.getElementById('main-product-grid');
-            const query = document.getElementById('store-search-input').value.toLowerCase();
-            
-            const filtered = GLOBAL_CATALOG.filter(p => {
-                const matchCat = currentCategory === "Todas" || p.category === currentCategory;
-                const matchSearch = p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query);
-                return matchCat && matchSearch;
-            });
-
-            if(filtered.length === 0) {
-                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:5rem; color:var(--jst-slate);">No encontramos productos que coincidan.</div>`;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(p => `
-                <article class="product-card">
-                    ${p.stock <= 0 ? '<span class="product-badge badge-out">AGOTADO</span>' : '<span class="product-badge badge-new">ELITE</span>'}
-                    <div class="product-image-container" onclick="openProductDetail('${p.id}')">
-                        <img src="${p.img}" alt="${p.name}" loading="lazy">
-                    </div>
-                    <div class="product-info">
-                        <span class="product-category">${p.category}</span>
-                        <h3>${p.name}</h3>
-                        <p class="product-desc">${p.description}</p>
-                    </div>
-                    <div class="product-footer">
-                        <span class="price-display">S/ ${p.price.toFixed(2)}</span>
-                        <button class="add-to-cart-btn" onclick="addToCart('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''}>
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
-                    </div>
-                </article>
-            `).join('');
-        }
-
-        function renderCategoryPills() {
-            const container = document.getElementById('category-pills-render');
-            const categories = ["Todas", ...new Set(GLOBAL_CATALOG.map(p => p.category))];
-            
-            container.innerHTML = categories.map(c => `
-                <button class="pill-btn ${c === currentCategory ? 'active' : ''}" onclick="setStoreCategory('${c}')">
-                    ${c}
-                </button>
-            `).join('');
-        }
-
-        // --- LÓGICA DE CARRITO ---
-        function addToCart(id) {
-            const product = GLOBAL_CATALOG.find(p => p.id === id);
-            if(!product) return;
-
-            const existing = SHOPPING_CART.find(item => item.id === id);
-            if(existing) {
-                existing.qty++;
-            } else {
-                SHOPPING_CART.push({...product, qty: 1});
-            }
-
-            saveAndUpdateCart();
-            triggerToast("Producto añadido");
-        }
-
-        function saveAndUpdateCart() {
-            localStorage.setItem('jst_master_cart', JSON.stringify(SHOPPING_CART));
-            updateUIState();
-        }
-
-        function updateUIState() {
-            const badge = document.getElementById('global-cart-badge');
-            const totalQty = SHOPPING_CART.reduce((sum, item) => sum + item.qty, 0);
-            
-            badge.innerText = totalQty;
-            badge.style.display = totalQty > 0 ? 'flex' : 'none';
-
-            renderCartItems();
-            calculateCartTotals();
-        }
-
-        function renderCartItems() {
-            const container = document.getElementById('cart-items-wrapper');
-            if(SHOPPING_CART.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:3rem; opacity:0.4;"><i class="fa-solid fa-basket-shopping fa-3xl"></i><p style="margin-top:20px;">Tu bolsa está vacía</p></div>`;
-                return;
-            }
-
-            container.innerHTML = SHOPPING_CART.map(item => `
-                <div style="display:flex; gap:15px; margin-bottom:20px; align-items:center; background:white; padding:15px; border-radius:20px; border:1px solid var(--jst-slate-light);">
-                    <img src="${item.img}" style="width:70px; height:70px; border-radius:12px; object-fit:cover;">
-                    <div style="flex:1;">
-                        <h4 style="font-size:0.9rem; margin:0;">${item.name}</h4>
-                        <span style="font-weight:800; color:var(--jst-accent-gold);">S/ ${item.price.toFixed(2)}</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:10px; background:var(--jst-bg-ivory); padding:8px 12px; border-radius:100px;">
-                        <i class="fa-solid fa-minus" onclick="updateQty('${item.id}', -1)" style="cursor:pointer; font-size:0.7rem;"></i>
-                        <span style="font-weight:800; font-size:0.9rem;">${item.qty}</span>
-                        <i class="fa-solid fa-plus" onclick="updateQty('${item.id}', 1)" style="cursor:pointer; font-size:0.7rem;"></i>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function calculateCartTotals() {
-            const sub = SHOPPING_CART.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            document.getElementById('cart-subtotal-display').innerText = `S/ ${sub.toFixed(2)}`;
-            document.getElementById('summary-sub').innerText = `S/ ${sub.toFixed(2)}`;
-
-            // Upsell bar
-            const bar = document.getElementById('upsell-bar');
-            const text = document.getElementById('upsell-text');
-            const progress = Math.min((sub / FREE_SHIP_LIMIT) * 100, 100);
-            
-            bar.style.width = `${progress}%`;
-            if(sub >= FREE_SHIP_LIMIT) {
-                text.innerText = "¡Envío gratis desbloqueado!";
-                text.style.color = "var(--jst-success)";
-            } else {
-                text.innerText = `Faltan S/ ${(FREE_SHIP_LIMIT - sub).toFixed(2)} para envío gratis`;
-                text.style.color = "var(--jst-slate)";
-            }
-
-            // Delivery calculation
-            let delivery = 0;
-            if(sub < FREE_SHIP_LIMIT && currentKM > 0) {
-                delivery = Math.max(8, currentKM * KM_RATE);
-            }
-
-            document.getElementById('summary-ship').innerText = sub >= FREE_SHIP_LIMIT ? "GRATIS" : (currentKM > 0 ? `S/ ${delivery.toFixed(2)}` : "Calculando...");
-            document.getElementById('summary-total').innerText = `S/ ${(sub + delivery).toFixed(2)}`;
-            
-            checkFormValidity();
-        }
-
-        function updateQty(id, delta) {
-            const item = SHOPPING_CART.find(i => i.id === id);
-            if(item) {
-                item.qty += delta;
-                if(item.qty <= 0) SHOPPING_CART = SHOPPING_CART.filter(i => i.id !== id);
-                saveAndUpdateCart();
-            }
-        }
-
-        // --- SISTEMA GPS Y MAPAS (Leaflet Core) ---
-        function initiateGPSDetection() {
-            const icon = document.getElementById('gps-icon');
-            const bar = document.getElementById('gps-info-bar');
-
-            if (!navigator.geolocation) {
-                alert("GPS no soportado en este dispositivo");
-                return;
-            }
-
-            icon.className = "fa-solid fa-spinner fa-spin fa-lg";
-            bar.innerText = "Conectando con satélites...";
-
-            navigator.geolocation.getCurrentPosition(position => {
-                const { latitude, longitude, accuracy } = position.coords;
-                
-                if(confirm("CONFIRMACIÓN DE SEGURIDAD:\n\n¿Deseas usar tu ubicación actual como punto de entrega?")) {
-                    
-                    // Mostrar mapa
-                    document.getElementById('map-wrapper').classList.add('map-active');
-                    setTimeout(() => renderLeafletMap(latitude, longitude, accuracy), 500);
-
-                    // Calcular distancia
-                    currentKM = calculateDistanceBetween(HQ_LOCATION.lat, HQ_LOCATION.lng, latitude, longitude);
-                    
-                    // Inversa Geocoding
-                    fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            const address = data.display_name.split(',').slice(0, 3).join(', ');
-                            document.getElementById('cust-address').value = address;
-                            icon.className = "fa-solid fa-circle-check fa-lg";
-                            icon.style.color = "var(--jst-success)";
-                            bar.innerHTML = `<span style="color:var(--jst-success)">📍 Ubicación verificada (+/- ${Math.round(accuracy)}m)</span>`;
-                            calculateCartTotals();
-                        });
-                } else {
-                    icon.className = "fa-solid fa-location-crosshairs fa-lg";
-                    bar.innerText = "Cálculo cancelado por el usuario.";
+                const line = lines[i].trim();
+                if(!line) continue;
+                const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
+                const clean = (txt) => txt ? txt.replace(/^"|"$/g, '').trim() : '';
+                if(parts.length >= 5) {
+                    let priceString = clean(parts[3]).replace(/[S/$,\s]/g, ''); 
+                    const precio = parseFloat(priceString);
+                    const stockVal = parts[6] ? parseInt(clean(parts[6]).replace(/\D/g,'')) : 0;
+                    if(!isNaN(precio)) result.push({ id: clean(parts[0]), name: clean(parts[1]), cat: clean(parts[2]), price: precio, img: clean(parts[4]), desc: clean(parts[5]), stock: isNaN(stockVal) ? 0 : stockVal });
                 }
-
-            }, error => {
-                icon.className = "fa-solid fa-location-crosshairs fa-lg";
-                bar.innerText = "Error: Activa el GPS e inténtalo de nuevo.";
-            }, { enableHighAccuracy: true });
-        }
-
-        function renderLeafletMap(lat, lng, acc) {
-            if (!mapInstance) {
-                mapInstance = L.map('map-element').setView([lat, lng], 16);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap'
-                }).addTo(mapInstance);
-                userMarker = L.marker([lat, lng]).addTo(mapInstance);
-                accuracyCircle = L.circle([lat, lng], { radius: acc }).addTo(mapInstance);
-            } else {
-                mapInstance.setView([lat, lng], 16);
-                userMarker.setLatLng([lat, lng]);
-                accuracyCircle.setLatLng([lat, lng]).setRadius(acc);
             }
+            return result;
         }
 
-        function calculateDistanceBetween(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Radio Tierra
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return (R * c) * 1.28; // Factor de corrección vial Lima
+        // RENDERIZADO
+        function renderCollection() {
+            const query = document.getElementById('master-search').value.toLowerCase();
+            const grid = document.getElementById('main-grid');
+            const filtered = CATALOG_DB.filter(p => (current_category === "Todas" || p.cat === current_category) && (p.name.toLowerCase().includes(query) || p.cat.toLowerCase().includes(query)));
+            if(filtered.length === 0) { if(CATALOG_DB.length > 0) grid.innerHTML = '<div style="grid-column:1/-1; padding:4rem; text-align:center; color:#94a3b8;">No encontramos coincidencias.</div>'; return; }
+            grid.innerHTML = filtered.map(p => {
+                const isSoldOut = p.stock <= 0; const isLow = p.stock > 0 && p.stock <= 3;
+                let badge = isSoldOut ? '<div style="position:absolute; top:10px; right:10px; background:#ef4444; color:white; font-size:0.7rem; font-weight:800; padding:5px 10px; border-radius:50px; z-index:2;">AGOTADO</div>' : (isLow ? `<div style="position:absolute; top:10px; right:10px; background:#f59e0b; color:white; font-size:0.7rem; font-weight:800; padding:5px 10px; border-radius:50px; z-index:2;">¡QUEDAN ${p.stock}!</div>` : '');
+                const btn = isSoldOut ? `<button class="btn-add" style="background:#f1f5f9; color:#cbd5e1; cursor:not-allowed;"><i class="fas fa-ban"></i></button>` : `<button class="btn-add" onclick="addItemToCart('${p.id}')"><i class="fas fa-plus"></i></button>`;
+                return `<article class="card-item" style="${isSoldOut ? 'opacity:0.7;' : ''}">${badge}<div class="card-img-container" onclick="openQuickView('${p.id}')"><img src="${p.img}" alt="${p.name}" loading="lazy" style="${isSoldOut ? 'filter:grayscale(100%);' : ''}"></div><div class="card-info"><span style="font-size:0.65rem; color:var(--jst-accent-gold); font-weight:800; text-transform:uppercase;">${p.cat}</span><h3 style="font-size:1.1rem; margin:5px 0 8px;">${p.name}</h3><p style="font-size:0.85rem; color:var(--jst-slate); line-height:1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.desc}</p></div><div class="card-action" style="margin-top:auto; padding-top:15px; display:flex; justify-content:space-between; align-items:center;"><span class="price-tag">S/ ${p.price.toFixed(2)}</span>${btn}</div></article>`;
+            }).join('');
         }
+        function renderPills() { document.getElementById('category-pills-render').innerHTML = ["Todas", ...new Set(CATALOG_DB.map(p => p.cat).filter(Boolean))].map(c => `<div class="pill-item ${c===current_category?'active':''}" onclick="setCategory('${c}',this)">${c}</div>`).join(''); }
+        function setCategory(c, el) { current_category = c; renderPills(); renderCollection(); }
+        function handleSmartFilter() { renderCollection(); }
 
-        // --- FUNCIONES DE SOPORTE ---
-        function setStoreCategory(cat) {
-            currentCategory = cat;
-            renderCategoryPills();
-            renderProductCatalog();
+        // FUNCIONES DE CARRITO & UI
+        function openQuickView(id) {
+            const p = CATALOG_DB.find(x => x.id == id); if(!p) return;
+            currentQVId = id;
+            document.getElementById('qv-img').src = p.img; document.getElementById('qv-cat').innerText = p.cat;
+            document.getElementById('qv-name').innerText = p.name; document.getElementById('qv-price').innerText = `S/ ${p.price.toFixed(2)}`;
+            document.getElementById('qv-desc').innerText = p.desc;
+            const btn = document.getElementById('qv-btn-add');
+            if(p.stock <= 0) { btn.innerHTML = '<span>Agotado</span><i class="fas fa-ban"></i>'; btn.style.pointerEvents = 'none'; btn.style.background='#e2e8f0'; btn.style.color='#94a3b8'; }
+            else { btn.innerHTML = '<span>Lo quiero</span><i class="fas fa-plus"></i>'; btn.style.pointerEvents = 'auto'; btn.style.background='var(--jst-onyx)'; btn.style.color='#fff'; }
+            document.getElementById('quick-view-modal').classList.add('active');
         }
-
-        function handleCartToggle(open) {
-            const panel = document.getElementById('side-cart-panel');
-            if(open) panel.classList.add('open');
-            else {
-                panel.classList.remove('open');
-                setTimeout(() => changeCartStep(1), 500);
-            }
+        function closeQuickView(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('quick-view-modal').classList.remove('active'); }
+        function addToCartFromQV() { if(currentQVId) { addItemToCart(currentQVId); closeQuickView(); toggleCart(true); } }
+        function addItemToCart(id) {
+            const prod = CATALOG_DB.find(x => x.id == id); if(!prod || prod.stock <= 0) return;
+            const item = state_cart.find(x => x.id == id);
+            if(item) { if(item.qty < prod.stock) item.qty++; else return alert("Stock límite alcanzado."); } else { state_cart.push({...prod, qty:1}); }
+            updateCart(); showToast(); if(document.getElementById('side-cart').classList.contains('open')) renderSuggestions();
         }
-
-        function changeCartStep(step) {
-            const panel = document.getElementById('side-cart-panel');
-            const title = document.getElementById('cart-panel-title');
-            if(step === 2) {
-                if(SHOPPING_CART.length === 0) return alert("Bolsa vacía");
-                panel.classList.add('step-2');
-                title.innerText = "Confirmar Pedido";
-            } else {
-                panel.classList.remove('step-2');
-                title.innerText = "Tu Bolsa";
-            }
+        function modQty(id, d) {
+            const item = state_cart.find(x => x.id == id); const prod = CATALOG_DB.find(x => x.id == id);
+            if(item) { if(d > 0 && item.qty >= prod.stock) return alert("Stock límite alcanzado."); item.qty+=d; if(item.qty<=0) state_cart = state_cart.filter(x=>x.id!=id); updateCart(); }
         }
-
-        function checkFormValidity() {
-            const name = document.getElementById('cust-name').value;
-            const phone = document.getElementById('cust-phone').value;
-            const address = document.getElementById('cust-address').value;
-            const btn = document.getElementById('final-checkout-btn');
-
-            if(name.length > 3 && phone.length > 8 && address.length > 5) {
-                btn.classList.add('ready');
-            } else {
-                btn.classList.remove('ready');
-            }
+        function updateCart() { localStorage.setItem('jst_master_cart', JSON.stringify(state_cart)); refreshCartUI(); }
+        function refreshCartUI() {
+            const count = state_cart.reduce((a,b)=>a+b.qty,0);
+            const badge = document.getElementById('cart-badge'); badge.innerText = count; badge.style.display = count>0?'flex':'none';
+            if(count>0) { badge.classList.add('pop'); setTimeout(()=>badge.classList.remove('pop'),300); }
+            const list = document.getElementById('cart-items-list');
+            if(state_cart.length===0) { list.innerHTML = '<div style="text-align:center; padding:3rem; opacity:0.5;">Tu bolsa está vacía...</div>'; goToStep(1); }
+            else { list.innerHTML = state_cart.map(i => `<div style="display:flex; gap:12px; margin-bottom:15px; align-items:center; background:white; padding:10px; border-radius:15px; border:1px solid #f1f5f9;"><img src="${i.img}" style="width:60px; height:60px; border-radius:10px; object-fit:cover;"><div style="flex:1;"><h4 style="font-size:0.9rem; margin:0;">${i.name}</h4><span style="font-weight:700; color:var(--jst-accent-gold);">S/ ${i.price.toFixed(2)}</span></div><div style="display:flex; gap:8px; background:#f8fafc; padding:5px 10px; border-radius:20px;"><i class="fas fa-minus" onclick="modQty('${i.id}',-1)" style="cursor:pointer; font-size:0.7rem; padding:4px;"></i><span style="font-weight:700; font-size:0.85rem;">${i.qty}</span><i class="fas fa-plus" onclick="modQty('${i.id}',1)" style="cursor:pointer; font-size:0.7rem; padding:4px;"></i></div></div>`).join(''); }
+            const sub = state_cart.reduce((a,b)=>a+(b.price*b.qty),0);
+            document.getElementById('step1-total').innerText = `S/ ${sub.toFixed(2)}`;
+            const bar = document.getElementById('ship-progress-bar');
+            const pct = Math.min(100, (sub/FREE_SHIPPING_THRESHOLD)*100); bar.style.width = `${pct}%`;
+            if(sub >= FREE_SHIPPING_THRESHOLD) { document.getElementById('shipping-progress-box').classList.add('unlocked'); document.getElementById('ship-msg-text').innerHTML = "<span style='color:#10b981'>¡Envío GRATIS conseguido!</span>"; }
+            else { document.getElementById('shipping-progress-box').classList.remove('unlocked'); document.getElementById('ship-msg-text').innerHTML = `Faltan <b>S/ ${(FREE_SHIPPING_THRESHOLD-sub).toFixed(2)}</b> para envío gratis`; }
+            renderSuggestions(); refreshSummary();
         }
-
-        function executeOrderProcess() {
-            const name = document.getElementById('cust-name').value;
-            const address = document.getElementById('cust-address').value;
-            const ship = document.getElementById('summary-ship').innerText;
-            const total = document.getElementById('summary-total').innerText;
-
-            let message = `👋 *¡Hola JstoreR! Quiero procesar mi pedido*\n━━━━━━━━━━━━━━━━━━━━\n👤 *Cliente:* ${name}\n📍 *Entrega:* ${address}\n🚚 *Envío:* ${ship} (${currentKM.toFixed(1)} km)\n━━━━━━━━━━━━━━━━━━━━\n🛍️ *PRODUCTOS:*\n\n`;
-            
-            SHOPPING_CART.forEach(i => {
-                message += `• *${i.name}* x${i.qty}\n  Sub: S/ ${(i.price * i.qty).toFixed(2)}\n`;
-            });
-
-            message += `\n💰 *TOTAL A PAGAR: ${total}*\n━━━━━━━━━━━━━━━━━━━━\n_Enviado desde la Web JstoreR_`;
-
-            // Limpieza y envío
-            SHOPPING_CART = [];
-            saveAndUpdateCart();
-            
-            document.getElementById('celebration-modal').style.display = "flex";
-            setTimeout(() => {
-                window.location.href = `https://wa.me/51932508670?text=${encodeURIComponent(message)}`;
-            }, 2500);
+        function renderSuggestions() {
+            if(state_cart.length===0) { document.getElementById('suggestions-area').style.display='none'; return; }
+            const ids = state_cart.map(x=>x.id); const avail = CATALOG_DB.filter(p=>!ids.includes(p.id) && p.stock > 0).sort(()=>0.5-Math.random()).slice(0,4);
+            if(avail.length>0) { document.getElementById('suggestions-area').style.display='block'; document.getElementById('suggestions-render').innerHTML = avail.map(s=>`<div class="mini-card" onclick="addItemToCart('${s.id}')"><div style="position:relative;"><img src="${s.img}" style="width:100%; height:100px; object-fit:cover; border-radius:10px; margin-bottom:8px;"><div style="position:absolute; bottom:5px; right:5px; background:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-plus" style="font-size:0.6rem;"></i></div></div><div style="font-size:0.8rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.name}</div><div style="color:var(--jst-accent-gold); font-size:0.85rem; font-weight:800;">S/ ${s.price.toFixed(2)}</div></div>`).join(''); }
+            else document.getElementById('suggestions-area').style.display='none';
         }
-
-        // FAQ Y MODALES
-        function toggleFaqAccordion(el) {
-            el.classList.toggle('active');
-            const icon = el.querySelector('.faq-indicator');
-            icon.classList.toggle('fa-plus');
-            icon.classList.toggle('fa-minus');
+        function refreshSummary() {
+            const sub = state_cart.reduce((a,b)=>a+(b.price*b.qty),0); const km = parseFloat(document.getElementById('form-km').value) || 0;
+            let ship = (sub < FREE_SHIPPING_THRESHOLD && km > 0) ? Math.max(5, km * 1.90) : 0;
+            let shipTxt = (sub >= FREE_SHIPPING_THRESHOLD) ? "GRATIS" : (ship===0 ? "Calculando..." : `S/ ${ship.toFixed(2)}`);
+            document.getElementById('final-subtotal').innerText = `S/ ${sub.toFixed(2)}`;
+            document.getElementById('final-shipping').innerText = shipTxt;
+            document.getElementById('final-total').innerText = `S/ ${(sub+ship).toFixed(2)}`;
+            validateForm();
         }
-
-        function openReviewModal() { document.getElementById('review-modal-box').style.display = "flex"; }
-        function closeReviewModal() { document.getElementById('review-modal-box').style.display = "none"; }
-
-        function setupEventListeners() {
-            document.querySelectorAll('.star-click').forEach(s => {
-                s.onclick = () => {
-                    const val = parseInt(s.getAttribute('data-val'));
-                    currentRating = val;
-                    document.querySelectorAll('.star-click').forEach((star, idx) => {
-                        star.style.color = idx < val ? "#f59e0b" : "#e2e8f0";
-                    });
-                };
-            });
-            
-            // Auto-detect form changes
-            ['cust-name', 'cust-phone', 'cust-address'].forEach(id => {
-                document.getElementById(id).oninput = checkFormValidity;
-            });
+        function validateForm() {
+            const n = document.getElementById('form-name').value; const a = document.getElementById('form-address').value; const p = document.getElementById('form-phone').value;
+            const btn = document.getElementById('btn-wa'); if(n.length>3 && a.length>5 && p.length>8) btn.classList.add('active'); else btn.classList.remove('active');
         }
-
-        function sendReviewToWA() {
-            const comment = document.getElementById('review-comment').value;
-            const msg = `⭐ *NUEVA RESEÑA JSTORER*\nCalificación: ${currentRating}/5 estrellas\nComentario: "${comment}"`;
-            window.open(`https://wa.me/51932508670?text=${encodeURIComponent(msg)}`, '_blank');
-            closeReviewModal();
+        function launchCelebration() { toggleCart(false); document.getElementById('celebration-modal').classList.add('active'); setTimeout(()=>document.getElementById('progress-fill').style.width='100%', 100); setTimeout(actualRedirect, 3200); }
+        function actualRedirect() {
+            const n = document.getElementById('form-name').value; const a = document.getElementById('form-address').value;
+            const km = document.getElementById('form-km').value || 0; const ship = document.getElementById('final-shipping').innerText; const total = document.getElementById('final-total').innerText;
+            let msg = `👋 *¡Hola! Quiero hacer un pedido en JstoreR*\n━━━━━━━━━━━━━━━━━━━━\n👤 *Soy:* ${n}\n📍 *Para:* ${a}\n🚚 *Envío:* ${ship} (${km}km)\n━━━━━━━━━━━━━━━━━━━━\n🛍️ *MI PEDIDO:*\n\n`;
+            state_cart.forEach(i => { msg += `🔹 *${i.name}*\n     ${i.qty} und. x S/ ${i.price.toFixed(2)}\n`; });
+            msg += `\n💰 *TOTAL A PAGAR: ${total}*\n\n¿Me confirman si tienen stock? ¡Gracias!`;
+            state_cart=[]; updateCart(); window.location.href = `https://wa.me/51932508670?text=${encodeURIComponent(msg)}`;
         }
-
-        function triggerToast(text) {
-            const t = document.getElementById('toast-notify');
-            t.innerText = text;
-            t.style.bottom = "40px";
-            setTimeout(() => t.style.bottom = "-100px", 2500);
+        function toggleCart(o) { document.getElementById('side-cart').classList.toggle('open', o); if(!o) setTimeout(()=>goToStep(1),500); }
+        function goToStep(s) { const cart = document.getElementById('side-cart'); const title = document.getElementById('cart-title'); if(s===2) { if(state_cart.length===0) return alert("Agrega productos"); cart.classList.add('step-2'); title.innerText="Confirmar Datos"; } else { cart.classList.remove('step-2'); title.innerText="Tu Bolsa"; } }
+        function calculateGPSDistance() {
+            const btnIcon = document.getElementById('gps-icon-btn'); const statusMsg = document.getElementById('gps-status-msg');
+            if (!navigator.geolocation) return alert("Tu dispositivo no soporta geolocalización.");
+            btnIcon.className = 'fas fa-spinner fa-spin'; statusMsg.innerHTML = '<span style="color:var(--jst-accent-gold);">Buscando señal...</span>';
+            navigator.geolocation.getCurrentPosition(pos => {
+                if(confirm("CONFIRMACIÓN DE UBICACIÓN:\n\n¿Estás en el lugar de entrega ahora mismo?")) {
+                    const dist = getDist(STORE_LOCATION.lat, STORE_LOCATION.lng, pos.coords.latitude, pos.coords.longitude);
+                    document.getElementById('form-km').value = dist.toFixed(1); refreshSummary();
+                    btnIcon.className = 'fas fa-check-circle'; btnIcon.style.color = '#10b981';
+                    statusMsg.innerHTML = '<i class="fas fa-check-circle" style="color:#10b981;"></i> Ubicación verificada';
+                    if(document.getElementById('form-address').value==="") { document.getElementById('form-address').value="(Ubicación GPS actual)"; validateForm(); }
+                } else {
+                    alert("Entendido. Ingresa los KM manualmente."); btnIcon.className = 'fas fa-map-marker-alt'; statusMsg.innerHTML = '<span style="color:#ef4444;">Cancelado. Ingresa KM manual.</span>';
+                }
+            }, err => { alert("Activa el GPS."); btnIcon.className = 'fas fa-map-marker-alt'; statusMsg.innerHTML = 'Error GPS'; }, { enableHighAccuracy: true });
         }
-
-        // --- EFECTOS VISUALES (POLVO DE ORO) ---
-        function renderGoldDust() {
-            const canvas = document.getElementById('gold-dust-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            const particles = Array(45).fill().map(() => ({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: Math.random() * 1.5 + 0.5,
-                speed: Math.random() * 0.4 + 0.1,
-                opacity: Math.random() * 0.5 + 0.2
-            }));
-
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => {
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(199, 106, 58, ${p.opacity})`;
-                    ctx.fill();
-                    p.y -= p.speed;
-                    p.x += Math.sin(p.y * 0.01) * 0.2;
-                    if (p.y < -10) p.y = canvas.height + 10;
-                });
-                requestAnimationFrame(animate);
-            }
-            animate();
+        function getDist(lat1, lon1, lat2, lon2) {
+            const R = 6371; const dLat = (lat2-lat1)*(Math.PI/180); const dLon = (lon2-lon1)*(Math.PI/180);
+            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*(Math.PI/180))*Math.cos(lat2*(Math.PI/180)) * Math.sin(dLon/2)*Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.25;
         }
-
-        window.addEventListener('resize', () => {
-            const canvas = document.getElementById('gold-dust-canvas');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-
-        function filterStoreCatalog() {
-            renderProductCatalog();
-        }
-
+        function showToast() { const t = document.getElementById('toast-notify'); t.style.bottom='40px'; setTimeout(()=>t.style.bottom='-100px', 2500); }
+        // NUEVO: Lógica del Acordeón FAQ
+        function toggleFaq(el) { el.classList.toggle('active'); }
+        // Reseñas y Efectos
+        function openReviewModal() { const m = document.getElementById('review-modal'); m.style.opacity='1'; m.style.pointerEvents='auto'; m.querySelector('div').style.transform='translateY(0)'; }
+        function closeReviewModal(e) { if(e && e.target !== e.currentTarget) return; const m = document.getElementById('review-modal'); m.style.opacity='0'; m.style.pointerEvents='none'; m.querySelector('div').style.transform='translateY(20px)'; }
+        let starRating = 5; function setStars(n) { starRating = n; document.querySelectorAll('.onclick-star').forEach((s,i) => { s.style.color = i < n ? '#f59e0b' : '#e2e8f0'; }); } function initReviewStars() { setStars(5); }
+        function submitReviewWA() { const txt = document.getElementById('review-text').value; window.open(`https://wa.me/51932508670?text=${encodeURIComponent(`Reseña ${starRating} estrellas: "${txt}"`)}`, '_blank'); closeReviewModal(); }
+        function initGoldDust() {
+            const cvs = document.getElementById('gold-dust-layer'); if(!cvs) return; const ctx = cvs.getContext('2d');
+            cvs.width=window.innerWidth; cvs.height=window.innerHeight;
+            const p = Array(25).fill().map(()=>({x:Math.random()*cvs.width, y:Math.random()*cvs.height, r:Math.random()*1.5+0.5, s:Math.random()*0.3+0.1}));
+            function d() { ctx.clearRect(0,0,cvs.width,cvs.height); ctx.fillStyle="rgba(199, 106, 58, 0.4)"; p.forEach(f=>{ ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fill(); f.y-=f.s; f.x+=Math.sin(f.y*0.02)*0.3; if(f.y<0) f.y=cvs.height; if(f.x>cvs.width) f.x=0; }); requestAnimationFrame(d); } d();
+        } window.addEventListener('resize', () => { const cvs = document.getElementById('gold-dust-layer'); if(cvs) { cvs.width=window.innerWidth; cvs.height=window.innerHeight; }});
     </script>
 </body>
 </html>
