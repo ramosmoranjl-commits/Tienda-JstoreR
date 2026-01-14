@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#111827"> <title>JstoreR · Tienda Oficial</title>
-    <meta name="description" content="Galería exclusiva de artículos. Envíos seguros y verificados a todo el Perú.">
+    <meta name="theme-color" content="#fdfaf7">
+    
+    <title>JstoreR · Elite Selection & Tracking</title>
+    <meta name="description" content="Galería exclusiva de artículos de lujo. Envíos seguros y verificados a todo el Perú.">
     
     <meta property="og:type" content="website">
-    <meta property="og:title" content="JstoreR · Catálogo 2026">
+    <meta property="og:title" content="JstoreR Elite · Catálogo 2026">
     <meta property="og:description" content="Descubre nuestra colección exclusiva. Envíos a todo el Perú.">
     <meta property="og:image" content="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png">
     
@@ -16,51 +18,69 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <style>
         /* ==========================================================================
-           JSTORER DESIGN SYSTEM V23.0 - CORPORATE EDITION
+           JSTORER DESIGN SYSTEM V22.0 - PLATINUM INTEGRATION
            ========================================================================== */
         :root {
-            --jst-bg-ivory: #fdfaf7; --jst-accent-gold: #c76a3a; --jst-onyx: #111827;
-            --jst-slate: #64748b; --jst-white: #ffffff; --jst-whatsapp: #25d366;
-            --font-main: 'Plus Jakarta Sans', sans-serif; --font-accent: 'Playfair Display', serif;
+            --jst-bg-ivory: #fdfaf7; 
+            --jst-accent-gold: #c76a3a; 
+            --jst-onyx: #111827;
+            --jst-slate: #64748b; 
+            --jst-white: #ffffff; 
+            --jst-whatsapp: #25d366;
+            --font-main: 'Plus Jakarta Sans', sans-serif; 
+            --font-accent: 'Playfair Display', serif;
             --transition-smooth: 0.6s cubic-bezier(0.3, 0, 0.2, 1);
+            --shadow-elevation: 0 20px 50px -12px rgba(0,0,0,0.1);
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: var(--font-main); background-color: var(--jst-bg-ivory); color: var(--jst-onyx); overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* NUEVO: TOP BAR (ANUNCIO SUPERIOR) */
-        .top-announcement-bar { background: var(--jst-onyx); color: white; text-align: center; padding: 10px; font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; position: relative; z-index: 5001; display: flex; justify-content: center; align-items: center; gap: 10px; }
-        .top-tag { background: var(--jst-accent-gold); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; }
-
         /* HEADER & HERO */
         .header-master { position: sticky; top: 0; z-index: 5000; background: rgba(253, 250, 247, 0.92); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-bottom: 1px solid rgba(199, 106, 58, 0.1); }
         .nav-container { max-width: 1440px; margin: auto; display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; }
+        
         .logo-box { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
         .logo-img { height: 60px; filter: drop-shadow(0 4px 10px rgba(199, 106, 58, 0.15)); }
-        .cart-trigger { position: relative; cursor: pointer; background: var(--jst-white); padding: 14px; border-radius: 50%; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05); transition: 0.3s; }
-        .cart-trigger:hover { transform: scale(1.05); }
+        
+        /* Controles de Cabecera (Carrito + GPS) */
+        .header-controls { display: flex; gap: 15px; align-items: center; }
+
+        .icon-trigger { position: relative; cursor: pointer; background: var(--jst-white); padding: 14px; border-radius: 50%; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05); transition: 0.3s; color: var(--jst-onyx); font-size: 1.1rem; border: none; }
+        .icon-trigger:hover { transform: scale(1.1); box-shadow: 0 15px 35px -5px rgba(199, 106, 58, 0.2); color: var(--jst-accent-gold); }
+        
         .badge-count { position: absolute; top: -5px; right: -5px; background: var(--jst-onyx); color: white; min-width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; }
 
-        .hero-v10 { padding: 6rem 2rem 2rem; text-align: center; max-width: 1100px; margin: auto; animation: heroFadeIn 1.5s ease; }
+        /* HERO SECTION */
+        .hero-v10 { padding: 8rem 2rem 2rem; text-align: center; max-width: 1100px; margin: auto; animation: heroFadeIn 1.5s ease; }
         @keyframes heroFadeIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
         .hero-v10 h1 { font-family: var(--font-accent); font-size: clamp(2.5rem, 8vw, 4.5rem); line-height: 1.1; margin-bottom: 1.5rem; }
 
-        /* SEARCH & PILLS */
+        /* SEARCH & FILTERS */
         .search-wrapper { position: relative; max-width: 700px; margin: 3rem auto 1.5rem; }
         .search-input { width: 100%; padding: 24px 30px 24px 70px; border-radius: 100px; border: 1px solid rgba(0,0,0,0.06); background: white; font-size: 1.1rem; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05); transition: 0.5s; }
         .search-input:focus { outline: none; border-color: var(--jst-accent-gold); transform: scale(1.02); }
         .search-icon { position: absolute; left: 30px; top: 50%; transform: translateY(-50%); color: var(--jst-accent-gold); font-size: 1.4rem; pointer-events: none; }
         
         .pills-container-wrapper { max-width: 100%; overflow-x: auto; padding: 10px 1.5rem 20px; margin-bottom: 2rem; scrollbar-width: none; }
-        .pills-container-wrapper::-webkit-scrollbar { display: none; }
         .pills-flex { display: flex; gap: 12px; justify-content: center; width: max-content; margin: auto; }
         .pill-item { background: white; border: 1px solid rgba(199, 106, 58, 0.1); padding: 12px 28px; border-radius: 50px; font-size: 0.9rem; font-weight: 700; color: var(--jst-slate); white-space: nowrap; cursor: pointer; transition: 0.4s; }
         .pill-item.active { background: var(--jst-accent-gold); color: white; border-color: var(--jst-accent-gold); transform: scale(1.05); }
 
-        /* GRID */
-        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 40px; padding: 2rem; max-width: 1440px; margin: auto; flex: 1; }
+        /* PRODUCT GRID */
+        .catalog-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 40px; 
+            padding: 2rem; 
+            max-width: 1440px; 
+            margin: auto; 
+            flex: 1; 
+        }
         .card-item { background: white; border-radius: 28px; padding: 20px; border: 1px solid rgba(0,0,0,0.02); transition: var(--transition-smooth); display: flex; flex-direction: column; position: relative; }
         .card-item:hover { transform: translateY(-15px); box-shadow: 0 30px 60px -12px rgba(199, 106, 58, 0.18); }
         .card-img-container { width: 100%; aspect-ratio: 1; border-radius: 20px; overflow: hidden; background: #f8fafc; margin-bottom: 20px; cursor: pointer; position: relative; }
@@ -69,36 +89,15 @@
         .price-tag { font-weight: 900; font-size: 1.6rem; color: var(--jst-onyx); }
         .btn-add { background: var(--jst-accent-gold); color: white; border: none; width: 54px; height: 54px; border-radius: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.3s; }
 
-        /* NUEVO: FAQ ACORDEÓN (ESTILO CORPORATIVO) */
-        .faq-container { max-width: 800px; margin: 4rem auto; padding: 0 2rem; }
-        .faq-item { background: white; border-radius: 15px; margin-bottom: 10px; border: 1px solid #f1f5f9; overflow: hidden; transition: 0.3s; }
-        .faq-item:hover { border-color: var(--jst-accent-gold); }
-        .faq-question { padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1rem; }
-        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; padding: 0 20px; color: var(--jst-slate); line-height: 1.6; }
-        .faq-item.active .faq-answer { max-height: 200px; padding-bottom: 20px; }
-        .faq-icon { transition: 0.3s; }
-        .faq-item.active .faq-icon { transform: rotate(180deg); color: var(--jst-accent-gold); }
+        /* EFECTOS VISUALES (Polvo de Oro) */
+        #gold-dust-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; mix-blend-mode: overlay; opacity: 0.6; }
 
-        /* SKELETON LOADING */
-        .skeleton { background: #e2e8f0; border-radius: 20px; position: relative; overflow: hidden; }
-        .skeleton::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); animation: shimmer 1.5s infinite; }
-        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
-        /* CARRITO */
+        /* CARRITO LATERAL */
         .side-cart { position: fixed; right: -100%; top: 0; width: 100%; max-width: 500px; height: 100%; background: var(--jst-white); z-index: 6000; transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); display: flex; flex-direction: column; box-shadow: -20px 0 80px rgba(0,0,0,0.15); }
         .side-cart.open { right: 0; }
         .cart-header { padding: 2rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.95); z-index: 10; }
         .cart-views-container { flex: 1; position: relative; overflow: hidden; display: flex; }
         .cart-step { min-width: 100%; height: 100%; overflow-y: auto; padding: 2rem; transition: transform 0.5s; display: flex; flex-direction: column; }
-        .side-cart.step-2 .cart-step { transform: translateX(-100%); }
-
-        .shipping-progress-box { margin-bottom: 20px; padding: 15px; background: #f8fafc; border-radius: 12px; }
-        .progress-bar-ship { height: 6px; background: var(--jst-accent-gold); width: 0%; border-radius:10px; transition: width 0.5s; }
-        .shipping-progress-box.unlocked .progress-bar-ship { background: #10b981; }
-
-        .suggestions-box { margin-top: 2rem; padding-top: 2rem; border-top: 1px dashed #e2e8f0; }
-        .suggestions-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
-        .mini-card { min-width: 140px; background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 10px; cursor: pointer; transition: 0.3s; }
         
         /* QUICK VIEW MODAL */
         #quick-view-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 8000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s; padding: 20px; }
@@ -106,402 +105,521 @@
         .qv-content { background: white; width: 100%; max-width: 900px; border-radius: 30px; overflow: hidden; position: relative; transform: translateY(30px); transition: 0.5s; max-height: 90vh; overflow-y: auto; }
         #quick-view-modal.active .qv-content { transform: translateY(0); }
         .qv-grid { display: grid; grid-template-columns: 1fr 1fr; }
-        .qv-image { background: #f8fafc; height: 100%; min-height: 400px; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .qv-image img { width: 100%; height: 100%; object-fit: contain; max-height: 400px; border-radius: 15px; }
-        .qv-details { padding: 40px; display: flex; flex-direction: column; justify-content: center; }
+        @media(max-width: 768px) { .qv-grid { grid-template-columns: 1fr; } }
+        
+        /* ==========================================================================
+           MODAL DE GPS INTEGRADO (NUEVO)
+           Estilo profesional adaptado a JstoreR
+           ========================================================================== */
+        #gps-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(17, 24, 39, 0.85); /* Onyx oscuro */
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            z-index: 9000;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: all 0.5s ease;
+        }
+        #gps-modal.active { opacity: 1; pointer-events: auto; }
+        
+        .gps-container {
+            width: 95%; max-width: 1000px; height: 85vh;
+            background: white; border-radius: 30px;
+            overflow: hidden; position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
+            transform: scale(0.95); transition: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #gps-modal.active .gps-container { transform: scale(1); }
 
-        /* CELEBRATION MODAL */
-        #celebration-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 7000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.5s; }
-        #celebration-modal.active { opacity: 1; pointer-events: auto; }
-        .celebration-content { text-align: center; max-width: 400px; padding: 2rem; transform: scale(0.8); transition: 0.5s; }
-        #celebration-modal.active .celebration-content { transform: scale(1); }
-        .success-icon { width: 100px; height: 100px; background: #d1fae5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 2rem; animation: bounceIn 1s infinite alternate; }
-        @keyframes bounceIn { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-        .progress-bar-bg { width: 100%; height: 6px; background: #eee; border-radius: 10px; margin-top: 2rem; overflow: hidden; }
-        .progress-bar-fill { width: 0%; height: 100%; background: var(--jst-whatsapp); transition: width 3s linear; }
+        .gps-header {
+            padding: 20px 30px;
+            background: white;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 10;
+        }
+        .gps-title h2 { font-family: var(--font-accent); color: var(--jst-onyx); margin-bottom: 5px; }
+        .gps-status { font-size: 0.9rem; color: var(--jst-slate); display: flex; align-items: center; gap: 8px; }
+        .status-dot { width: 10px; height: 10px; background: #ccc; border-radius: 50%; display: inline-block; transition: 0.3s; }
+        .status-dot.active { background: #10b981; box-shadow: 0 0 10px #10b981; }
+        
+        #map-frame { flex: 1; width: 100%; height: 100%; position: relative; background: #eee; }
+        
+        /* Panel flotante dentro del mapa */
+        .gps-overlay-info {
+            position: absolute; bottom: 30px; left: 30px; right: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 1000; backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 15px;
+        }
+        .gps-coords-box { flex: 1; }
+        .gps-address { font-weight: 700; color: var(--jst-onyx); margin-bottom: 5px; font-size: 1.05rem; }
+        .gps-latlng { font-size: 0.85rem; color: var(--jst-slate); font-family: monospace; }
+        
+        .btn-gps-action {
+            padding: 12px 24px; border-radius: 50px; border: none; cursor: pointer;
+            font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;
+            transition: 0.3s;
+        }
+        .btn-confirm-loc { background: var(--jst-onyx); color: white; }
+        .btn-confirm-loc:hover { background: var(--jst-accent-gold); transform: translateY(-2px); }
 
-        .premium-input { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; font-family: inherit; font-size: 0.95rem; margin-bottom: 15px; }
-        .btn-wa-final { width: 100%; padding: 22px; background: var(--jst-whatsapp); color: white; border: none; border-radius: 20px; font-weight: 800; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; opacity: 0.5; pointer-events: none; transition: 0.4s; }
-        .btn-wa-final.active { opacity: 1; pointer-events: auto; box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3); }
+        .btn-close-modal {
+            background: #f1f5f9; width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--jst-onyx); cursor: pointer; transition: 0.3s;
+        }
+        .btn-close-modal:hover { background: #e2e8f0; transform: rotate(90deg); }
 
-        @media (max-width: 768px) {
-            .catalog-container { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 1rem; }
-            .qv-grid { grid-template-columns: 1fr; } .qv-image { height: 250px; min-height: 250px; }
-            .card-info p { display: none; }
-            .btn-add { width: 40px; height: 40px; font-size: 1rem; border-radius: 12px; }
+        /* Estilos personalizados para Leaflet Popup */
+        .leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .leaflet-popup-content { margin: 15px; font-family: var(--font-main); line-height: 1.5; }
+
+        @media(max-width: 600px) {
+            .gps-overlay-info { flex-direction: column; align-items: flex-start; bottom: 10px; left: 10px; right: 10px; width: auto; }
+            .btn-gps-action { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-    <canvas id="gold-dust-layer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:5; opacity:0.4;"></canvas>
+    <canvas id="gold-dust-layer"></canvas>
 
-    <div class="top-announcement-bar">
-        <span class="top-tag">OFERTA</span>
-        <span>Envíos GRATIS en pedidos superiores a S/ 500</span>
-    </div>
-
-    <header class="header-master" id="navbar">
+    <header class="header-master">
         <nav class="nav-container">
             <a href="#" class="logo-box">
-                <img src="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png" class="logo-img" alt="Logo">
-                <div style="line-height:1;">
-                    <span style="display:block; font-family:var(--font-accent); font-weight:900; font-size:1.6rem;">JstoreR</span>
-                    <span style="font-size:0.6rem; text-transform:uppercase; letter-spacing:3px; color:var(--jst-accent-gold); font-weight:800;">Tienda Oficial</span>
+                <div style="font-family:var(--font-accent); font-weight:900; font-size:1.8rem; color:var(--jst-onyx); letter-spacing:-1px;">
+                    Jstore<span style="color:var(--jst-accent-gold)">R</span>.
                 </div>
             </a>
-            <div class="cart-trigger" onclick="toggleCart(true)">
-                <i class="fas fa-shopping-bag" style="font-size: 1.2rem;"></i>
-                <span id="cart-badge" class="badge-count" style="display:none;">0</span>
+            
+            <div class="header-controls">
+                <button class="icon-trigger" onclick="openGPS()" title="Rastrear Entrega / Mi Ubicación">
+                    <i class="fa-solid fa-location-dot"></i>
+                </button>
+
+                <button class="icon-trigger cart-trigger" onclick="toggleCart()">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span class="badge-count" id="cart-count">0</span>
+                </button>
             </div>
         </nav>
     </header>
 
     <main>
         <section class="hero-v10">
-            <div style="display:inline-block; border:1px solid var(--jst-accent-gold); padding:5px 15px; border-radius:50px; margin-bottom:1rem; color:var(--jst-accent-gold); font-weight:700; font-size:0.8rem;">
-                <i class="fas fa-clock"></i> Colección Disponible por Tiempo Limitado
+            <h1>Exclusividad que <br><span style="color:var(--jst-accent-gold); font-style:italic;">trasciende</span>.</h1>
+            <p style="color:var(--jst-slate); font-size:1.1rem; max-width:600px; margin:auto;">
+                Bienvenido a la colección 2026. Donde el lujo se encuentra con la tecnología.
+            </p>
+            
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" class="search-input" placeholder="Buscar en la colección Elite..." onkeyup="filterProducts(this.value)">
             </div>
-            <h1>Date el gusto que mereces</h1>
-            <div class="search-wrapper"><i class="fas fa-search search-icon"></i><input type="text" id="master-search" class="search-input" placeholder="¿Qué estás buscando hoy?" oninput="handleSmartFilter()"></div>
-            <div class="pills-container-wrapper"><div class="pills-flex" id="category-pills-render"></div></div>
         </section>
 
-        <div class="catalog-container" id="main-grid">
-            <div class="skeleton" style="height:400px;"></div>
-            <div class="skeleton" style="height:400px;"></div>
-            <div class="skeleton" style="height:400px;"></div>
-            <div class="skeleton" style="height:400px;"></div>
+        <div class="pills-container-wrapper">
+            <div class="pills-flex" id="pills-container">
+                </div>
         </div>
 
-        <section style="max-width:1200px; margin:4rem auto; padding:0 2rem;">
-            <div style="text-align:center; margin-bottom:3rem;">
-                <span style="color:var(--jst-accent-gold); font-weight:800; letter-spacing:2px; font-size:0.8rem; text-transform:uppercase;">Social Proof</span>
-                <h2 style="font-family:var(--font-accent); font-size:2.2rem; margin:10px 0;">La Experiencia JstoreR</h2>
-                <div style="display:flex; justify-content:center; align-items:center; gap:10px; color:var(--jst-onyx);">
-                    <div style="font-size:1.2rem; color:#f59e0b;">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                    <span style="font-weight:700;">4.9/5</span>
-                    <span style="color:var(--jst-slate);">(Más de 500 clientes felices)</span>
-                </div>
+        <div class="catalog-container" id="catalog">
             </div>
-
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:30px;">
-                <div style="background:white; padding:25px; border-radius:20px; border:1px solid #f1f5f9; box-shadow:0 10px 30px -10px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
-                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-                        <div style="width:45px; height:45px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--jst-slate);">JP</div>
-                        <div><h4 style="font-size:0.95rem; margin:0;">Juan Pablo M.</h4><span style="font-size:0.8rem; color:#10b981;"><i class="fas fa-check-circle"></i> Compra Verificada</span></div>
-                    </div>
-                    <div style="margin-bottom:15px; color:#f59e0b; font-size:0.9rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <p style="color:var(--jst-slate); font-size:0.9rem; line-height:1.6; margin-bottom:15px; flex:1;">"La calidad me sorprendió. Llegó en 2 días a Arequipa y el empaque estaba impecable. Definitivamente volveré a pedir."</p>
-                    <div style="width:100%; height:180px; background:#f8fafc; border-radius:15px; overflow:hidden;"><img src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?auto=format&fit=crop&w=500&q=80" style="width:100%; height:100%; object-fit:cover; transition:0.5s;"></div>
-                </div>
-                <div style="background:white; padding:25px; border-radius:20px; border:1px solid #f1f5f9; box-shadow:0 10px 30px -10px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
-                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-                        <div style="width:45px; height:45px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--jst-slate);">AL</div>
-                        <div><h4 style="font-size:0.95rem; margin:0;">Ana Lucia R.</h4><span style="font-size:0.8rem; color:#10b981;"><i class="fas fa-check-circle"></i> Compra Verificada</span></div>
-                    </div>
-                    <div style="margin-bottom:15px; color:#f59e0b; font-size:0.9rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <p style="color:var(--jst-slate); font-size:0.9rem; line-height:1.6; margin-bottom:15px; flex:1;">"Estaba dudando por ser online, pero la atención por WhatsApp fue A1. Llegó exactamente lo que pedí."</p>
-                    <div style="width:100%; height:180px; background:#f8fafc; border-radius:15px; overflow:hidden;"><img src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=500&q=80" style="width:100%; height:100%; object-fit:cover;"></div>
-                </div>
-                <div style="background:white; padding:25px; border-radius:20px; border:1px solid #f1f5f9; box-shadow:0 10px 30px -10px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
-                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-                        <div style="width:45px; height:45px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--jst-slate);">CR</div>
-                        <div><h4 style="font-size:0.95rem; margin:0;">Carlos Ruiz</h4><span style="font-size:0.8rem; color:#10b981;"><i class="fas fa-check-circle"></i> Compra Verificada</span></div>
-                    </div>
-                    <div style="margin-bottom:15px; color:#f59e0b; font-size:0.9rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                    <p style="color:var(--jst-slate); font-size:0.9rem; line-height:1.6; margin-bottom:15px; flex:1;">"Excelente presentación, ideal para regalo. Me salvaron el aniversario. Gracias JstoreR!"</p>
-                     <div style="width:100%; height:180px; background:#f8fafc; border-radius:15px; overflow:hidden; display:flex; align-items:center; justify-content:center; color:#94a3b8; border:2px dashed #e2e8f0;"><div style="text-align:center;"><i class="fas fa-camera" style="font-size:2rem; opacity:0.3; margin-bottom:10px;"></i><div style="font-size:0.8rem;">Foto del cliente</div></div></div>
-                </div>
-            </div>
-
-            <div style="text-align:center; margin-top:3rem;">
-                <button onclick="openReviewModal()" style="background:white; border:2px solid var(--jst-onyx); padding:15px 30px; border-radius:50px; font-weight:800; cursor:pointer; transition:0.3s; display:inline-flex; align-items:center; gap:10px; font-size:1rem;">
-                    <i class="fas fa-pen"></i> ¿Ya compraste? Déjanos tu opinión
-                </button>
-            </div>
-        </section>
-
-        <section class="faq-container">
-            <h2 style="font-family:var(--font-accent); text-align:center; margin-bottom:2rem;">Preguntas Frecuentes</h2>
-            
-            <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">¿Cómo realizo el pago? <i class="fas fa-chevron-down faq-icon"></i></div>
-                <div class="faq-answer">Aceptamos transferencias BCP, Interbank, BBVA y Yape/Plin. Una vez confirmado tu pedido por WhatsApp, te enviaremos los datos seguros.</div>
-            </div>
-            
-            <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">¿Es seguro el envío a provincia? <i class="fas fa-chevron-down faq-icon"></i></div>
-                <div class="faq-answer">Totalmente. Trabajamos con Shalom y Olva Courier. Todos los paquetes van con código de seguimiento y doble embalaje de protección.</div>
-            </div>
-
-            <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">¿Tienen tienda física? <i class="fas fa-chevron-down faq-icon"></i></div>
-                <div class="faq-answer">Actualmente somos una tienda 100% online con almacén central en Cercado de Lima, lo que nos permite ofrecerte mejores precios al no pagar alquiler de local.</div>
-            </div>
-
-            <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">¿Qué pasa si el producto llega dañado? <i class="fas fa-chevron-down faq-icon"></i></div>
-                <div class="faq-answer">Tu satisfacción es primero. Si hay algún inconveniente (que nunca nos ha pasado), te cambiamos el producto o te devolvemos el dinero inmediatamente.</div>
-            </div>
-        </section>
-
-        <footer style="background: white; border-top: 1px solid #f1f5f9; padding: 4rem 2rem 2rem; margin-top: auto;">
-            <div style="max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; text-align: left;">
-                <div>
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
-                        <img src="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png" style="height:40px;">
-                        <span style="font-family:var(--font-accent); font-weight:900; font-size:1.4rem;">JstoreR</span>
-                    </div>
-                    <p style="color:var(--jst-slate); font-size:0.9rem; line-height:1.6;">Redefiniendo la experiencia de compra online en Perú. Calidad, estilo y un servicio que te trata como mereces.</p>
-                </div>
-                <div>
-                    <h4 style="font-family:var(--font-accent); font-size:1.1rem; margin-bottom:15px;">Tu tranquilidad primero</h4>
-                    <ul style="list-style:none; padding:0; color:var(--jst-slate); font-size:0.9rem; line-height:2;">
-                        <li><i class="fas fa-truck-fast" style="color:var(--jst-accent-gold); width:20px;"></i> Envíos a todo el Perú</li>
-                        <li><i class="fas fa-medal" style="color:var(--jst-accent-gold); width:20px;"></i> Garantía de calidad A1</li>
-                        <li><i class="fas fa-shield-alt" style="color:var(--jst-accent-gold); width:20px;"></i> Compra 100% segura</li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 style="font-family:var(--font-accent); font-size:1.1rem; margin-bottom:15px;">¿Necesitas ayuda?</h4>
-                    <p style="color:var(--jst-slate); font-size:0.9rem; margin-bottom:10px;">Estamos aquí para asesorarte.</p>
-                    <a href="https://wa.me/51932508670" target="_blank" style="text-decoration:none; color:var(--jst-onyx); font-weight:700; display:flex; align-items:center; gap:8px;">
-                        <i class="fab fa-whatsapp" style="font-size:1.2rem; color:var(--jst-whatsapp);"></i> Escríbenos al WhatsApp
-                    </a>
-                </div>
-            </div>
-            <div style="text-align:center; margin-top:4rem; padding-top:2rem; border-top:1px solid #f8fafc; color:#94a3b8; font-size:0.8rem;">&copy; 2026 JstoreR. Todos los derechos reservados.</div>
-        </footer>
     </main>
 
     <aside class="side-cart" id="side-cart">
         <div class="cart-header">
-            <h2 id="cart-title" style="font-family:var(--font-accent); font-size:1.5rem; margin:0;">Tu Bolsa</h2>
-            <div onclick="toggleCart(false)" style="cursor:pointer; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:#f1f5f9;"><i class="fas fa-times"></i></div>
+            <h3 style="font-family:var(--font-accent);">Tu Selección</h3>
+            <div class="btn-close-modal" onclick="toggleCart()"><i class="fa-solid fa-xmark"></i></div>
         </div>
+        
+        <div class="cart-views-container" id="cart-slider">
+            <div class="cart-step">
+                <div class="shipping-progress-box" id="ship-box">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem; font-weight:700;">
+                        <span>Meta de envío gratuito</span>
+                        <span id="ship-amount">Faltan S/500</span>
+                    </div>
+                    <div style="background:#e2e8f0; height:6px; border-radius:10px; overflow:hidden;">
+                        <div class="progress-bar-ship" id="ship-bar"></div>
+                    </div>
+                </div>
+                
+                <div id="cart-items-container" style="flex:1;">
+                    <div style="text-align:center; padding:4rem 1rem; color:var(--jst-slate);">
+                        <i class="fa-solid fa-basket-shopping" style="font-size:3rem; margin-bottom:1rem; opacity:0.3;"></i>
+                        <p>Tu bolsa de compras está vacía.</p>
+                    </div>
+                </div>
 
-        <div class="cart-views-container">
-            <div class="cart-step" id="step-1">
-                <div class="shipping-progress-box" id="shipping-progress-box">
-                    <div style="font-size:0.85rem; font-weight:700; color:var(--jst-slate); margin-bottom:8px; display:flex; justify-content:space-between;"><span id="ship-msg-text">Agrega más para envío gratis</span><i class="fas fa-truck-fast"></i></div>
-                    <div style="width:100%; height:6px; background:#e2e8f0; border-radius:10px;"><div class="progress-bar-ship" id="ship-progress-bar"></div></div>
+                <div style="margin-top:auto; padding-top:20px; border-top:1px solid #f1f5f9;">
+                    <div style="display:flex; justify-content:space-between; font-size:1.3rem; font-weight:800; margin-bottom:20px;">
+                        <span>Total</span>
+                        <span id="cart-total">S/ 0.00</span>
+                    </div>
+                    <button onclick="checkoutWA()" class="btn-gps-action" style="width:100%; justify-content:center; background:var(--jst-onyx); color:white;">
+                        Procesar Compra <i class="fa-brands fa-whatsapp"></i>
+                    </button>
                 </div>
-                <div id="cart-items-list" style="flex:1;"></div>
-                <div class="suggestions-box" id="suggestions-area" style="display:none;">
-                    <div style="font-size:0.9rem; font-weight:800; color:var(--jst-slate); text-transform:uppercase; margin-bottom:1rem;">Te podría gustar</div>
-                    <div class="suggestions-scroll" id="suggestions-render"></div>
-                </div>
-                <div style="margin-top:auto; padding-top:2rem;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:800; font-size:1.2rem;"><span>Subtotal:</span><span id="step1-total">S/ 0.00</span></div>
-                    <button style="width:100%; padding:20px; background:var(--jst-onyx); color:white; border:none; border-radius:18px; font-weight:800; font-size:1.1rem; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="goToStep(2)"><span>Continuar Compra</span><i class="fas fa-arrow-right"></i></button>
-                </div>
-            </div>
-
-            <div class="cart-step" id="step-2">
-                <button onclick="goToStep(1)" style="background:none; border:none; font-weight:700; color:var(--jst-slate); cursor:pointer; display:flex; align-items:center; gap:8px; margin-bottom:1.5rem;"><i class="fas fa-arrow-left"></i> Volver a productos</button>
-                <h3 style="font-family:var(--font-accent); margin-bottom:1.5rem;">Datos de Entrega</h3>
-                <input type="text" id="form-name" class="premium-input" placeholder="Tu nombre" oninput="validateForm()">
-                <input type="text" id="form-address" class="premium-input" placeholder="Dirección exacta de entrega" oninput="validateForm()">
-                <input type="tel" id="form-phone" class="premium-input" placeholder="Celular para coordinar" oninput="validateForm()">
-                <div style="position:relative; margin-bottom:5px;">
-                    <input type="number" id="form-km" class="premium-input" placeholder="Distancia (KM)" oninput="refreshSummary()" style="padding-right:50px;">
-                    <button onclick="calculateGPSDistance()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); border:none; background:none; color:var(--jst-accent-gold); cursor:pointer; font-size:1.2rem;" title="Usar mi ubicación actual"><i class="fas fa-map-marker-alt" id="gps-icon-btn"></i></button>
-                </div>
-                <div id="gps-status-msg" style="font-size:0.75rem; color:#94a3b8; margin-bottom:20px; display:flex; align-items:center; gap:5px;"><i class="fas fa-info-circle"></i> Toca el ícono 📍 si estás en el lugar de entrega ahora.</div>
-                <div style="background:#fffbf7; padding:20px; border-radius:15px; border:1px dashed var(--jst-accent-gold); margin-bottom:20px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px; color:#64748b;"><span>Productos:</span><span id="final-subtotal">S/ 0.00</span></div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:#64748b;"><span>Delivery:</span><span id="final-shipping">Calculando...</span></div>
-                    <div style="display:flex; justify-content:space-between; font-weight:900; font-size:1.4rem; border-top:1px solid #ddd; padding-top:10px; color:var(--jst-accent-gold);"><span>TOTAL:</span><span id="final-total">S/ 0.00</span></div>
-                </div>
-                <button id="btn-wa" class="btn-wa-final" onclick="launchCelebration()"><i class="fab fa-whatsapp" style="font-size:1.4rem;"></i> Pedir por WhatsApp</button>
             </div>
         </div>
     </aside>
 
-    <div id="celebration-modal"><div class="celebration-content"><div class="success-icon"><i class="fas fa-check"></i></div><h2 style="font-family:var(--font-accent); font-size:2rem; margin-bottom:10px;">¡Excelente!</h2><p style="color:var(--jst-slate); font-size:1.1rem;">Tu pedido está listo.<br>Te atendemos por WhatsApp...</p><div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div></div></div>
-
-    <div id="review-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px); z-index:9500; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:0.3s;" onclick="closeReviewModal(event)">
-        <div style="background:white; width:90%; max-width:500px; padding:30px; border-radius:25px; position:relative; transform:translateY(20px); transition:0.3s;">
-            <button onclick="closeReviewModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:1.2rem; cursor:pointer;"><i class="fas fa-times"></i></button>
-            <h3 style="font-family:var(--font-accent); text-align:center; margin-bottom:10px;">Tu opinión nos importa</h3>
-            <p style="text-align:center; color:#64748b; font-size:0.9rem; margin-bottom:20px;">Ayúdanos a mejorar contándonos tu experiencia.</p>
-            <div style="display:flex; justify-content:center; gap:10px; margin-bottom:20px; color:#e2e8f0; font-size:1.8rem; cursor:pointer;"><i class="fas fa-star onclick-star" onclick="setStars(1)"></i><i class="fas fa-star onclick-star" onclick="setStars(2)"></i><i class="fas fa-star onclick-star" onclick="setStars(3)"></i><i class="fas fa-star onclick-star" onclick="setStars(4)"></i><i class="fas fa-star onclick-star" onclick="setStars(5)"></i></div>
-            <textarea id="review-text" placeholder="¿Qué te pareció el producto?..." style="width:100%; height:100px; padding:15px; border-radius:15px; border:1px solid #e2e8f0; resize:none; font-family:inherit; margin-bottom:15px; font-size:0.95rem;"></textarea>
-            <button onclick="submitReviewWA()" style="width:100%; background:var(--jst-whatsapp); color:white; padding:18px; border:none; border-radius:15px; font-weight:800; cursor:pointer; display:flex; justify-content:center; align-items:center; gap:10px; font-size:1rem;">Enviar Reseña <i class="fab fa-whatsapp"></i></button>
+    <div id="quick-view-modal">
+        <div class="qv-content">
+            <div style="position:absolute; top:20px; right:20px; z-index:100;">
+                <div class="btn-close-modal" onclick="closeQuickView()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            <div class="qv-grid" id="qv-body">
+                </div>
         </div>
     </div>
 
-    <div id="quick-view-modal" onclick="closeQuickView(event)"><div class="qv-content" onclick="event.stopPropagation()"><button class="qv-close" onclick="closeQuickView()"><i class="fas fa-times"></i></button><div class="qv-grid"><div class="qv-image"><img id="qv-img" src="" alt=""></div><div class="qv-details"><span id="qv-cat" class="qv-category">CATEGORÍA</span><h2 id="qv-name">Producto</h2><div class="qv-price" id="qv-price">S/ 0.00</div><p id="qv-desc" class="qv-description">...</p><button id="qv-btn-add" class="btn-add-qv" onclick="addToCartFromQV()"><span>Lo quiero</span><i class="fas fa-plus"></i></button></div></div></div></div>
-    <div id="toast-notify" style="position:fixed; bottom:-100px; left:50%; transform:translateX(-50%); background:var(--jst-onyx); color:white; padding:14px 28px; border-radius:50px; z-index:9000; transition:0.5s; font-weight:700; box-shadow:0 10px 25px rgba(0,0,0,0.2); white-space:nowrap;">Agregado al carrito</div>
+    <div id="gps-modal">
+        <div class="gps-container">
+            <div class="gps-header">
+                <div class="gps-title">
+                    <h2>Ubicación de Entrega</h2>
+                    <div class="gps-status">
+                        <span class="status-dot" id="gps-dot"></span>
+                        <span id="gps-status-text">Esperando señal...</span>
+                    </div>
+                </div>
+                <div class="btn-close-modal" onclick="closeGPS()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            
+            <div id="map-frame">
+                <div id="map" style="width:100%; height:100%;"></div>
+            </div>
 
+            <div class="gps-overlay-info">
+                <div class="gps-coords-box">
+                    <div class="gps-address" id="gps-address-display">Localizando...</div>
+                    <div class="gps-latlng" id="gps-coords-display">--.------, --.------</div>
+                </div>
+                <button class="btn-gps-action btn-confirm-loc" onclick="sendLocationWA()">
+                    <i class="fa-brands fa-whatsapp"></i> Confirmar Ubicación
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // CONFIGURACIÓN
-        const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOKWE4Wyh_N_pt12iDlXx_garwZHFKRcE19DRoKSa2Cb_v3KoSmcQcJXRS2MdrfB7Bso-DqSXdINSt/pub?gid=0&single=true&output=csv";
-        const STORE_LOCATION = { lat: -12.053850, lng: -77.031550 }; 
-        let CATALOG_DB = [];
-        let state_cart = JSON.parse(localStorage.getItem('jst_master_cart')) || [];
-        let current_category = "Todas";
-        let currentQVId = null;
-        const FREE_SHIPPING_THRESHOLD = 500;
+        /* ==========================================================================
+           LÓGICA DE NEGOCIO JSTORE R
+           ========================================================================== */
+        
+        // 1. DATA (Productos Simulados para Demo)
+        const globalProducts = [
+            { id:1, name:"Reloj Midnight Chrono", price:1250, cat:"Relojes", img:"https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=600&q=80" },
+            { id:2, name:"Bolso Leather Elite", price:890, cat:"Accesorios", img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=600&q=80" },
+            { id:3, name:"Gafas Aviator Gold", price:450, cat:"Gafas", img:"https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=600&q=80" },
+            { id:4, name:"Perfume Essence Noir", price:320, cat:"Perfumes", img:"https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=600&q=80" },
+            { id:5, name:"Sneakers Urban King", price:680, cat:"Calzado", img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" },
+            { id:6, name:"Collar Diamond Cut", price:1500, cat:"Joyería", img:"https://images.unsplash.com/photo-1599643478518-17488fbbcd75?auto=format&fit=crop&w=600&q=80" }
+        ];
 
-        window.onload = async () => { initGoldDust(); await fetchProducts(); renderPills(); refreshCartUI(); initReviewStars(); };
+        let cart = [];
+        let currentFilter = 'all';
 
-        // LÓGICA DE DATOS
-        async function fetchProducts() {
-            try {
-                const response = await fetch(GOOGLE_SHEET_URL);
-                if (!response.ok) throw new Error("Error de conexión");
-                const data = await response.text();
-                CATALOG_DB = parseCSV(data);
-                renderCollection();
-            } catch (error) { 
-                console.error("Error:", error);
-                document.getElementById('main-grid').innerHTML = '<div style="grid-column:1/-1; padding:4rem; text-align:center; color:#ef4444;">Error cargando productos.</div>';
+        // 2. INICIALIZACIÓN
+        window.onload = () => {
+            initGoldDust(); // Efecto Visual
+            renderPills();
+            renderCatalog(globalProducts);
+            // El mapa NO se inicia aquí para ahorrar batería
+        };
+
+        // 3. RENDERIZADO CATÁLOGO
+        function renderCatalog(products) {
+            const container = document.getElementById('catalog');
+            container.innerHTML = products.map(p => `
+                <div class="card-item">
+                    <div class="card-img-container" onclick="openQuickView(${p.id})">
+                        <img src="${p.img}" loading="lazy" alt="${p.name}">
+                    </div>
+                    <div style="margin-top:auto;">
+                        <div style="font-size:0.85rem; color:var(--jst-accent-gold); font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;">${p.cat}</div>
+                        <h3 style="font-size:1.15rem; margin-bottom:10px;">${p.name}</h3>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="price-tag">S/ ${p.price}</span>
+                            <button class="btn-add" onclick="addToCart(${p.id})"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPills() {
+            const cats = ['all', ...new Set(globalProducts.map(p=>p.cat))];
+            const container = document.getElementById('pills-container');
+            container.innerHTML = cats.map(c => 
+                `<div class="pill-item ${c==='all'?'active':''}" onclick="filterByCat('${c}', this)">${c === 'all' ? 'Todo' : c}</div>`
+            ).join('');
+        }
+
+        function filterByCat(cat, el) {
+            document.querySelectorAll('.pill-item').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            const filtered = cat === 'all' ? globalProducts : globalProducts.filter(p => p.cat === cat);
+            renderCatalog(filtered);
+        }
+
+        function filterProducts(txt) {
+            const term = txt.toLowerCase();
+            const filtered = globalProducts.filter(p => p.name.toLowerCase().includes(term));
+            renderCatalog(filtered);
+        }
+
+        // 4. CARRITO & MODALES
+        function addToCart(id) {
+            const prod = globalProducts.find(p => p.id === id);
+            const existing = cart.find(c => c.id === id);
+            if(existing) existing.qty++;
+            else cart.push({...prod, qty:1});
+            updateCartUI();
+            toggleCart(true); // Abrir carrito al añadir
+        }
+
+        function updateCartUI() {
+            document.getElementById('cart-count').innerText = cart.reduce((a,b)=>a+b.qty, 0);
+            const total = cart.reduce((a,b)=>a+(b.price*b.qty), 0);
+            document.getElementById('cart-total').innerText = `S/ ${total.toFixed(2)}`;
+            
+            // Render Items
+            const container = document.getElementById('cart-items-container');
+            if(cart.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:4rem 1rem; color:var(--jst-slate);"><i class="fa-solid fa-basket-shopping" style="font-size:3rem; margin-bottom:1rem; opacity:0.3;"></i><p>Tu bolsa de compras está vacía.</p></div>`;
+            } else {
+                container.innerHTML = cart.map(c => `
+                    <div style="display:flex; gap:15px; margin-bottom:20px;">
+                        <img src="${c.img}" style="width:70px; height:70px; border-radius:12px; object-fit:cover;">
+                        <div style="flex:1;">
+                            <div style="font-weight:700;">${c.name}</div>
+                            <div style="color:var(--jst-slate); font-size:0.9rem;">S/ ${c.price} x ${c.qty}</div>
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+                            <div style="font-weight:800;">S/ ${c.price*c.qty}</div>
+                            <i class="fa-solid fa-trash" style="color:#ef4444; cursor:pointer;" onclick="removeFromCart(${c.id})"></i>
+                        </div>
+                    </div>
+                `).join('');
             }
         }
-        function parseCSV(csvText) {
-            const lines = csvText.split('\n');
-            const result = [];
-            for(let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if(!line) continue;
-                const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
-                const clean = (txt) => txt ? txt.replace(/^"|"$/g, '').trim() : '';
-                if(parts.length >= 5) {
-                    let priceString = clean(parts[3]).replace(/[S/$,\s]/g, ''); 
-                    const precio = parseFloat(priceString);
-                    const stockVal = parts[6] ? parseInt(clean(parts[6]).replace(/\D/g,'')) : 0;
-                    if(!isNaN(precio)) result.push({ id: clean(parts[0]), name: clean(parts[1]), cat: clean(parts[2]), price: precio, img: clean(parts[4]), desc: clean(parts[5]), stock: isNaN(stockVal) ? 0 : stockVal });
+
+        function removeFromCart(id) {
+            cart = cart.filter(c => c.id !== id);
+            updateCartUI();
+        }
+
+        function toggleCart(forceOpen = false) {
+            const el = document.getElementById('side-cart');
+            if(forceOpen) el.classList.add('open');
+            else el.classList.toggle('open');
+        }
+
+        function checkoutWA() {
+            if(cart.length === 0) return;
+            const items = cart.map(c => `• ${c.name} (x${c.qty}) - S/${c.price*c.qty}`).join('%0A');
+            const total = document.getElementById('cart-total').innerText;
+            const msg = `Hola JstoreR, quiero procesar este pedido:%0A%0A${items}%0A%0A*TOTAL: ${total}*`;
+            window.open(`https://wa.me/51932508670?text=${msg}`, '_blank');
+        }
+
+        // ==========================================================================
+        // MÓDULO DE GPS & MAPAS (INTEGRACIÓN PROFESIONAL)
+        // ==========================================================================
+        let map, userMarker, accuracyCircle, watchId;
+        let currentUserLocation = { lat: null, lng: null, address: '' };
+
+        function openGPS() {
+            document.getElementById('gps-modal').classList.add('active');
+            if (!map) {
+                // Pequeño delay para permitir que la animación CSS termine antes de cargar el mapa pesado
+                setTimeout(initMap, 300);
+            } else {
+                startTracking(); // Reactivar tracking si ya estaba cargado
+            }
+        }
+
+        function closeGPS() {
+            document.getElementById('gps-modal').classList.remove('active');
+            stopTracking(); // Ahorrar batería al cerrar
+        }
+
+        function initMap() {
+            // Inicializar Leaflet
+            map = L.map('map').setView([-12.046374, -77.042793], 13); // Default Lima
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            startTracking();
+        }
+
+        function startTracking() {
+            if (!navigator.geolocation) {
+                alert("Tu navegador no soporta geolocalización.");
+                return;
+            }
+
+            const statusDot = document.getElementById('gps-dot');
+            const statusText = document.getElementById('gps-status-text');
+
+            statusText.innerText = "Buscando señal satelital...";
+            statusDot.classList.remove('active');
+
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            };
+
+            watchId = navigator.geolocation.watchPosition(successGPS, errorGPS, options);
+        }
+
+        function stopTracking() {
+            if (watchId) navigator.geolocation.clearWatch(watchId);
+            const statusDot = document.getElementById('gps-dot');
+            if(statusDot) statusDot.classList.remove('active');
+        }
+
+        function successGPS(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+
+            currentUserLocation.lat = lat;
+            currentUserLocation.lng = lng;
+
+            // Actualizar UI Estado
+            document.getElementById('gps-dot').classList.add('active');
+            document.getElementById('gps-status-text').innerText = `Señal activa (Precisión: ${Math.round(accuracy)}m)`;
+            document.getElementById('gps-coords-display').innerText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+            // Actualizar Mapa
+            if (!userMarker) {
+                userMarker = L.marker([lat, lng]).addTo(map);
+                accuracyCircle = L.circle([lat, lng], { radius: accuracy, color: '#c76a3a', fillColor: '#c76a3a', fillOpacity: 0.2 }).addTo(map);
+                map.setView([lat, lng], 18); // Zoom cercano
+            } else {
+                userMarker.setLatLng([lat, lng]);
+                accuracyCircle.setLatLng([lat, lng]).setRadius(accuracy);
+                // Solo centrar si está muy lejos para no molestar si el usuario mueve el mapa
+                if(!map.getBounds().contains(userMarker.getLatLng())) {
+                    map.panTo([lat, lng]);
                 }
             }
-            return result;
+
+            // Reverse Geocoding (Obtener Dirección)
+            // Debounce simple para no saturar la API
+            if(!this.lastFetch || (Date.now() - this.lastFetch > 3000)) {
+                this.lastFetch = Date.now();
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const addr = data.display_name;
+                        currentUserLocation.address = addr;
+                        document.getElementById('gps-address-display').innerText = addr.split(',')[0]; // Solo la calle principal
+                        
+                        userMarker.bindPopup(`
+                            <div style="text-align:center;">
+                                <b style="color:#c76a3a">Tu ubicación actual</b><br>
+                                ${addr}<br>
+                                <span style="font-size:0.8em; color:#666">Actualizado ahora mismo</span>
+                            </div>
+                        `).openPopup();
+                    })
+                    .catch(err => console.log("Error dirección:", err));
+            }
         }
 
-        // RENDERIZADO
-        function renderCollection() {
-            const query = document.getElementById('master-search').value.toLowerCase();
-            const grid = document.getElementById('main-grid');
-            const filtered = CATALOG_DB.filter(p => (current_category === "Todas" || p.cat === current_category) && (p.name.toLowerCase().includes(query) || p.cat.toLowerCase().includes(query)));
-            if(filtered.length === 0) { if(CATALOG_DB.length > 0) grid.innerHTML = '<div style="grid-column:1/-1; padding:4rem; text-align:center; color:#94a3b8;">No encontramos coincidencias.</div>'; return; }
-            grid.innerHTML = filtered.map(p => {
-                const isSoldOut = p.stock <= 0; const isLow = p.stock > 0 && p.stock <= 3;
-                let badge = isSoldOut ? '<div style="position:absolute; top:10px; right:10px; background:#ef4444; color:white; font-size:0.7rem; font-weight:800; padding:5px 10px; border-radius:50px; z-index:2;">AGOTADO</div>' : (isLow ? `<div style="position:absolute; top:10px; right:10px; background:#f59e0b; color:white; font-size:0.7rem; font-weight:800; padding:5px 10px; border-radius:50px; z-index:2;">¡QUEDAN ${p.stock}!</div>` : '');
-                const btn = isSoldOut ? `<button class="btn-add" style="background:#f1f5f9; color:#cbd5e1; cursor:not-allowed;"><i class="fas fa-ban"></i></button>` : `<button class="btn-add" onclick="addItemToCart('${p.id}')"><i class="fas fa-plus"></i></button>`;
-                return `<article class="card-item" style="${isSoldOut ? 'opacity:0.7;' : ''}">${badge}<div class="card-img-container" onclick="openQuickView('${p.id}')"><img src="${p.img}" alt="${p.name}" loading="lazy" style="${isSoldOut ? 'filter:grayscale(100%);' : ''}"></div><div class="card-info"><span style="font-size:0.65rem; color:var(--jst-accent-gold); font-weight:800; text-transform:uppercase;">${p.cat}</span><h3 style="font-size:1.1rem; margin:5px 0 8px;">${p.name}</h3><p style="font-size:0.85rem; color:var(--jst-slate); line-height:1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.desc}</p></div><div class="card-action" style="margin-top:auto; padding-top:15px; display:flex; justify-content:space-between; align-items:center;"><span class="price-tag">S/ ${p.price.toFixed(2)}</span>${btn}</div></article>`;
-            }).join('');
+        function errorGPS(err) {
+            console.warn(`ERROR(${err.code}): ${err.message}`);
+            document.getElementById('gps-status-text').innerText = "Error de señal o permiso denegado";
         }
-        function renderPills() { document.getElementById('category-pills-render').innerHTML = ["Todas", ...new Set(CATALOG_DB.map(p => p.cat).filter(Boolean))].map(c => `<div class="pill-item ${c===current_category?'active':''}" onclick="setCategory('${c}',this)">${c}</div>`).join(''); }
-        function setCategory(c, el) { current_category = c; renderPills(); renderCollection(); }
-        function handleSmartFilter() { renderCollection(); }
 
-        // FUNCIONES DE CARRITO & UI
-        function openQuickView(id) {
-            const p = CATALOG_DB.find(x => x.id == id); if(!p) return;
-            currentQVId = id;
-            document.getElementById('qv-img').src = p.img; document.getElementById('qv-cat').innerText = p.cat;
-            document.getElementById('qv-name').innerText = p.name; document.getElementById('qv-price').innerText = `S/ ${p.price.toFixed(2)}`;
-            document.getElementById('qv-desc').innerText = p.desc;
-            const btn = document.getElementById('qv-btn-add');
-            if(p.stock <= 0) { btn.innerHTML = '<span>Agotado</span><i class="fas fa-ban"></i>'; btn.style.pointerEvents = 'none'; btn.style.background='#e2e8f0'; btn.style.color='#94a3b8'; }
-            else { btn.innerHTML = '<span>Lo quiero</span><i class="fas fa-plus"></i>'; btn.style.pointerEvents = 'auto'; btn.style.background='var(--jst-onyx)'; btn.style.color='#fff'; }
-            document.getElementById('quick-view-modal').classList.add('active');
+        // Función "Killer Feature": Enviar ubicación al vendedor
+        function sendLocationWA() {
+            if(!currentUserLocation.lat) {
+                alert("Espera a que obtengamos tu ubicación exacta.");
+                return;
+            }
+            
+            const msg = `Hola JstoreR, confirmo mi ubicación de entrega:%0A%0A📍 *Dirección:* ${currentUserLocation.address}%0A🌍 *Coords:* https://maps.google.com/?q=${currentUserLocation.lat},${currentUserLocation.lng}%0A%0A(Precisión GPS verificada)`;
+            
+            window.open(`https://wa.me/51932508670?text=${msg}`, '_blank');
         }
-        function closeQuickView(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('quick-view-modal').classList.remove('active'); }
-        function addToCartFromQV() { if(currentQVId) { addItemToCart(currentQVId); closeQuickView(); toggleCart(true); } }
-        function addItemToCart(id) {
-            const prod = CATALOG_DB.find(x => x.id == id); if(!prod || prod.stock <= 0) return;
-            const item = state_cart.find(x => x.id == id);
-            if(item) { if(item.qty < prod.stock) item.qty++; else return alert("Stock límite alcanzado."); } else { state_cart.push({...prod, qty:1}); }
-            updateCart(); showToast(); if(document.getElementById('side-cart').classList.contains('open')) renderSuggestions();
-        }
-        function modQty(id, d) {
-            const item = state_cart.find(x => x.id == id); const prod = CATALOG_DB.find(x => x.id == id);
-            if(item) { if(d > 0 && item.qty >= prod.stock) return alert("Stock límite alcanzado."); item.qty+=d; if(item.qty<=0) state_cart = state_cart.filter(x=>x.id!=id); updateCart(); }
-        }
-        function updateCart() { localStorage.setItem('jst_master_cart', JSON.stringify(state_cart)); refreshCartUI(); }
-        function refreshCartUI() {
-            const count = state_cart.reduce((a,b)=>a+b.qty,0);
-            const badge = document.getElementById('cart-badge'); badge.innerText = count; badge.style.display = count>0?'flex':'none';
-            if(count>0) { badge.classList.add('pop'); setTimeout(()=>badge.classList.remove('pop'),300); }
-            const list = document.getElementById('cart-items-list');
-            if(state_cart.length===0) { list.innerHTML = '<div style="text-align:center; padding:3rem; opacity:0.5;">Tu bolsa está vacía...</div>'; goToStep(1); }
-            else { list.innerHTML = state_cart.map(i => `<div style="display:flex; gap:12px; margin-bottom:15px; align-items:center; background:white; padding:10px; border-radius:15px; border:1px solid #f1f5f9;"><img src="${i.img}" style="width:60px; height:60px; border-radius:10px; object-fit:cover;"><div style="flex:1;"><h4 style="font-size:0.9rem; margin:0;">${i.name}</h4><span style="font-weight:700; color:var(--jst-accent-gold);">S/ ${i.price.toFixed(2)}</span></div><div style="display:flex; gap:8px; background:#f8fafc; padding:5px 10px; border-radius:20px;"><i class="fas fa-minus" onclick="modQty('${i.id}',-1)" style="cursor:pointer; font-size:0.7rem; padding:4px;"></i><span style="font-weight:700; font-size:0.85rem;">${i.qty}</span><i class="fas fa-plus" onclick="modQty('${i.id}',1)" style="cursor:pointer; font-size:0.7rem; padding:4px;"></i></div></div>`).join(''); }
-            const sub = state_cart.reduce((a,b)=>a+(b.price*b.qty),0);
-            document.getElementById('step1-total').innerText = `S/ ${sub.toFixed(2)}`;
-            const bar = document.getElementById('ship-progress-bar');
-            const pct = Math.min(100, (sub/FREE_SHIPPING_THRESHOLD)*100); bar.style.width = `${pct}%`;
-            if(sub >= FREE_SHIPPING_THRESHOLD) { document.getElementById('shipping-progress-box').classList.add('unlocked'); document.getElementById('ship-msg-text').innerHTML = "<span style='color:#10b981'>¡Envío GRATIS conseguido!</span>"; }
-            else { document.getElementById('shipping-progress-box').classList.remove('unlocked'); document.getElementById('ship-msg-text').innerHTML = `Faltan <b>S/ ${(FREE_SHIPPING_THRESHOLD-sub).toFixed(2)}</b> para envío gratis`; }
-            renderSuggestions(); refreshSummary();
-        }
-        function renderSuggestions() {
-            if(state_cart.length===0) { document.getElementById('suggestions-area').style.display='none'; return; }
-            const ids = state_cart.map(x=>x.id); const avail = CATALOG_DB.filter(p=>!ids.includes(p.id) && p.stock > 0).sort(()=>0.5-Math.random()).slice(0,4);
-            if(avail.length>0) { document.getElementById('suggestions-area').style.display='block'; document.getElementById('suggestions-render').innerHTML = avail.map(s=>`<div class="mini-card" onclick="addItemToCart('${s.id}')"><div style="position:relative;"><img src="${s.img}" style="width:100%; height:100px; object-fit:cover; border-radius:10px; margin-bottom:8px;"><div style="position:absolute; bottom:5px; right:5px; background:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-plus" style="font-size:0.6rem;"></i></div></div><div style="font-size:0.8rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.name}</div><div style="color:var(--jst-accent-gold); font-size:0.85rem; font-weight:800;">S/ ${s.price.toFixed(2)}</div></div>`).join(''); }
-            else document.getElementById('suggestions-area').style.display='none';
-        }
-        function refreshSummary() {
-            const sub = state_cart.reduce((a,b)=>a+(b.price*b.qty),0); const km = parseFloat(document.getElementById('form-km').value) || 0;
-            let ship = (sub < FREE_SHIPPING_THRESHOLD && km > 0) ? Math.max(5, km * 1.90) : 0;
-            let shipTxt = (sub >= FREE_SHIPPING_THRESHOLD) ? "GRATIS" : (ship===0 ? "Calculando..." : `S/ ${ship.toFixed(2)}`);
-            document.getElementById('final-subtotal').innerText = `S/ ${sub.toFixed(2)}`;
-            document.getElementById('final-shipping').innerText = shipTxt;
-            document.getElementById('final-total').innerText = `S/ ${(sub+ship).toFixed(2)}`;
-            validateForm();
-        }
-        function validateForm() {
-            const n = document.getElementById('form-name').value; const a = document.getElementById('form-address').value; const p = document.getElementById('form-phone').value;
-            const btn = document.getElementById('btn-wa'); if(n.length>3 && a.length>5 && p.length>8) btn.classList.add('active'); else btn.classList.remove('active');
-        }
-        function launchCelebration() { toggleCart(false); document.getElementById('celebration-modal').classList.add('active'); setTimeout(()=>document.getElementById('progress-fill').style.width='100%', 100); setTimeout(actualRedirect, 3200); }
-        function actualRedirect() {
-            const n = document.getElementById('form-name').value; const a = document.getElementById('form-address').value;
-            const km = document.getElementById('form-km').value || 0; const ship = document.getElementById('final-shipping').innerText; const total = document.getElementById('final-total').innerText;
-            let msg = `👋 *¡Hola! Quiero hacer un pedido en JstoreR*\n━━━━━━━━━━━━━━━━━━━━\n👤 *Soy:* ${n}\n📍 *Para:* ${a}\n🚚 *Envío:* ${ship} (${km}km)\n━━━━━━━━━━━━━━━━━━━━\n🛍️ *MI PEDIDO:*\n\n`;
-            state_cart.forEach(i => { msg += `🔹 *${i.name}*\n     ${i.qty} und. x S/ ${i.price.toFixed(2)}\n`; });
-            msg += `\n💰 *TOTAL A PAGAR: ${total}*\n\n¿Me confirman si tienen stock? ¡Gracias!`;
-            state_cart=[]; updateCart(); window.location.href = `https://wa.me/51932508670?text=${encodeURIComponent(msg)}`;
-        }
-        function toggleCart(o) { document.getElementById('side-cart').classList.toggle('open', o); if(!o) setTimeout(()=>goToStep(1),500); }
-        function goToStep(s) { const cart = document.getElementById('side-cart'); const title = document.getElementById('cart-title'); if(s===2) { if(state_cart.length===0) return alert("Agrega productos"); cart.classList.add('step-2'); title.innerText="Confirmar Datos"; } else { cart.classList.remove('step-2'); title.innerText="Tu Bolsa"; } }
-        function calculateGPSDistance() {
-            const btnIcon = document.getElementById('gps-icon-btn'); const statusMsg = document.getElementById('gps-status-msg');
-            if (!navigator.geolocation) return alert("Tu dispositivo no soporta geolocalización.");
-            btnIcon.className = 'fas fa-spinner fa-spin'; statusMsg.innerHTML = '<span style="color:var(--jst-accent-gold);">Buscando señal...</span>';
-            navigator.geolocation.getCurrentPosition(pos => {
-                if(confirm("CONFIRMACIÓN DE UBICACIÓN:\n\n¿Estás en el lugar de entrega ahora mismo?")) {
-                    const dist = getDist(STORE_LOCATION.lat, STORE_LOCATION.lng, pos.coords.latitude, pos.coords.longitude);
-                    document.getElementById('form-km').value = dist.toFixed(1); refreshSummary();
-                    btnIcon.className = 'fas fa-check-circle'; btnIcon.style.color = '#10b981';
-                    statusMsg.innerHTML = '<i class="fas fa-check-circle" style="color:#10b981;"></i> Ubicación verificada';
-                    if(document.getElementById('form-address').value==="") { document.getElementById('form-address').value="(Ubicación GPS actual)"; validateForm(); }
-                } else {
-                    alert("Entendido. Ingresa los KM manualmente."); btnIcon.className = 'fas fa-map-marker-alt'; statusMsg.innerHTML = '<span style="color:#ef4444;">Cancelado. Ingresa KM manual.</span>';
-                }
-            }, err => { alert("Activa el GPS."); btnIcon.className = 'fas fa-map-marker-alt'; statusMsg.innerHTML = 'Error GPS'; }, { enableHighAccuracy: true });
-        }
-        function getDist(lat1, lon1, lat2, lon2) {
-            const R = 6371; const dLat = (lat2-lat1)*(Math.PI/180); const dLon = (lon2-lon1)*(Math.PI/180);
-            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*(Math.PI/180))*Math.cos(lat2*(Math.PI/180)) * Math.sin(dLon/2)*Math.sin(dLon/2);
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.25;
-        }
-        function showToast() { const t = document.getElementById('toast-notify'); t.style.bottom='40px'; setTimeout(()=>t.style.bottom='-100px', 2500); }
-        // NUEVO: Lógica del Acordeón FAQ
-        function toggleFaq(el) { el.classList.toggle('active'); }
-        // Reseñas y Efectos
-        function openReviewModal() { const m = document.getElementById('review-modal'); m.style.opacity='1'; m.style.pointerEvents='auto'; m.querySelector('div').style.transform='translateY(0)'; }
-        function closeReviewModal(e) { if(e && e.target !== e.currentTarget) return; const m = document.getElementById('review-modal'); m.style.opacity='0'; m.style.pointerEvents='none'; m.querySelector('div').style.transform='translateY(20px)'; }
-        let starRating = 5; function setStars(n) { starRating = n; document.querySelectorAll('.onclick-star').forEach((s,i) => { s.style.color = i < n ? '#f59e0b' : '#e2e8f0'; }); } function initReviewStars() { setStars(5); }
-        function submitReviewWA() { const txt = document.getElementById('review-text').value; window.open(`https://wa.me/51932508670?text=${encodeURIComponent(`Reseña ${starRating} estrellas: "${txt}"`)}`, '_blank'); closeReviewModal(); }
+
+        /* ==========================================================================
+           EFECTOS VISUALES (Polvo de Oro)
+           ========================================================================== */
         function initGoldDust() {
-            const cvs = document.getElementById('gold-dust-layer'); if(!cvs) return; const ctx = cvs.getContext('2d');
-            cvs.width=window.innerWidth; cvs.height=window.innerHeight;
-            const p = Array(25).fill().map(()=>({x:Math.random()*cvs.width, y:Math.random()*cvs.height, r:Math.random()*1.5+0.5, s:Math.random()*0.3+0.1}));
-            function d() { ctx.clearRect(0,0,cvs.width,cvs.height); ctx.fillStyle="rgba(199, 106, 58, 0.4)"; p.forEach(f=>{ ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fill(); f.y-=f.s; f.x+=Math.sin(f.y*0.02)*0.3; if(f.y<0) f.y=cvs.height; if(f.x>cvs.width) f.x=0; }); requestAnimationFrame(d); } d();
-        } window.addEventListener('resize', () => { const cvs = document.getElementById('gold-dust-layer'); if(cvs) { cvs.width=window.innerWidth; cvs.height=window.innerHeight; }});
+            const cvs = document.getElementById('gold-dust-layer');
+            const ctx = cvs.getContext('2d');
+            cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+            
+            const particles = Array(35).fill().map(() => ({
+                x: Math.random() * cvs.width,
+                y: Math.random() * cvs.height,
+                r: Math.random() * 2,
+                speed: Math.random() * 0.5 + 0.1
+            }));
+            
+            function animate() {
+                ctx.clearRect(0, 0, cvs.width, cvs.height);
+                ctx.fillStyle = "rgba(199, 106, 58, 0.5)"; // Tono Gold
+                
+                particles.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    p.y -= p.speed; // Flotan hacia arriba
+                    if(p.y < 0) p.y = cvs.height;
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+            
+            window.addEventListener('resize', () => {
+                cvs.width = window.innerWidth;
+                cvs.height = window.innerHeight;
+            });
+        }
+
+        // Quick View Logic (Simplificada)
+        function openQuickView(id) {
+            const p = globalProducts.find(x => x.id === id);
+            const modal = document.getElementById('quick-view-modal');
+            const content = document.getElementById('qv-body');
+            
+            content.innerHTML = `
+                <div style="background:#f8fafc; padding:30px; display:flex; align-items:center; justify-content:center;">
+                    <img src="${p.img}" style="max-width:100%; max-height:400px; object-fit:contain;">
+                </div>
+                <div style="padding:40px;">
+                    <div style="color:var(--jst-accent-gold); font-weight:700; margin-bottom:10px;">${p.cat}</div>
+                    <h2 style="font-family:var(--font-accent); font-size:2rem; margin-bottom:20px;">${p.name}</h2>
+                    <div style="font-size:2rem; font-weight:800; margin-bottom:30px;">S/ ${p.price}</div>
+                    <p style="color:var(--jst-slate); line-height:1.6; margin-bottom:30px;">
+                        Esta pieza exclusiva de la colección Elite representa la cúspide del diseño moderno.
+                        Materiales premium y acabados a mano.
+                    </p>
+                    <button class="btn-gps-action" style="background:var(--jst-onyx); color:white; width:100%; justify-content:center;" onclick="addToCart(${p.id}); closeQuickView()">
+                        Añadir a la Bolsa
+                    </button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+        function closeQuickView() { document.getElementById('quick-view-modal').classList.remove('active'); }
+
     </script>
 </body>
 </html>
