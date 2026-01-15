@@ -1,8 +1,8 @@
 
 /* ==========================================================================
-   JSTORER - LÓGICA INTEGRADA V24.0 (FINAL VERIFIED)
+   JSTORER - LÓGICA INTEGRADA V24.0 (VERIFICADA)
    ========================================================================== */
-// 1. CONFIGURACIÓN
+// 1. CONFIGURACIÓN E INTERFAZ CON GOOGLE SHEETS
 const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOKWE4Wyh_N_pt12iDlXx_garwZHFKRcE19DRoKSa2Cb_v3KoSmcQcJXRS2MdrfB7Bso-DqSXdINSt/pub?gid=0&single=true&output=csv";
 const STORE_LOCATION = { lat: -12.053850, lng: -77.031550 };
 let CATALOG_DB = [];
@@ -11,7 +11,7 @@ let current_category = "Todas";
 let currentQVId = null;
 const FREE_SHIPPING_THRESHOLD = 500;
 const SHIPPING_RATE_PER_KM = 1.5;
-// Variables Globales
+// Variables de Mapa
 let map, userMarker, debounceTimer;
 let starRating = 5;
 window.onload = async () => {
@@ -21,7 +21,7 @@ window.onload = async () => {
     refreshCartUI();
     initReviewStars();
 };
-// --- LÓGICA DE DATOS (GOOGLE SHEETS) ---
+// --- CARGA DE PRODUCTOS ---
 async function fetchProducts() {
     try {
         const response = await fetch(GOOGLE_SHEET_URL);
@@ -40,7 +40,7 @@ async function fetchProducts() {
             };
         }).filter(p => p.id && p.name);
         renderCollection();
-    } catch (e) { console.error("Error cargando productos:", e); }
+    } catch (e) { console.error("Error cargando Sheet:", e); }
 }
 function renderCollection() {
     const grid = document.getElementById('main-grid');
@@ -49,32 +49,28 @@ function renderCollection() {
     const term = document.getElementById('master-search').value.toLowerCase();
     const final = filtered.filter(p => p.name.toLowerCase().includes(term));
     
-    grid.innerHTML = final.map(p => {
-        const isSoldOut = p.stock <= 0;
-        const btn = isSoldOut 
-            ? `<button class="btn-add" style="background:#e2e8f0; color:#94a3b8; cursor:not-allowed;"><i class="fas fa-ban"></i></button>`
-            : `<button class="btn-add" onclick="addItemToCart('${p.id}')"><i class="fas fa-plus"></i></button>`;
-        return `
-        <article class="card-item" style="${isSoldOut ? 'opacity:0.7;' : ''}">
+    grid.innerHTML = final.map(p => `
+        <article class="card-item" style="${p.stock <= 0 ? 'opacity:0.7;' : ''}">
             <div class="card-img-container" onclick="openQuickView('${p.id}')">
                 <img src="${p.img}" alt="${p.name}" loading="lazy">
             </div>
             <div class="card-info">
                 <span style="font-size:0.65rem; color:var(--jst-accent-gold); font-weight:800; text-transform:uppercase;">${p.cat}</span>
                 <h3 style="font-size:1.1rem; margin:5px 0 8px;">${p.name}</h3>
-                <p style="font-size:0.85rem; color:var(--jst-slate); line-height:1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.desc}</p>
             </div>
             <div class="card-action" style="margin-top:auto; padding-top:15px; display:flex; justify-content:space-between; align-items:center;">
-                <span class="price-tag">S/ ${p.price.toFixed(2)}</span>${btn}
+                <span class="price-tag">S/ ${p.price.toFixed(2)}</span>
+                <button class="btn-add" onclick="addItemToCart('${p.id}')">
+                    <i class="fas ${p.stock <= 0 ? 'fa-ban' : 'fa-plus'}"></i>
+                </button>
             </div>
-        </article>`;
-    }).join('');
+        </article>`).join('');
 }
 function renderPills() {
     const pillsCont = document.getElementById('category-pills-render');
     if (!pillsCont) return;
-    pillsCont.innerHTML = ["Todas", ...new Set(CATALOG_DB.map(p => p.cat).filter(Boolean))]
-        .map(c => `<div class="pill-item ${c===current_category?'active':''}" onclick="setCategory('${c}',this)">${c}</div>`).join('');
+    const cats = ["Todas", ...new Set(CATALOG_DB.map(p => p.cat).filter(Boolean))];
+    pillsCont.innerHTML = cats.map(c => `<div class="pill-item ${c===current_category?'active':''}" onclick="setCategory('${c}')">${c}</div>`).join('');
 }
 function setCategory(c) { current_category = c; renderPills(); renderCollection(); }
 function handleSmartFilter() { renderCollection(); }
@@ -89,7 +85,7 @@ function addItemToCart(id) {
     const exist = state_cart.find(x => x.id == id);
     if(exist) exist.qty++; else state_cart.push({...p, qty: 1});
     updateCart();
-    showToast("Producto agregado");
+    showToast("Agregado al carrito");
 }
 function updateCart() {
     localStorage.setItem('jst_master_cart', JSON.stringify(state_cart));
@@ -106,19 +102,18 @@ function refreshCartUI() {
     if (cartList) {
         cartList.innerHTML = state_cart.map((item, idx) => `
             <div style="display:flex; gap:15px; margin-bottom:20px; align-items:center;">
-                <img src="${item.img}" style="width:70px; height:70px; border-radius:12px; object-fit:cover;">
+                <img src="${item.img}" style="width:60px; height:60px; border-radius:12px; object-fit:cover;">
                 <div style="flex:1;">
                     <h4 style="font-size:0.9rem;">${item.name}</h4>
                     <div style="color:var(--jst-accent-gold); font-weight:700;">S/ ${(item.price * item.qty).toFixed(2)}</div>
                 </div>
                 <div style="display:flex; align-items:center; gap:10px; background:#f1f5f9; padding:5px 10px; border-radius:8px;">
                     <button onclick="modQty(${idx}, -1)" style="border:none; background:none; cursor:pointer;">-</button>
-                    <span style="font-weight:700; font-size:0.9rem;">${item.qty}</span>
+                    <span style="font-weight:700;">${item.qty}</span>
                     <button onclick="modQty(${idx}, 1)" style="border:none; background:none; cursor:pointer;">+</button>
                 </div>
-                <button onclick="remItem(${idx})" style="border:none; background:none; color:#ef4444; cursor:pointer;"><i class="fas fa-trash"></i></button>
-            </div>
-        `).join('');
+                <button onclick="remItem(${idx})" style="border:none; background:none; color:#ef4444;"><i class="fas fa-trash"></i></button>
+            </div>`).join('');
     }
     refreshSummary();
 }
@@ -133,6 +128,7 @@ function refreshSummary() {
     const step1Total = document.getElementById('step1-total');
     if (step1Total) step1Total.innerText = `S/ ${sub.toFixed(2)}`;
     
+    // Envío Gratis
     const bar = document.getElementById('ship-progress-bar');
     if (bar) {
         const pct = Math.min(100, (sub/FREE_SHIPPING_THRESHOLD)*100);
@@ -147,10 +143,10 @@ function refreshSummary() {
             msg.innerHTML = `Faltan <b>S/ ${(FREE_SHIPPING_THRESHOLD-sub).toFixed(2)}</b> para envío gratis`;
         }
     }
-    renderSuggestions();
-    
     // Totales Paso 2
-    document.getElementById('final-subtotal').innerText = `S/ ${sub.toFixed(2)}`;
+    const finalSub = document.getElementById('final-subtotal');
+    if (finalSub) finalSub.innerText = `S/ ${sub.toFixed(2)}`;
+    
     const distStr = document.getElementById('form-km').value;
     let shipCost = 0;
     const shipDisplay = document.getElementById('final-shipping');
@@ -161,27 +157,13 @@ function refreshSummary() {
         shipCost = Math.max(10, parseFloat(distStr) * SHIPPING_RATE_PER_KM);
         if (shipDisplay) shipDisplay.innerText = `S/ ${shipCost.toFixed(2)}`;
     } else {
-        if (shipDisplay) shipDisplay.innerText = "Por calcular";
+        if (shipDisplay) shipDisplay.innerText = "S/ 0.00";
     }
     
-    document.getElementById('final-total').innerText = `S/ ${(sub + shipCost).toFixed(2)}`;
+    const finalTotal = document.getElementById('final-total');
+    if (finalTotal) finalTotal.innerText = `S/ ${(sub + shipCost).toFixed(2)}`;
 }
-function renderSuggestions() {
-    const sugArea = document.getElementById('suggestions-area');
-    if(!sugArea) return;
-    if(!state_cart.length) return sugArea.style.display='none';
-    const ids = state_cart.map(x=>x.id);
-    const avail = CATALOG_DB.filter(p=>!ids.includes(p.id) && p.stock > 0).sort(()=>0.5-Math.random()).slice(0,4);
-    if(avail.length) {
-        sugArea.style.display='block';
-        document.getElementById('suggestions-render').innerHTML = avail.map(s=>`
-            <div class="mini-card" onclick="addItemToCart('${s.id}')">
-                <img src="${s.img}" style="width:100%; height:80px; object-fit:cover; border-radius:10px; margin-bottom:8px;">
-                <div style="font-size:0.8rem; font-weight:700;">S/ ${s.price}</div>
-            </div>`).join('');
-    }
-}
-// --- MAPAS & NAVEGACIÓN ---
+// --- NAVEGACIÓN Y MAPAS ---
 function goToStep(n) {
     const cart = document.getElementById('side-cart');
     n === 2 ? cart.classList.add('step-2') : cart.classList.remove('step-2');
@@ -196,12 +178,11 @@ function initMapLogic() {
     if(map) return;
     map = L.map('map-picker').setView([STORE_LOCATION.lat, STORE_LOCATION.lng], 12);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '© OSM & Carto', maxZoom: 19
+        attribution: '© OSM', maxZoom: 19
     }).addTo(map);
     map.on('click', function(e) {
         setPin(e.latlng.lat, e.latlng.lng, true);
     });
-    addGpsControl();
 }
 function setPin(lat, lng, autoFetchName = false) {
     if(userMarker) map.removeLayer(userMarker);
@@ -257,24 +238,6 @@ function searchAddress(query) {
         } catch(e) {}
     }, 400);
 }
-function addGpsControl() {
-    const btn = L.Control.extend({
-        options: { position: 'topright' },
-        onAdd: function() {
-            const c = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-            c.innerHTML = '<a href="#" style="background:white; width:30px; height:30px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#333;"><i class="fas fa-crosshairs"></i></a>';
-            c.onclick = function(e) {
-                e.preventDefault();
-                if(!navigator.geolocation) return alert("GPS no activo");
-                navigator.geolocation.getCurrentPosition(pos => {
-                    setPin(pos.coords.latitude, pos.coords.longitude, true);
-                });
-            };
-            return c;
-        }
-    });
-    map.addControl(new btn());
-}
 function getDist(lat1, lon1, lat2, lon2) {
     const R = 6371; 
     const dLat = (lat2-lat1) * Math.PI/180;
@@ -282,7 +245,7 @@ function getDist(lat1, lon1, lat2, lon2) {
     const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
-// --- FORMULARIOS & CELEBRACIÓN ---
+// --- FINALIZAR PEDIDO ---
 function validateForm() {
     const name = document.getElementById('form-name').value;
     const addr = document.getElementById('address-search').value;
@@ -295,12 +258,12 @@ function triggerCelebration() {
     const bar = document.getElementById('celebration-progress');
     modal.style.opacity = '1';
     modal.style.pointerEvents = 'auto';
-    setTimeout(() => { bar.style.width = "100%"; }, 100);
+    setTimeout(() => { if(bar) bar.style.width = "100%"; }, 100);
     setTimeout(() => { 
         sendOrder(); 
         modal.style.opacity = '0';
         modal.style.pointerEvents = 'none';
-        bar.style.width = "0%"; 
+        if(bar) bar.style.width = "0%"; 
     }, 3000);
 }
 function sendOrder() {
@@ -310,29 +273,18 @@ function sendOrder() {
     const total = document.getElementById('final-total').innerText;
     const coords = document.getElementById('real-coordinates').value;
     
-    let msg = `*HOLA JSTORE-R, NUEVO PEDIDO:*\n\n`;
+    let msg = `*NUEVO PEDIDO JSTORE-R:*\n\n`;
     state_cart.forEach(p => msg += `— ${p.name} (x${p.qty})\n`);
-    msg += `\n*TOTAL A PAGAR:* ${total}\n`;
+    msg += `\n*TOTAL:* ${total}\n`;
     msg += `--------------------------\n`;
-    msg += `*DATOS DE ENTREGA:*\n👤 Cliente: ${name}\n📍 Dirección: ${addr}\n📱 Celular: ${phone}`;
-    if(coords) msg += `\n🗺️ Mapa: https://www.google.com/maps?q=${coords}`;
+    msg += `*ENVÍO:* ${addr}\n`;
+    msg += `*CLIENTE:* ${name}\n`;
+    msg += `*CELULAR:* ${phone}`;
+    if(coords) msg += `\n*MAPA:* https://www.google.com/maps?q=${coords}`;
     
     window.open(`https://wa.me/51932508670?text=${encodeURIComponent(msg)}`, '_blank');
 }
-// --- VISUALS, REVIEWS & MODALS ---
-function openQuickView(id) {
-    const p = CATALOG_DB.find(x => x.id == id);
-    if(!p) return;
-    currentQVId = id;
-    document.getElementById('qv-img').src = p.img;
-    document.getElementById('qv-cat').innerText = p.cat;
-    document.getElementById('qv-name').innerText = p.name;
-    document.getElementById('qv-price').innerText = `S/ ${p.price.toFixed(2)}`;
-    document.getElementById('qv-desc').innerText = p.desc;
-    document.getElementById('quick-view-modal').classList.add('active');
-}
-function closeQuickView() { document.getElementById('quick-view-modal').classList.remove('active'); }
-function addToCartFromQV() { if(currentQVId) { addItemToCart(currentQVId); closeQuickView(); } }
+// --- EFECTOS VISUALES ---
 function initGoldDust() {
     const cvs = document.getElementById('gold-dust-layer'); if(!cvs) return;
     const ctx = cvs.getContext('2d');
@@ -349,21 +301,24 @@ function initGoldDust() {
     }
     draw();
 }
-function openReviewModal() { 
-    const modal = document.getElementById('review-modal');
-    modal.style.opacity = '1';
-    modal.style.pointerEvents = 'auto';
+function openQuickView(id) {
+    const p = CATALOG_DB.find(x => x.id == id);
+    if(!p) return;
+    currentQVId = id;
+    document.getElementById('qv-img').src = p.img;
+    document.getElementById('qv-cat').innerText = p.cat;
+    document.getElementById('qv-name').innerText = p.name;
+    document.getElementById('qv-price').innerText = `S/ ${p.price.toFixed(2)}`;
+    document.getElementById('qv-desc').innerText = p.desc;
+    document.getElementById('quick-view-modal').classList.add('active');
 }
-function closeReviewModal() { 
-    const modal = document.getElementById('review-modal');
-    modal.style.opacity = '0';
-    modal.style.pointerEvents = 'none';
-}
+function closeQuickView() { document.getElementById('quick-view-modal').classList.remove('active'); }
+function addToCartFromQV() { if(currentQVId) { addItemToCart(currentQVId); closeQuickView(); } }
+function openReviewModal() { document.getElementById('review-modal').classList.add('active'); }
+function closeReviewModal() { document.getElementById('review-modal').classList.remove('active'); }
 function setStars(n) { 
     starRating = n; 
-    document.querySelectorAll('.onclick-star').forEach((s,i) => { 
-        s.style.color = i < n ? '#f59e0b' : '#e2e8f0'; 
-    }); 
+    document.querySelectorAll('.onclick-star').forEach((s,i) => { s.style.color = i < n ? '#f59e0b' : '#e2e8f0'; }); 
 }
 function initReviewStars() { setStars(5); }
 function submitReviewWA() {
