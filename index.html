@@ -5,10 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#111827"> 
-    <title>JstoreR · Luxury Shopping</title>
+    <title>JstoreR · Tienda Oficial</title>
+    <meta name="description" content="Galería exclusiva de artículos. Envíos seguros y verificados a todo el Perú.">
     
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="styles.css">
@@ -17,78 +20,124 @@
     <canvas id="gold-dust-layer"></canvas>
     
     <div class="top-announcement-bar">
-        <span class="top-tag">PREMIUM</span>
-        <span>Envío GRATIS desde S/ 400</span>
+        <span class="top-tag">OFERTA</span>
+        <span>Envíos GRATIS en pedidos superiores a S/ 400</span>
     </div>
     <header class="header-master" id="navbar">
         <nav class="nav-container">
             <a href="#" class="logo-box">
-                <img src="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png" class="logo-img" alt="Logo JstoreR">
+                <img src="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png" class="logo-img" alt="Logo">
                 <div class="logo-text">
-                    <span class="brand-name">JstoreR</span>
-                    <span class="brand-sub">Luxury Store</span>
+                    <span class="brand-title">JstoreR</span>
+                    <span class="brand-subtitle">Tienda Oficial</span>
                 </div>
             </a>
             <div class="cart-trigger" onclick="toggleCart(true)">
                 <i class="fas fa-shopping-bag"></i>
-                <span id="cart-badge" class="badge-count">0</span>
+                <span id="cart-badge" class="badge-count" style="display:none;">0</span>
             </div>
         </nav>
     </header>
     <main>
-        <section class="hero-mobile-ready">
-            <h1>Exclusividad en cada detalle</h1>
+        <section class="hero-v10">
+            <div class="hero-badge">
+                <i class="fas fa-clock"></i> Colección Disponible 2026
+            </div>
+            <h1>Date el gusto que mereces</h1>
             <div class="search-wrapper">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" id="master-search" class="search-input" placeholder="Buscar productos..." oninput="handleSmartFilter()">
+                <input type="text" id="master-search" class="search-input" placeholder="¿Qué estás buscando hoy?" oninput="handleSmartFilter()">
             </div>
             <div class="pills-container-wrapper">
                 <div class="pills-flex" id="category-pills-render"></div>
             </div>
         </section>
         <div class="catalog-container" id="main-grid">
+            <div class="skeleton"></div><div class="skeleton"></div>
+            <div class="skeleton"></div><div class="skeleton"></div>
+        </div>
+        <section class="reviews-section">
+            <div class="section-header">
+                <span class="sub">Social Proof</span>
+                <h2>La Experiencia JstoreR</h2>
+                <div class="rating-summary">
+                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <span class="score">4.9/5</span>
+                    <span class="count">(+500 clientes felices)</span>
+                </div>
             </div>
-        <section class="trust-badges">
-            <div class="badge-item"><i class="fas fa-shield-check"></i><span>Pago Seguro</span></div>
-            <div class="badge-item"><i class="fas fa-truck-fast"></i><span>Envío Express</span></div>
-            <div class="badge-item"><i class="fas fa-star"></i><span>Calidad Top</span></div>
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="rev-user">
+                        <div class="avatar">JP</div>
+                        <div class="u-info"><h4>Juan Pablo M.</h4><span><i class="fas fa-check-circle"></i> Compra Verificada</span></div>
+                    </div>
+                    <p>"La calidad superó mis expectativas. El envío llegó al día siguiente a Arequipa."</p>
+                </div>
+            </div>
+            <div class="review-action">
+                <button onclick="openReviewModal()"><i class="fas fa-pen"></i> Déjanos tu opinión</button>
+            </div>
+        </section>
+        <section class="faq-container">
+            <h2 class="faq-title">Preguntas Frecuentes</h2>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Cómo realizo el pago? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">Aceptamos transferencias BCP, Interbank, BBVA y Yape/Plin. El pago se coordina por WhatsApp tras finalizar el pedido.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Es seguro el envío? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">Totalmente. Trabajamos con Shalom y Olva Courier con código de seguimiento en tiempo real.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">¿Tienen tienda física? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">Somos 100% online con almacén en Lima para ofrecer los mejores precios del mercado.</div>
+            </div>
         </section>
     </main>
     <div class="side-cart" id="side-cart">
         <div class="cart-header">
-            <h3>Mi Bolsa</h3>
-            <button class="close-cart" onclick="toggleCart(false)"><i class="fas fa-times"></i></button>
+            <h3>Tu Bolsa</h3>
+            <button onclick="toggleCart(false)"><i class="fas fa-times"></i></button>
         </div>
         
         <div class="cart-views-container">
             <div class="cart-step" id="step-1">
-                <div class="shipping-info-mini" id="shipping-progress-box">
-                    <div class="msg-bar"><span id="ship-msg-text">Cargando...</span></div>
-                    <div class="progress-track"><div class="progress-fill" id="ship-progress-bar"></div></div>
+                <div class="shipping-bar-container">
+                    <div class="ship-header"><span id="ship-msg-text">Calculando...</span><i class="fas fa-truck-fast"></i></div>
+                    <div class="ship-track"><div class="ship-fill" id="ship-progress-bar"></div></div>
                 </div>
-                <div id="cart-items-list" class="items-scroll"></div>
-                <div class="step-footer">
-                    <div class="total-row"><span>Subtotal</span><span id="step1-total">S/ 0.00</span></div>
-                    <button class="btn-primary" onclick="goToStep(2)">Continuar <i class="fas fa-chevron-right"></i></button>
+                <div id="cart-items-list" class="items-list-scroll"></div>
+                <div class="suggestions-area" id="suggestions-area" style="display:none;">
+                    <p class="sug-title">TE PODRÍA GUSTAR</p>
+                    <div class="suggestions-scroll" id="suggestions-render"></div>
+                </div>
+                <div class="cart-footer">
+                    <div class="total-row"><span>Subtotal:</span><span id="step1-total">S/ 0.00</span></div>
+                    <button class="btn-main" onclick="goToStep(2)">Continuar Compra <i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
             
             <div class="cart-step" id="step-2">
-                <button class="back-btn" onclick="goToStep(1)"><i class="fas fa-arrow-left"></i> Volver</button>
-                <div class="map-section">
+                <button class="btn-back" onclick="goToStep(1)"><i class="fas fa-arrow-left"></i> Volver</button>
+                <h3 class="step-title">¿Dónde lo entregamos?</h3>
+                
+                <div class="map-wrapper">
                     <div id="order-map"></div>
-                    <button class="gps-btn" onclick="getCurrentLocation()"><i class="fas fa-location-arrow"></i></button>
+                    <button class="btn-gps" onclick="getCurrentLocation()"><i class="fas fa-location-crosshairs"></i></button>
                 </div>
-                <div class="form-container">
-                    <input type="text" id="form-name" class="premium-input" placeholder="Nombre completo" oninput="validateForm()">
-                    <textarea id="form-address" class="premium-input" placeholder="Dirección (Ubícala en el mapa)" oninput="validateForm()" readonly></textarea>
+                <p class="map-hint"><i class="fas fa-info-circle"></i> Mueve el pin para ubicar tu casa exactamente.</p>
+                <div class="form-group">
+                    <input type="text" id="form-name" class="premium-input" placeholder="Tu nombre" oninput="validateForm()">
+                    <textarea id="form-address" class="premium-input" placeholder="Dirección detallada" oninput="validateForm()" rows="2"></textarea>
                     <input type="tel" id="form-phone" class="premium-input" placeholder="Celular / WhatsApp" oninput="validateForm()">
                     <input type="hidden" id="form-km" value="0">
                 </div>
-                <div class="step-footer">
-                    <div class="summary-box">
-                        <div class="sum-row"><span>Envío (km)</span><span id="final-shipping">S/ 0.00</span></div>
-                        <div class="sum-row total"><span>Total</span><span id="final-total">S/ 0.00</span></div>
+                <div class="cart-footer">
+                    <div class="summary-card">
+                        <div class="sum-line"><span>Subtotal:</span><span id="final-subtotal">S/ 0.00</span></div>
+                        <div class="sum-line"><span>Envío (KM):</span><span id="final-shipping">S/ 0.00</span></div>
+                        <div class="sum-line total"><span>Total:</span><span id="final-total">S/ 0.00</span></div>
                     </div>
                     <button class="btn-wa-final" id="btn-finish" onclick="sendOrder()">
                         Finalizar por WhatsApp <i class="fab fa-whatsapp"></i>
@@ -97,7 +146,22 @@
             </div>
         </div>
     </div>
-    <div id="toast-notify">Producto agregado</div>
+    <div id="quick-view-modal" onclick="closeQuickView(event)">
+        <div class="qv-content" onclick="event.stopPropagation()">
+            <button class="qv-close" onclick="closeQuickView()"><i class="fas fa-times"></i></button>
+            <div class="qv-grid">
+                <div class="qv-image"><img id="qv-img" src=""></div>
+                <div class="qv-details">
+                    <span id="qv-cat" class="qv-cat"></span>
+                    <h2 id="qv-name"></h2>
+                    <div id="qv-price" class="qv-price"></div>
+                    <p id="qv-desc"></p>
+                    <button class="btn-wa-final active" onclick="addToCartFromQV()">Lo quiero <i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="toast-notify">Agregado al carrito</div>
     <script src="script.js"></script>
 </body>
 </html>
