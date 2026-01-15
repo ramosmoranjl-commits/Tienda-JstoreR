@@ -6,9 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#111827"> 
     <title>JstoreR · Tienda Oficial</title>
+    <meta name="description" content="Galería exclusiva de artículos. Envíos seguros y verificados a todo el Perú.">
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="JstoreR · Catálogo 2026">
+    <meta property="og:description" content="Descubre nuestra colección exclusiva. Envíos a todo el Perú.">
+    <meta property="og:image" content="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png">
+    
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -16,6 +21,10 @@
 </head>
 <body>
     <canvas id="gold-dust-layer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:5; opacity:0.4;"></canvas>
+    <div class="top-announcement-bar">
+        <span class="top-tag">OFERTA</span>
+        <span>Envíos GRATIS en pedidos superiores a S/ 500</span>
+    </div>
     <header class="header-master" id="navbar">
         <nav class="nav-container">
             <a href="#" class="logo-box">
@@ -33,64 +42,119 @@
     </header>
     <main>
         <section class="hero-v10">
-            <h1>Date el gusto que mereces</h1>
-            <div class="search-wrapper">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="master-search" class="search-input" placeholder="¿Qué estás buscando hoy?" oninput="handleSmartFilter()">
+            <div style="display:inline-block; border:1px solid var(--jst-accent-gold); padding:5px 15px; border-radius:50px; margin-bottom:1rem; color:var(--jst-accent-gold); font-weight:700; font-size:0.8rem;">
+                <i class="fas fa-clock"></i> Colección Disponible por Tiempo Limitado
             </div>
+            <h1>Date el gusto que mereces</h1>
+            <div class="search-wrapper"><i class="fas fa-search search-icon"></i><input type="text" id="master-search" class="search-input" placeholder="¿Qué estás buscando hoy?" oninput="handleSmartFilter()"></div>
             <div class="pills-container-wrapper"><div class="pills-flex" id="category-pills-render"></div></div>
         </section>
         <div class="catalog-container" id="main-grid">
             <div class="skeleton" style="height:400px;"></div>
+            <div class="skeleton" style="height:400px;"></div>
+            <div class="skeleton" style="height:400px;"></div>
+            <div class="skeleton" style="height:400px;"></div>
         </div>
+        <section style="max-width:1200px; margin:4rem auto; padding:0 2rem;">
+            <div style="text-align:center; margin-bottom:3rem;">
+                <span style="color:var(--jst-accent-gold); font-weight:800; letter-spacing:2px; font-size:0.8rem; text-transform:uppercase;">Social Proof</span>
+                <h2 style="font-family:var(--font-accent); font-size:2.2rem; margin:10px 0;">La Experiencia JstoreR</h2>
+                <div style="display:flex; justify-content:center; align-items:center; gap:10px; color:var(--jst-onyx);">
+                    <div style="font-size:1.2rem; color:#f59e0b;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <span style="font-weight:700;">4.9/5</span>
+                    <span style="color:var(--jst-slate);">(Más de 500 clientes felices)</span>
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:30px;">
+                <div style="background:white; padding:25px; border-radius:20px; border:1px solid #f1f5f9; box-shadow:0 10px 30px -10px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+                    <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                        <div style="width:45px; height:45px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--jst-slate);">JP</div>
+                        <div><h4 style="font-size:0.95rem; margin:0;">Juan Pablo M.</h4><span style="font-size:0.8rem; color:#10b981;"><i class="fas fa-check-circle"></i> Compra Verificada</span></div>
+                    </div>
+                    <div style="margin-bottom:15px; color:#f59e0b; font-size:0.9rem;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p style="color:var(--jst-slate); font-size:0.95rem; line-height:1.6;">"La calidad superó mis expectativas. El envío llegó al día siguiente a Arequipa."</p>
+                </div>
+            </div>
+            
+            <div style="text-align:center; margin-top:3rem;">
+                <button onclick="openReviewModal()" style="background:none; border:2px solid var(--jst-onyx); padding:15px 30px; border-radius:50px; font-weight:800; cursor:pointer; transition:0.3s; display:inline-flex; align-items:center; gap:10px; font-size:1rem;">
+                    <i class="fas fa-pen"></i> ¿Ya compraste? Déjanos tu opinión
+                </button>
+            </div>
+        </section>
+        <section class="faq-container">
+            <h2 style="font-family:var(--font-accent); text-align:center; margin-bottom:2rem;">Preguntas Frecuentes</h2>
+            <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question">¿Cómo realizo el pago? <i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-answer">Aceptamos transferencias BCP, Interbank, BBVA y Yape/Plin.</div></div>
+            <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question">¿Es seguro el envío? <i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-answer">Totalmente. Trabajamos con Shalom y Olva Courier con código de seguimiento.</div></div>
+            <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question">¿Tienen tienda física? <i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-answer">Somos 100% online con almacén en Lima para ofrecer mejores precios.</div></div>
+        </section>
     </main>
+    <footer style="background: white; border-top: 1px solid #f1f5f9; padding: 4rem 2rem 2rem; margin-top: auto;">
+        <div style="text-align:center; font-size:0.9rem; color:var(--jst-slate);">
+            &copy; 2026 JstoreR. Todos los derechos reservados.
+        </div>
+    </footer>
     <div class="side-cart" id="side-cart">
         <div class="cart-header">
-            <h2>Tu Bolsa</h2>
-            <button onclick="toggleCart(false)" style="background:none; border:none; font-size:1.5rem;"><i class="fas fa-times"></i></button>
+            <h2 style="font-family:var(--font-accent);">Tu Bolsa</h2>
+            <button onclick="toggleCart(false)" style="background:none; border:none; font-size:1.5rem; cursor:pointer;"><i class="fas fa-times"></i></button>
         </div>
         <div class="cart-views-container">
             <div class="cart-step" id="step-1">
+                <div class="shipping-progress-box" id="shipping-progress-box">
+                    <div style="font-size:0.85rem; font-weight:700; color:var(--jst-slate); margin-bottom:8px; display:flex; justify-content:space-between;"><span id="ship-msg-text">Calculando envío...</span><i class="fas fa-truck-fast"></i></div>
+                    <div style="width:100%; height:6px; background:#e2e8f0; border-radius:10px;"><div class="progress-bar-ship" id="ship-progress-bar"></div></div>
+                </div>
                 <div id="cart-items-list" style="flex:1;"></div>
+                <div class="suggestions-box" id="suggestions-area" style="display:none;">
+                    <div style="font-size:0.9rem; font-weight:800; color:var(--jst-slate); text-transform:uppercase; margin-bottom:1rem;">Te podría gustar</div>
+                    <div class="suggestions-scroll" id="suggestions-render"></div>
+                </div>
                 <div style="margin-top:auto; padding-top:2rem;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:800; font-size:1.2rem;"><span>Subtotal:</span><span id="step1-total">S/ 0.00</span></div>
-                    <button class="btn-wa-final active" style="opacity:1; pointer-events:auto;" onclick="goToStep(2)"><span>Continuar Compra</span><i class="fas fa-arrow-right"></i></button>
+                    <button style="width:100%; padding:20px; background:var(--jst-onyx); color:white; border:none; border-radius:18px; font-weight:800; font-size:1.1rem; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="goToStep(2)"><span>Continuar Compra</span><i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
             
             <div class="cart-step" id="step-2">
-                <button onclick="goToStep(1)" style="background:none; border:none; font-weight:700; color:var(--jst-slate); cursor:pointer; margin-bottom:1.5rem;"><i class="fas fa-arrow-left"></i> Volver</button>
-                <h3 style="font-family:var(--font-accent); margin-bottom:1rem;">Ubicación de Entrega</h3>
-                
-                <div style="position:relative; margin-bottom:15px;">
-                    <input type="text" id="address-search" class="premium-input" placeholder="Escribe tu dirección..." oninput="searchAddress(this.value)">
-                    <div id="address-results" class="search-results"></div>
-                </div>
-                <div id="map-picker" class="map-container"></div>
+                <button onclick="goToStep(1)" style="background:none; border:none; font-weight:700; color:var(--jst-slate); cursor:pointer; display:flex; align-items:center; gap:8px; margin-bottom:1.5rem;"><i class="fas fa-arrow-left"></i> Volver</button>
+                <h3 style="font-family:var(--font-accent); margin-bottom:1.5rem;">Datos de Entrega</h3>
                 <input type="text" id="form-name" class="premium-input" placeholder="Tu nombre" oninput="validateForm()">
-                <input type="tel" id="form-phone" class="premium-input" placeholder="Celular" oninput="validateForm()">
-                
-                <input type="hidden" id="form-km"> 
-                <input type="hidden" id="real-coordinates">
-                <div style="margin-top:auto; background:#f8fafc; padding:20px; border-radius:15px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>Envío:</span><span id="final-shipping">S/ 0.00</span></div>
-                    <div style="display:flex; justify-content:space-between; font-weight:900; font-size:1.3rem;"><span>Total:</span><span id="final-total">S/ 0.00</span></div>
-                    <button class="btn-wa-final" id="btn-finish" onclick="triggerCelebration()" style="margin-top:15px;">Finalizar Pedido <i class="fab fa-whatsapp"></i></button>
+                <input type="text" id="form-address" class="premium-input" placeholder="Dirección exacta de entrega" oninput="validateForm()">
+                <input type="tel" id="form-phone" class="premium-input" placeholder="Celular para coordinar" oninput="validateForm()">
+                <div style="position:relative; margin-bottom:20px;">
+                    <input type="number" id="form-km" class="premium-input" placeholder="Distancia (KM)" oninput="validateForm()" readonly style="background:#f8fafc;">
+                    <button onclick="handleLocation()" style="position:absolute; right:10px; top:10px; padding:8px 15px; background:var(--jst-onyx); color:white; border:none; border-radius:8px; cursor:pointer;"><i class="fas fa-map-marker-alt" id="gps-icon"></i></button>
+                </div>
+                <div style="margin-top:auto;">
+                    <div style="background:#f8fafc; padding:20px; border-radius:15px; margin-bottom:20px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:var(--jst-slate);"><span>Subtotal:</span><span id="final-subtotal">S/ 0.00</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:var(--jst-slate);"><span>Envío:</span><span id="final-shipping">Calculando...</span></div>
+                        <div style="display:flex; justify-content:space-between; font-weight:900; font-size:1.3rem; border-top:1px solid #e2e8f0; padding-top:10px;"><span>Total:</span><span id="final-total">S/ 0.00</span></div>
+                    </div>
+                    <button class="btn-wa-final" id="btn-finish" onclick="sendOrder()"><span>Finalizar por WhatsApp</span><i class="fab fa-whatsapp"></i></button>
                 </div>
             </div>
         </div>
     </div>
-    <div id="quick-view-modal" onclick="closeQuickView(event)">...</div>
-    <div id="celebration-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:7000; display:none; align-items:center; justify-content:center; flex-direction:column; opacity:0; transition:0.5s;">
-        <div style="text-align:center;">
-            <div style="font-size:4rem; color:#10b981;"><i class="fas fa-check-circle"></i></div>
-            <h2>¡Pedido casi listo!</h2>
-            <p>Conectando con WhatsApp...</p>
-            <div style="width:200px; height:6px; background:#eee; border-radius:10px; margin:20px auto; overflow:hidden;">
-                <div id="celebration-progress" style="width:0%; height:100%; background:#25d366; transition:3s linear;"></div>
+    <div id="quick-view-modal" onclick="closeQuickView(event)">
+        <div class="qv-content" onclick="event.stopPropagation()">
+            <button class="qv-close" onclick="closeQuickView()" style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:1.5rem; cursor:pointer;"><i class="fas fa-times"></i></button>
+            <div class="qv-grid">
+                <div class="qv-image"><img id="qv-img" src="" alt=""></div>
+                <div class="qv-details">
+                    <span id="qv-cat" style="color:var(--jst-accent-gold); font-weight:800; text-transform:uppercase;"></span>
+                    <h2 id="qv-name" style="font-family:var(--font-accent); font-size:2rem; margin:10px 0;"></h2>
+                    <div id="qv-price" class="price-tag" style="margin-bottom:20px;"></div>
+                    <p id="qv-desc" style="color:var(--jst-slate); line-height:1.6; margin-bottom:30px;"></p>
+                    <button id="qv-btn-add" class="btn-wa-final active" onclick="addToCartFromQV()" style="opacity:1; pointer-events:auto;"><span>Lo quiero</span><i class="fas fa-plus"></i></button>
+                </div>
             </div>
         </div>
     </div>
+    <div id="toast-notify" style="position:fixed; bottom:-100px; left:50%; transform:translateX(-50%); background:var(--jst-onyx); color:white; padding:14px 28px; border-radius:50px; z-index:9000; transition:0.5s; font-weight:700; box-shadow:0 10px 25px rgba(0,0,0,0.2);">Agregado al carrito</div>
     <script src="script.js"></script>
 </body>
 </html>
