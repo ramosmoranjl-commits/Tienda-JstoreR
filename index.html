@@ -4,62 +4,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#111827"> 
+    <meta name="theme-color" content="#111827">
     <title>JstoreR · Tienda Oficial</title>
     <meta name="description" content="Galería exclusiva de artículos. Envíos seguros y verificados a todo el Perú.">
-    
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="JstoreR · Catálogo 2026">
     <meta property="og:description" content="Descubre nuestra colección exclusiva. Envíos a todo el Perú.">
     <meta property="og:image" content="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png">
-    
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png">
-    
+    <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <canvas id="gold-dust-layer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:5; opacity:0.4;"></canvas>
-    <div class="top-announcement-bar">
-        <span class="top-tag">OFERTA</span>
-        <span>Envíos GRATIS en pedidos superiores a S/ 500</span>
-    </div>
-    <header class="header-master" id="navbar">
-        <nav class="nav-container">
-            <a href="#" class="logo-box">
-                <img src="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png" class="logo-img" alt="Logo">
-                <div style="line-height:1;">
-                    <span style="display:block; font-family:var(--font-accent); font-weight:900; font-size:1.6rem;">JstoreR</span>
-                    <span style="font-size:0.6rem; text-transform:uppercase; letter-spacing:3px; color:var(--jst-accent-gold); font-weight:800;">Tienda Oficial</span>
-                </div>
-            </a>
-            <div class="cart-trigger" onclick="toggleCart(true)">
-                <i class="fas fa-shopping-bag" style="font-size: 1.2rem;"></i>
-                <span id="cart-badge" class="badge-count" style="display:none;">0</span>
+<canvas id="gold-dust-layer"></canvas>
+<!-- TOP BAR -->
+<div class="top-announcement-bar">
+    <span class="top-tag">OFERTA</span>
+    <span>Envíos GRATIS en pedidos superiores a S/ 500</span>
+</div>
+<!-- HEADER -->
+<header class="header-master">
+    <nav class="nav-container">
+        <a href="#" class="logo-box">
+            <img src="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png" class="logo-img">
+            <div>
+                <span class="logo-title">JstoreR</span>
+                <span class="logo-sub">Tienda Oficial</span>
             </div>
-        </nav>
-    </header>
-    <main>
-        <section class="hero-v10">
-            <div style="display:inline-block; border:1px solid var(--jst-accent-gold); padding:5px 15px; border-radius:50px; margin-bottom:1rem; color:var(--jst-accent-gold); font-weight:700; font-size:0.8rem;">
-                <i class="fas fa-clock"></i>Colección Disponible por Tiempo Limitado
-            </div>
-            <h1>Date el gusto que mereces</h1>
-            <div class="search-wrapper">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="master-search" class="search-input" placeholder="¿Qué estás buscando hoy?" oninput="handleSmartFilter()">
-            </div>
-            <div class="pills-container-wrapper"><div class="pills-flex" id="category-pills-render"></div></div>
-        </section>
-        <div class="catalog-container" id="main-grid">
-            <div class="skeleton" style="height:400px;"></div>
-            <div class="skeleton" style="height:400px;"></div>
-            <div class="skeleton" style="height:400px;"></div>
-            <div class="skeleton" style="height:400px;"></div>
+        </a>
+        <div class="cart-trigger" onclick="toggleCart(true)">
+            <i class="fas fa-shopping-bag"></i>
+            <span id="cart-badge" class="badge-count">0</span>
         </div>
-        </main>
-    <script src="script.js"></script>
+    </nav>
+</header>
+<main>
+    <!-- HERO -->
+    <section class="hero-v10">
+        <h1>Date el gusto que mereces</h1>
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input id="master-search" class="search-input" placeholder="¿Qué estás buscando hoy?" oninput="handleSmartFilter()">
+        </div>
+        <div class="pills-container-wrapper">
+            <div class="pills-flex" id="category-pills-render"></div>
+        </div>
+    </section>
+    <!-- GRID -->
+    <div class="catalog-container" id="main-grid"></div>
+    <!-- FAQ -->
+    <section class="faq-container">
+        <h2>Preguntas Frecuentes</h2>
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">¿Cómo realizo el pago? <i class="fas fa-chevron-down faq-icon"></i></div>
+            <div class="faq-answer">Aceptamos transferencias, Yape y Plin.</div>
+        </div>
+    </section>
+</main>
+<!-- CARRITO -->
+<aside class="side-cart" id="side-cart"></aside>
+<!-- MODALES -->
+<div id="quick-view-modal"></div>
+<div id="celebration-modal"></div>
+<div id="review-modal"></div>
+<div id="toast-notify">Agregado al carrito</div>
+<!-- JS principal -->
+<script src="js/app.js"></script>
 </body>
 </html>

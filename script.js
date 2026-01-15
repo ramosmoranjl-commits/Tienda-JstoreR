@@ -1,218 +1,83 @@
 
-/* INICIALIZACIÓN DE EFECTOS */
-window.onload = function() {
-    initGoldDust();
-    // Aquí puedes llamar a otras funciones de inicialización que tengas
+// CONFIG
+const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOKWE4Wyh_N_pt12iDlXx_garwZHFKRcE19DRoKSa2Cb_v3KoSmcQcJXRS2MdrfB7Bso-DqSXdINSt/pub?gid=0&single=true&output=csv";
+const FREE_SHIPPING_THRESHOLD = 500;
+let CATALOG_DB = [];
+let state_cart = JSON.parse(localStorage.getItem('jst_master_cart')) || [];
+let current_category = "Todas";
+window.onload = async () => {
+    await fetchProducts();
+    renderPills();
+    refreshCartUI();
 };
-
-function initGoldDust() {
-    const cvs = document.getElementById('gold-dust-layer'); 
-    if(!cvs) return; 
-    const ctx = cvs.getContext('2d');
-    cvs.width = window.innerWidth; 
-    cvs.height = window.innerHeight;
-    const p = Array(25).fill().map(()=>({
-        x: Math.random()*cvs.width, 
-        y: Math.random()*cvs.height, 
-        r: Math.random()*1.5+0.5, 
-        s: Math.random()*0.3+0.1
-    }));
-    function d() { 
-        ctx.clearRect(0,0,cvs.width,cvs.height); 
-        ctx.fillStyle = "rgba(199, 106, 58, 0.4)"; 
-        p.forEach(f => { 
-            ctx.beginPath(); 
-            ctx.arc(f.x, f.y, f.r, 0, Math.PI*2);
-            ctx.fill();
-            f.y -= f.s;
-            if(f.y < -10) f.y = cvs.height + 10;
-        });
-        requestAnimationFrame(d);
-    }
-    d();
+// FETCH
+async function fetchProducts(){
+    const res = await fetch(GOOGLE_SHEET_URL);
+    const csv = await res.text();
+    CATALOG_DB = parseCSV(csv);
+    renderCollection();
 }
-
-/* FUNCIONALIDAD DE RESEÑAS Y CARRITO */
-let starRating = 5; 
-function setStars(n) { 
-    starRating = n; 
-    document.querySelectorAll('.onclick-star').forEach((s,i) => { 
-        s.style.color = i < n ? '#f59e0b' : '#e2e8f0'; 
-    }); 
-} 
-
-function submitReviewWA() { 
-    const txt = document.getElementById('review-text').value; 
-    window.open(`https://wa.me/51932508670?text=${encodeURIComponent(`Reseña ${starRating} estrellas: "${txt}"`)}`, '_blank'); 
-    closeReviewModal(); 
+function parseCSV(csv){
+    const lines = csv.split('\n');
+    const result=[];
+    for(let i=1;i<lines.length;i++){
+        const p = lines[i].split(',');
+        if(p.length>=5){
+            result.push({
+                id:p[0],
+                name:p[1],
+                cat:p[2],
+                price:parseFloat(p[3]),
+                img:p[4],
+                desc:p[5]||"",
+                stock:parseInt(p[6])||0
+            });
+        }
+    }
+    return result;
 }
-
-// ... (<script>
-        // CONFIGURACIÓN
-        const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOKWE4Wyh_N_pt12iDlXx_garwZHFKRcE19DRoKSa2Cb_v3KoSmcQcJXRS2MdrfB7Bso-DqSXdINSt/pub?gid=0&single=true&output=csv";
-        const STORE_LOCATION = { lat: -12.053850, lng: -77.031550 }; 
-        let CATALOG_DB = [];
-        let state_cart = JSON.parse(localStorage.getItem('jst_master_cart')) || [];
-        let current_category = "Todas";
-        let currentQVId = null;
-        const FREE_SHIPPING_THRESHOLD = 500;
-
-        window.onload = async () => { initGoldDust(); await fetchProducts(); renderPills(); refreshCartUI(); initReviewStars(); };
-
-        // LÓGICA DE DATOS
-        async function fetchProducts() {
-            try {
-                const response = await fetch(GOOGLE_SHEET_URL);
-                if (!response.ok) throw new Error("Error de conexión");
-                const data = await response.text();
-                CATALOG_DB = parseCSV(data);
-                renderCollection();
-            } catch (error) { 
-                console.error("Error:", error);
-                document.getElementById('main-grid').innerHTML = '<div style="grid-column:1/-1; padding:4rem; text-align:center; color:#ef4444;">Error cargando productos.</div>';
-            }
-        }
-        function parseCSV(csvText) {
-            const lines = csvText.split('\n');
-            const result = [];
-            for(let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if(!line) continue;
-                const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
-                const clean = (txt) => txt ? txt.replace(/^"|"$/g, '').trim() : '';
-                if(parts.length >= 5) {
-                    let priceString = clean(parts[3]).replace(/[S/$,\s]/g, ''); 
-                    const precio = parseFloat(priceString);
-                    const stockVal = parts[6] ? parseInt(clean(parts[6]).replace(/\D/g,'')) : 0;
-                    if(!isNaN(precio)) result.push({ id: clean(parts[0]), name: clean(parts[1]), cat: clean(parts[2]), price: precio, img: clean(parts[4]), desc: clean(parts[5]), stock: isNaN(stockVal) ? 0 : stockVal });
-                }
-            }
-            return result;
-        }
-
-        // RENDERIZADO
-        function renderCollection() {
-            const query = document.getElementById('master-search').value.toLowerCase();
-            const grid = document.getElementById('main-grid');
-            const filtered = CATALOG_DB.filter(p => (current_category === "Todas" || p.cat === current_category) && (p.name.toLowerCase().includes(query) || p.cat.toLowerCase().includes(query)));
-            if(filtered.length === 0) { if(CATALOG_DB.length > 0) grid.innerHTML = '<div style="grid-column:1/-1; padding:4rem; text-align:center; color:#94a3b8;">No encontramos coincidencias.</div>'; return; }
-            grid.innerHTML = filtered.map(p => {
-                const isSoldOut = p.stock <= 0; const isLow = p.stock > 0 && p.stock <= 3;
-                let badge = isSoldOut ? '<div style="position:absolute; top:10px; right:10px; background:#ef4444; color:white; font-size:0.7rem; font-weight:800; padding:5px 10px; border-radius:50px; z-index:2;">AGOTADO</div>' : (isLow ? `<div style="position:absolute; top:10px; right:10px; background:#f59e0b; color:white; font-size:0.7rem; font-weight:800; padding:5px 10px; border-radius:50px; z-index:2;">¡QUEDAN ${p.stock}!</div>` : '');
-                const btn = isSoldOut ? `<button class="btn-add" style="background:#f1f5f9; color:#cbd5e1; cursor:not-allowed;"><i class="fas fa-ban"></i></button>` : `<button class="btn-add" onclick="addItemToCart('${p.id}')"><i class="fas fa-plus"></i></button>`;
-                return `<article class="card-item" style="${isSoldOut ? 'opacity:0.7;' : ''}">${badge}<div class="card-img-container" onclick="openQuickView('${p.id}')"><img src="${p.img}" alt="${p.name}" loading="lazy" style="${isSoldOut ? 'filter:grayscale(100%);' : ''}"></div><div class="card-info"><span style="font-size:0.65rem; color:var(--jst-accent-gold); font-weight:800; text-transform:uppercase;">${p.cat}</span><h3 style="font-size:1.1rem; margin:5px 0 8px;">${p.name}</h3><p style="font-size:0.85rem; color:var(--jst-slate); line-height:1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.desc}</p></div><div class="card-action" style="margin-top:auto; padding-top:15px; display:flex; justify-content:space-between; align-items:center;"><span class="price-tag">S/ ${p.price.toFixed(2)}</span>${btn}</div></article>`;
-            }).join('');
-        }
-        function renderPills() { document.getElementById('category-pills-render').innerHTML = ["Todas", ...new Set(CATALOG_DB.map(p => p.cat).filter(Boolean))].map(c => `<div class="pill-item ${c===current_category?'active':''}" onclick="setCategory('${c}',this)">${c}</div>`).join(''); }
-        function setCategory(c, el) { current_category = c; renderPills(); renderCollection(); }
-        function handleSmartFilter() { renderCollection(); }
-
-        // FUNCIONES DE CARRITO & UI
-        function openQuickView(id) {
-            const p = CATALOG_DB.find(x => x.id == id); if(!p) return;
-            currentQVId = id;
-            document.getElementById('qv-img').src = p.img; document.getElementById('qv-cat').innerText = p.cat;
-            document.getElementById('qv-name').innerText = p.name; document.getElementById('qv-price').innerText = `S/ ${p.price.toFixed(2)}`;
-            document.getElementById('qv-desc').innerText = p.desc;
-            const btn = document.getElementById('qv-btn-add');
-            if(p.stock <= 0) { btn.innerHTML = '<span>Agotado</span><i class="fas fa-ban"></i>'; btn.style.pointerEvents = 'none'; btn.style.background='#e2e8f0'; btn.style.color='#94a3b8'; }
-            else { btn.innerHTML = '<span>Lo quiero</span><i class="fas fa-plus"></i>'; btn.style.pointerEvents = 'auto'; btn.style.background='var(--jst-onyx)'; btn.style.color='#fff'; }
-            document.getElementById('quick-view-modal').classList.add('active');
-        }
-        function closeQuickView(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('quick-view-modal').classList.remove('active'); }
-        function addToCartFromQV() { if(currentQVId) { addItemToCart(currentQVId); closeQuickView(); toggleCart(true); } }
-        function addItemToCart(id) {
-            const prod = CATALOG_DB.find(x => x.id == id); if(!prod || prod.stock <= 0) return;
-            const item = state_cart.find(x => x.id == id);
-            if(item) { if(item.qty < prod.stock) item.qty++; else return alert("Stock límite alcanzado."); } else { state_cart.push({...prod, qty:1}); }
-            updateCart(); showToast(); if(document.getElementById('side-cart').classList.contains('open')) renderSuggestions();
-        }
-        function modQty(id, d) {
-            const item = state_cart.find(x => x.id == id); const prod = CATALOG_DB.find(x => x.id == id);
-            if(item) { if(d > 0 && item.qty >= prod.stock) return alert("Stock límite alcanzado."); item.qty+=d; if(item.qty<=0) state_cart = state_cart.filter(x=>x.id!=id); updateCart(); }
-        }
-        function updateCart() { localStorage.setItem('jst_master_cart', JSON.stringify(state_cart)); refreshCartUI(); }
-        function refreshCartUI() {
-            const count = state_cart.reduce((a,b)=>a+b.qty,0);
-            const badge = document.getElementById('cart-badge'); badge.innerText = count; badge.style.display = count>0?'flex':'none';
-            if(count>0) { badge.classList.add('pop'); setTimeout(()=>badge.classList.remove('pop'),300); }
-            const list = document.getElementById('cart-items-list');
-            if(state_cart.length===0) { list.innerHTML = '<div style="text-align:center; padding:3rem; opacity:0.5;">Tu bolsa está vacía...</div>'; goToStep(1); }
-            else { list.innerHTML = state_cart.map(i => `<div style="display:flex; gap:12px; margin-bottom:15px; align-items:center; background:white; padding:10px; border-radius:15px; border:1px solid #f1f5f9;"><img src="${i.img}" style="width:60px; height:60px; border-radius:10px; object-fit:cover;"><div style="flex:1;"><h4 style="font-size:0.9rem; margin:0;">${i.name}</h4><span style="font-weight:700; color:var(--jst-accent-gold);">S/ ${i.price.toFixed(2)}</span></div><div style="display:flex; gap:8px; background:#f8fafc; padding:5px 10px; border-radius:20px;"><i class="fas fa-minus" onclick="modQty('${i.id}',-1)" style="cursor:pointer; font-size:0.7rem; padding:4px;"></i><span style="font-weight:700; font-size:0.85rem;">${i.qty}</span><i class="fas fa-plus" onclick="modQty('${i.id}',1)" style="cursor:pointer; font-size:0.7rem; padding:4px;"></i></div></div>`).join(''); }
-            const sub = state_cart.reduce((a,b)=>a+(b.price*b.qty),0);
-            document.getElementById('step1-total').innerText = `S/ ${sub.toFixed(2)}`;
-            const bar = document.getElementById('ship-progress-bar');
-            const pct = Math.min(100, (sub/FREE_SHIPPING_THRESHOLD)*100); bar.style.width = `${pct}%`;
-            if(sub >= FREE_SHIPPING_THRESHOLD) { document.getElementById('shipping-progress-box').classList.add('unlocked'); document.getElementById('ship-msg-text').innerHTML = "<span style='color:#10b981'>¡Envío GRATIS conseguido!</span>"; }
-            else { document.getElementById('shipping-progress-box').classList.remove('unlocked'); document.getElementById('ship-msg-text').innerHTML = `Faltan <b>S/ ${(FREE_SHIPPING_THRESHOLD-sub).toFixed(2)}</b> para envío gratis`; }
-            renderSuggestions(); refreshSummary();
-        }
-        function renderSuggestions() {
-            if(state_cart.length===0) { document.getElementById('suggestions-area').style.display='none'; return; }
-            const ids = state_cart.map(x=>x.id); const avail = CATALOG_DB.filter(p=>!ids.includes(p.id) && p.stock > 0).sort(()=>0.5-Math.random()).slice(0,4);
-            if(avail.length>0) { document.getElementById('suggestions-area').style.display='block'; document.getElementById('suggestions-render').innerHTML = avail.map(s=>`<div class="mini-card" onclick="addItemToCart('${s.id}')"><div style="position:relative;"><img src="${s.img}" style="width:100%; height:100px; object-fit:cover; border-radius:10px; margin-bottom:8px;"><div style="position:absolute; bottom:5px; right:5px; background:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-plus" style="font-size:0.6rem;"></i></div></div><div style="font-size:0.8rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.name}</div><div style="color:var(--jst-accent-gold); font-size:0.85rem; font-weight:800;">S/ ${s.price.toFixed(2)}</div></div>`).join(''); }
-            else document.getElementById('suggestions-area').style.display='none';
-        }
-        function refreshSummary() {
-            const sub = state_cart.reduce((a,b)=>a+(b.price*b.qty),0); const km = parseFloat(document.getElementById('form-km').value) || 0;
-            let ship = (sub < FREE_SHIPPING_THRESHOLD && km > 0) ? Math.max(5, km * 1.90) : 0;
-            let shipTxt = (sub >= FREE_SHIPPING_THRESHOLD) ? "GRATIS" : (ship===0 ? "Calculando..." : `S/ ${ship.toFixed(2)}`);
-            document.getElementById('final-subtotal').innerText = `S/ ${sub.toFixed(2)}`;
-            document.getElementById('final-shipping').innerText = shipTxt;
-            document.getElementById('final-total').innerText = `S/ ${(sub+ship).toFixed(2)}`;
-            validateForm();
-        }
-        function validateForm() {
-            const n = document.getElementById('form-name').value; const a = document.getElementById('form-address').value; const p = document.getElementById('form-phone').value;
-            const btn = document.getElementById('btn-wa'); if(n.length>3 && a.length>5 && p.length>8) btn.classList.add('active'); else btn.classList.remove('active');
-        }
-        function launchCelebration() { toggleCart(false); document.getElementById('celebration-modal').classList.add('active'); setTimeout(()=>document.getElementById('progress-fill').style.width='100%', 100); setTimeout(actualRedirect, 3200); }
-        function actualRedirect() {
-            const n = document.getElementById('form-name').value; const a = document.getElementById('form-address').value;
-            const km = document.getElementById('form-km').value || 0; const ship = document.getElementById('final-shipping').innerText; const total = document.getElementById('final-total').innerText;
-            let msg = `👋 *¡Hola! Quiero hacer un pedido en JstoreR*\n━━━━━━━━━━━━━━━━━━━━\n👤 *Soy:* ${n}\n📍 *Para:* ${a}\n🚚 *Envío:* ${ship} (${km}km)\n━━━━━━━━━━━━━━━━━━━━\n🛍️ *MI PEDIDO:*\n\n`;
-            state_cart.forEach(i => { msg += `🔹 *${i.name}*\n     ${i.qty} und. x S/ ${i.price.toFixed(2)}\n`; });
-            msg += `\n💰 *TOTAL A PAGAR: ${total}*\n\n¿Me confirman si tienen stock? ¡Gracias!`;
-            state_cart=[]; updateCart(); window.location.href = `https://wa.me/51932508670?text=${encodeURIComponent(msg)}`;
-        }
-        function toggleCart(o) { document.getElementById('side-cart').classList.toggle('open', o); if(!o) setTimeout(()=>goToStep(1),500); }
-        function goToStep(s) { const cart = document.getElementById('side-cart'); const title = document.getElementById('cart-title'); if(s===2) { if(state_cart.length===0) return alert("Agrega productos"); cart.classList.add('step-2'); title.innerText="Confirmar Datos"; } else { cart.classList.remove('step-2'); title.innerText="Tu Bolsa"; } }
-        function calculateGPSDistance() {
-            const btnIcon = document.getElementById('gps-icon-btn'); const statusMsg = document.getElementById('gps-status-msg');
-            if (!navigator.geolocation) return alert("Tu dispositivo no soporta geolocalización.");
-            btnIcon.className = 'fas fa-spinner fa-spin'; statusMsg.innerHTML = '<span style="color:var(--jst-accent-gold);">Buscando señal...</span>';
-            navigator.geolocation.getCurrentPosition(pos => {
-                if(confirm("CONFIRMACIÓN DE UBICACIÓN:\n\n¿Estás en el lugar de entrega ahora mismo?")) {
-                    const dist = getDist(STORE_LOCATION.lat, STORE_LOCATION.lng, pos.coords.latitude, pos.coords.longitude);
-                    document.getElementById('form-km').value = dist.toFixed(1); refreshSummary();
-                    btnIcon.className = 'fas fa-check-circle'; btnIcon.style.color = '#10b981';
-                    statusMsg.innerHTML = '<i class="fas fa-check-circle" style="color:#10b981;"></i> Ubicación verificada';
-                    if(document.getElementById('form-address').value==="") { document.getElementById('form-address').value="(Ubicación GPS actual)"; validateForm(); }
-                } else {
-                    alert("Entendido. Ingresa los KM manualmente."); btnIcon.className = 'fas fa-map-marker-alt'; statusMsg.innerHTML = '<span style="color:#ef4444;">Cancelado. Ingresa KM manual.</span>';
-                }
-            }, err => { alert("Activa el GPS."); btnIcon.className = 'fas fa-map-marker-alt'; statusMsg.innerHTML = 'Error GPS'; }, { enableHighAccuracy: true });
-        }
-        function getDist(lat1, lon1, lat2, lon2) {
-            const R = 6371; const dLat = (lat2-lat1)*(Math.PI/180); const dLon = (lon2-lon1)*(Math.PI/180);
-            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*(Math.PI/180))*Math.cos(lat2*(Math.PI/180)) * Math.sin(dLon/2)*Math.sin(dLon/2);
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.25;
-        }
-        function showToast() { const t = document.getElementById('toast-notify'); t.style.bottom='40px'; setTimeout(()=>t.style.bottom='-100px', 2500); }
-        // NUEVO: Lógica del Acordeón FAQ
-        function toggleFaq(el) { el.classList.toggle('active'); }
-        // Reseñas y Efectos
-        function openReviewModal() { const m = document.getElementById('review-modal'); m.style.opacity='1'; m.style.pointerEvents='auto'; m.querySelector('div').style.transform='translateY(0)'; }
-        function closeReviewModal(e) { if(e && e.target !== e.currentTarget) return; const m = document.getElementById('review-modal'); m.style.opacity='0'; m.style.pointerEvents='none'; m.querySelector('div').style.transform='translateY(20px)'; }
-        let starRating = 5; function setStars(n) { starRating = n; document.querySelectorAll('.onclick-star').forEach((s,i) => { s.style.color = i < n ? '#f59e0b' : '#e2e8f0'; }); } function initReviewStars() { setStars(5); }
-        function submitReviewWA() { const txt = document.getElementById('review-text').value; window.open(`https://wa.me/51932508670?text=${encodeURIComponent(`Reseña ${starRating} estrellas: "${txt}"`)}`, '_blank'); closeReviewModal(); }
-        function initGoldDust() {
-            const cvs = document.getElementById('gold-dust-layer'); if(!cvs) return; const ctx = cvs.getContext('2d');
-            cvs.width=window.innerWidth; cvs.height=window.innerHeight;
-            const p = Array(25).fill().map(()=>({x:Math.random()*cvs.width, y:Math.random()*cvs.height, r:Math.random()*1.5+0.5, s:Math.random()*0.3+0.1}));
-            function d() { ctx.clearRect(0,0,cvs.width,cvs.height); ctx.fillStyle="rgba(199, 106, 58, 0.4)"; p.forEach(f=>{ ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fill(); f.y-=f.s; f.x+=Math.sin(f.y*0.02)*0.3; if(f.y<0) f.y=cvs.height; if(f.x>cvs.width) f.x=0; }); requestAnimationFrame(d); } d();
-        } window.addEventListener('resize', () => { const cvs = document.getElementById('gold-dust-layer'); if(cvs) { cvs.width=window.innerWidth; cvs.height=window.innerHeight; }});
-    </script>
-</body>
-</html>) ...
-
+// RENDER
+function renderCollection(){
+    const grid=document.getElementById('main-grid');
+    grid.innerHTML = CATALOG_DB.map(p=>`
+        <article class="card-item">
+            <img src="${p.img}">
+            <h3>${p.name}</h3>
+            <span>S/ ${p.price.toFixed(2)}</span>
+            <button onclick="addItemToCart('${p.id}')">+</button>
+        </article>
+    `).join('');
+}
+function renderPills(){
+    const pills=document.getElementById('category-pills-render');
+    const cats=["Todas",...new Set(CATALOG_DB.map(p=>p.cat))];
+    pills.innerHTML=cats.map(c=>`
+        <div class="pill-item" onclick="setCategory('${c}')">${c}</div>
+    `).join('');
+}
+function setCategory(c){
+    current_category=c;
+    renderCollection();
+}
+// CARRITO
+function addItemToCart(id){
+    const prod=CATALOG_DB.find(p=>p.id==id);
+    if(!prod) return;
+    const item=state_cart.find(i=>i.id==id);
+    if(item) item.qty++;
+    else state_cart.push({...prod,qty:1});
+    updateCart();
+}
+function updateCart(){
+    localStorage.setItem('jst_master_cart',JSON.stringify(state_cart));
+    refreshCartUI();
+}
+function refreshCartUI(){
+    const count=state_cart.reduce((a,b)=>a+b.qty,0);
+    const badge=document.getElementById('cart-badge');
+    badge.textContent=count;
+    badge.style.display=count?'flex':'none';
+}
+function toggleCart(open){
+    document.getElementById('side-cart').classList.toggle('open',open);
+}
