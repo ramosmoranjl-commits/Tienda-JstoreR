@@ -1,210 +1,264 @@
 
-// JSTORER CORE ENGINE V2.5
-const CONFIG = {
+/* JSTORER CORE ENGINE V2.6 - LOGISTICS & UI */
+// CONFIGURACIÓN GLOBAL
+const SETTINGS = {
     SHEET_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQOKWE4Wyh_N_pt12iDlXx_garwZHFKRcE19DRoKSa2Cb_v3KoSmcQcJXRS2MdrfB7Bso-DqSXdINSt/pub?gid=0&single=true&output=csv",
-    STORE_COORDS: { lat: -12.053850, lng: -77.031550 },
-    FREE_SHIP_LIMIT: 400,
-    KM_RATE: 2, // S/ 2.00 por Kilómetro
+    STORE_COORDS: { lat: -12.053850, lng: -77.031550 }, // Ubicación Tienda (Lima)
+    FREE_SHIP_MIN: 400, // S/ 400 para envío gratis
+    KM_PRICE: 2, // S/ 2.00 por Kilómetro
     WHATSAPP: "51932508670"
 };
-let CATALOG = [];
-let cart = JSON.parse(localStorage.getItem('jst_cart')) || [];
-let mainMap = null;
-let pinMarker = null;
+let DB_PRODUCTS = [];
+let shopping_cart = JSON.parse(localStorage.getItem('jst_master_cart')) || [];
+let active_map = null;
+let active_marker = null;
+// INICIALIZACIÓN
 window.onload = async () => {
     initGoldDust();
-    await loadProducts();
+    await loadInventory();
+    renderInventory();
     renderPills();
-    refreshCartUI();
+    updateCartUI();
 };
-// DATOS
-async function loadProducts() {
+// --- CARGA DE DATOS ---
+async function loadInventory() {
     try {
-        const res = await fetch(CONFIG.SHEET_URL);
-        const data = await res.text();
-        const rows = data.split('\n').slice(1);
-        CATALOG = rows.map(row => {
-            const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        const response = await fetch(SETTINGS.SHEET_URL);
+        const csv = await response.text();
+        const lines = csv.split('\n').slice(1);
+        
+        DB_PRODUCTS = lines.map(line => {
+            const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             return {
-                id: c[0]?.trim(),
-                name: c[1]?.replace(/"/g, '').trim(),
-                price: parseFloat(c[2]),
-                cat: c[3]?.trim(),
-                img: c[4]?.trim(),
-                stock: parseInt(c[5]) || 0,
-                desc: c[6]?.replace(/"/g, '').trim()
+                id: cols[0]?.trim(),
+                name: cols[1]?.replace(/"/g, '').trim(),
+                price: parseFloat(cols[2]),
+                cat: cols[3]?.trim(),
+                img: cols[4]?.trim(),
+                stock: parseInt(cols[5]) || 0,
+                desc: cols[6]?.replace(/"/g, '').trim() || "Calidad Premium Garantizada."
             };
-        }).filter(p => p.id);
-        renderGallery();
-    } catch (e) { console.error("Error cargando Sheet", e); }
+        }).filter(p => p.id && p.name);
+    } catch (err) {
+        console.error("Error al conectar con el inventario:", err);
+    }
 }
-function renderGallery() {
+// --- RENDERIZADO DE PRODUCTOS ---
+function renderInventory() {
     const grid = document.getElementById('main-grid');
-    const term = document.getElementById('master-search').value.toLowerCase();
-    const filtered = CATALOG.filter(p => p.name.toLowerCase().includes(term));
+    const search = document.getElementById('master-search').value.toLowerCase();
     
-    grid.innerHTML = filtered.map(p => `
-        <div class="card-item">
+    const filtered = DB_PRODUCTS.filter(p => p.name.toLowerCase().includes(search));
+    
+    grid.innerHTML = filtered.map(p => {
+        const outOfStock = p.stock <= 0;
+        return `
+        <div class="card-item" style="${outOfStock ? 'opacity:0.6;' : ''}">
             <div class="card-img-container" onclick="openQuickView('${p.id}')">
-                <img src="${p.img}" loading="lazy">
+                <img src="${p.img}" loading="lazy" alt="${p.name}">
             </div>
             <div style="flex:1;">
-                <span style="font-size:0.65rem; color:var(--gold); font-weight:800; text-transform:uppercase;">${p.cat}</span>
-                <h4 style="font-size:0.9rem; margin:4px 0;">${p.name}</h4>
+                <span style="font-size:0.7rem; color:var(--jst-gold); font-weight:800; text-transform:uppercase;">${p.cat}</span>
+                <h4 style="font-size:1rem; margin:5px 0 12px; line-height:1.3;">${p.name}</h4>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                <span class="price-tag">S/ ${p.price.toFixed(2)}</span>
-                <button class="btn-add" onclick="addToCart('${p.id}')"><i class="fas fa-plus"></i></button>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:900; font-size:1.3rem;">S/ ${p.price.toFixed(2)}</span>
+                <button class="cart-trigger" onclick="addItemToCart('${p.id}')" ${outOfStock ? 'disabled' : ''}>
+                    <i class="fas ${outOfStock ? 'fa-ban' : 'fa-plus'}"></i>
+                </button>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
-// CARRITO
-function toggleCart(show) { document.getElementById('side-cart').classList.toggle('open', show); }
-function addToCart(id) {
-    const p = CATALOG.find(x => x.id === id);
-    const exist = cart.find(x => x.id === id);
-    if(exist) exist.qty++; else cart.push({...p, qty: 1});
-    updateCart();
-    showToast("Producto agregado");
+// --- LÓGICA DEL CARRITO ---
+function toggleCart(open) {
+    document.getElementById('side-cart').classList.toggle('open', open);
 }
-function updateCart() {
-    localStorage.setItem('jst_cart', JSON.stringify(cart));
-    refreshCartUI();
+function addItemToCart(id) {
+    const p = DB_PRODUCTS.find(x => x.id === id);
+    if (!p || p.stock <= 0) return;
+    const existing = shopping_cart.find(x => x.id === id);
+    if (existing) {
+        existing.qty++;
+    } else {
+        shopping_cart.push({ ...p, qty: 1 });
+    }
+    
+    saveAndUpdate();
+    showToast(`"${p.name}" agregado`);
 }
-function refreshCartUI() {
+function saveAndUpdate() {
+    localStorage.setItem('jst_master_cart', JSON.stringify(shopping_cart));
+    updateCartUI();
+}
+function updateCartUI() {
     const badge = document.getElementById('cart-badge');
-    const totalQty = cart.reduce((a,b) => a + b.qty, 0);
+    const totalQty = shopping_cart.reduce((a, b) => a + b.qty, 0);
     badge.innerText = totalQty;
     badge.style.display = totalQty > 0 ? 'flex' : 'none';
-    document.getElementById('cart-items-list').innerHTML = cart.map((item, idx) => `
+    document.getElementById('cart-items-list').innerHTML = shopping_cart.map((item, idx) => `
         <div style="display:flex; gap:12px; margin-bottom:15px; align-items:center;">
             <img src="${item.img}" style="width:55px; height:55px; border-radius:12px; object-fit:cover;">
             <div style="flex:1;">
                 <h5 style="font-size:0.85rem; margin:0;">${item.name}</h5>
-                <b style="color:var(--gold);">S/ ${(item.price * item.qty).toFixed(2)}</b>
+                <b style="color:var(--jst-gold);">S/ ${(item.price * item.qty).toFixed(2)}</b>
             </div>
-            <div style="display:flex; gap:8px; align-items:center; background:#f1f5f9; padding:5px 10px; border-radius:10px; font-size:0.8rem;">
-                <span onclick="modQty(${idx},-1)" style="cursor:pointer; font-weight:800;">-</span>
+            <div style="display:flex; gap:10px; align-items:center; background:#f1f5f9; padding:5px 12px; border-radius:10px;">
+                <span onclick="modQty(${idx}, -1)" style="cursor:pointer; font-weight:900;">-</span>
                 <span style="font-weight:800;">${item.qty}</span>
-                <span onclick="modQty(${idx},1)" style="cursor:pointer; font-weight:800;">+</span>
+                <span onclick="modQty(${idx}, 1)" style="cursor:pointer; font-weight:900;">+</span>
             </div>
         </div>
     `).join('');
-    
-    calculateTotals();
-    renderSuggestions();
+    calculateCartTotals();
 }
-function modQty(idx, n) {
-    cart[idx].qty += n;
-    if(cart[idx].qty <= 0) cart.splice(idx, 1);
-    updateCart();
+function modQty(idx, val) {
+    shopping_cart[idx].qty += val;
+    if (shopping_cart[idx].qty <= 0) shopping_cart.splice(idx, 1);
+    saveAndUpdate();
 }
-function calculateTotals() {
-    const subtotal = cart.reduce((a,b) => a + (b.price * b.qty), 0);
+function calculateCartTotals() {
+    const subtotal = shopping_cart.reduce((a, b) => a + (b.price * b.qty), 0);
     const km = parseFloat(document.getElementById('form-km').value) || 0;
     
-    let shipping = (subtotal >= CONFIG.FREE_SHIP_LIMIT) ? 0 : (km * CONFIG.KM_RATE);
-    if(shipping > 0 && shipping < 8) shipping = 8; // Mínimo sugerido
+    let shipCost = (subtotal >= SETTINGS.FREE_SHIP_MIN) ? 0 : (km * SETTINGS.KM_PRICE);
+    if (shipCost > 0 && shipCost < 8) shipCost = 8; // Mínimo base
     document.getElementById('step1-total').innerText = `S/ ${subtotal.toFixed(2)}`;
     document.getElementById('final-subtotal').innerText = `S/ ${subtotal.toFixed(2)}`;
-    document.getElementById('final-shipping').innerText = shipping === 0 ? "GRATIS" : `S/ ${shipping.toFixed(2)}`;
-    document.getElementById('final-total').innerText = `S/ ${(subtotal + shipping).toFixed(2)}`;
-    const prog = Math.min(100, (subtotal / CONFIG.FREE_SHIP_LIMIT) * 100);
-    document.getElementById('ship-progress-bar').style.width = `${prog}%`;
-    document.getElementById('ship-msg-text').innerText = subtotal >= CONFIG.FREE_SHIP_LIMIT ? "¡Envío Gratis!" : `Faltan S/ ${(CONFIG.FREE_SHIP_LIMIT - subtotal).toFixed(2)} para envío gratis`;
-}
-// MAPA & GEOLOCALIZACIÓN
-function goToStep(n) {
-    const s = document.getElementById('side-cart');
-    if(n === 2) {
-        s.classList.add('step-2');
-        setTimeout(initMap, 450);
+    document.getElementById('final-shipping').innerText = shipCost === 0 ? "GRATIS" : `S/ ${shipCost.toFixed(2)}`;
+    document.getElementById('final-total').innerText = `S/ ${(subtotal + shipCost).toFixed(2)}`;
+    // Barra de progreso
+    const progress = Math.min(100, (subtotal / SETTINGS.FREE_SHIP_MIN) * 100);
+    document.getElementById('ship-progress-bar').style.width = `${progress}%`;
+    const msg = document.getElementById('ship-msg-text');
+    if (subtotal >= SETTINGS.FREE_SHIP_MIN) {
+        msg.innerHTML = "¡Envío Gratis Desbloqueado!";
     } else {
-        s.classList.remove('step-2');
+        msg.innerHTML = `Faltan S/ ${(SETTINGS.FREE_SHIP_MIN - subtotal).toFixed(2)} para Envío Gratis`;
     }
 }
-function initMap() {
-    if(mainMap) { mainMap.invalidateSize(); return; }
-    mainMap = L.map('order-map', { zoomControl: false }).setView([CONFIG.STORE_COORDS.lat, CONFIG.STORE_COORDS.lng], 15);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mainMap);
-    
-    const uberIcon = L.divIcon({
-        html: `<div style="background:var(--dark); width:32px; height:32px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); border:3px solid white; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);"><i class="fas fa-home" style="transform:rotate(45deg); color:white; font-size:14px;"></i></div>`,
-        className: '', iconSize: [32,32], iconAnchor: [16,32]
-    });
-    pinMarker = L.marker([CONFIG.STORE_COORDS.lat, CONFIG.STORE_COORDS.lng], { icon: uberIcon, draggable: true }).addTo(mainMap);
-    pinMarker.on('dragend', () => {
-        const pos = pinMarker.getLatLng();
-        updateMapData(pos.lat, pos.lng);
-    });
+// --- TECNOLOGÍA DE MAPAS (RAPPI/UBER) ---
+function goToStep(n) {
+    const cartEl = document.getElementById('side-cart');
+    if (n === 2) {
+        cartEl.classList.add('step-2');
+        setTimeout(initUberMap, 500); // Esperar animación
+    } else {
+        cartEl.classList.remove('step-2');
+    }
 }
-async function updateMapData(lat, lng) {
-    const dist = getDist(CONFIG.STORE_COORDS.lat, CONFIG.STORE_COORDS.lng, lat, lng);
+function initUberMap() {
+    if (active_map) {
+        active_map.invalidateSize();
+        return;
+    }
+    active_map = L.map('order-map', { zoomControl: false }).setView([SETTINGS.STORE_COORDS.lat, SETTINGS.STORE_COORDS.lng], 15);
+    
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(active_map);
+    const pinIcon = L.divIcon({
+        html: `<div style="background:var(--jst-dark); width:32px; height:32px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); border:3px solid white; display:flex; align-items:center; justify-content:center; box-shadow:0 5px 15px rgba(0,0,0,0.2);"><i class="fas fa-home" style="transform:rotate(45deg); color:white; font-size:14px;"></i></div>`,
+        className: '', iconSize: [32, 32], iconAnchor: [16, 32]
+    });
+    active_marker = L.marker([SETTINGS.STORE_COORDS.lat, SETTINGS.STORE_COORDS.lng], {
+        icon: pinIcon,
+        draggable: true
+    }).addTo(active_map);
+    active_marker.on('dragend', function() {
+        const pos = active_marker.getLatLng();
+        updateLogistics(pos.lat, pos.lng);
+    });
+    getCurrentLocation();
+}
+async function updateLogistics(lat, lng) {
+    // 1. Cálculo de Distancia Real
+    const dist = calculateDistance(SETTINGS.STORE_COORDS.lat, SETTINGS.STORE_COORDS.lng, lat, lng);
     document.getElementById('form-km').value = dist.toFixed(2);
     
+    // 2. Geocodificación Inversa (Dirección automática)
     try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18`);
         const data = await res.json();
-        // Limpiamos dirección para que no sea infinita
-        const parts = data.display_name.split(',');
-        document.getElementById('form-address').value = parts.slice(0,3).join(',');
-    } catch(e) { console.log("Geocoding failed"); }
+        if (data.display_name) {
+            const shortAddr = data.display_name.split(',').slice(0, 3).join(',');
+            document.getElementById('form-address').value = shortAddr;
+        }
+    } catch (e) { console.log("Nominatim error"); }
     
-    calculateTotals();
+    calculateCartTotals();
     validateForm();
 }
-function getDist(la1, lo1, la2, lo2) {
+function calculateDistance(la1, lo1, la2, lo2) {
     const R = 6371;
-    const dLa = (la2-la1)*Math.PI/180;
-    const dLo = (lo2-lo1)*Math.PI/180;
-    const a = Math.sin(dLa/2)**2 + Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const dLa = (la2 - la1) * Math.PI / 180;
+    const dLo = (lo2 - lo1) * Math.PI / 180;
+    const a = Math.sin(dLa / 2) ** 2 + Math.cos(la1 * Math.PI / 180) * Math.cos(la2 * Math.PI / 180) * Math.sin(dLo / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 function getCurrentLocation() {
-    if(!navigator.geolocation) return;
+    if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(p => {
-        const lat = p.coords.latitude; const lng = p.coords.longitude;
-        mainMap.setView([lat, lng], 17);
-        pinMarker.setLatLng([lat, lng]);
-        updateMapData(lat, lng);
+        const lat = p.coords.latitude;
+        const lng = p.coords.longitude;
+        active_map.setView([lat, lng], 16);
+        active_marker.setLatLng([lat, lng]);
+        updateLogistics(lat, lng);
     });
 }
-// FINALIZACIÓN
+// --- FINALIZACIÓN ---
 function validateForm() {
-    const n = document.getElementById('form-name').value;
-    const a = document.getElementById('form-address').value;
-    const p = document.getElementById('form-phone').value;
+    const name = document.getElementById('form-name').value;
+    const addr = document.getElementById('form-address').value;
+    const phone = document.getElementById('form-phone').value;
     const btn = document.getElementById('btn-finish');
-    if(n.length > 2 && a.length > 5 && p.length >= 9) btn.classList.add('active');
-    else btn.classList.remove('active');
+    
+    if (name.length > 2 && addr.length > 5 && phone.length >= 9) {
+        btn.classList.add('active');
+    } else {
+        btn.classList.remove('active');
+    }
 }
 function sendOrder() {
     const name = document.getElementById('form-name').value;
     const addr = document.getElementById('form-address').value;
+    const phone = document.getElementById('form-phone').value;
     const total = document.getElementById('final-total').innerText;
     const km = document.getElementById('form-km').value;
-    
-    let text = `*HOLA JSTORE-R, QUIERO PEDIR:*\n\n`;
-    cart.forEach(i => text += `— ${i.name} (x${i.qty})\n`);
+    let text = `*NUEVO PEDIDO JSTORE-R*\n\n`;
+    shopping_cart.forEach(i => text += `• ${i.name} (x${i.qty})\n`);
     text += `\n*RESUMEN:*`;
     text += `\nSubtotal: ${document.getElementById('final-subtotal').innerText}`;
     text += `\nEnvío: ${document.getElementById('final-shipping').innerText} (${km} km)`;
-    text += `\n*TOTAL:* ${total}`;
+    text += `\n*TOTAL: ${total}*`;
     text += `\n\n*DATOS DE ENTREGA:*`;
-    text += `\n👤 Cliente: ${name}\n📍 Dirección: ${addr}\n📱 Celular: ${document.getElementById('form-phone').value}`;
+    text += `\n👤: ${name}\n📍: ${addr}\n📱: ${phone}`;
     
-    window.open(`https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(text)}`);
+    window.open(`https://wa.me/${SETTINGS.WHATSAPP}?text=${encodeURIComponent(text)}`);
 }
-// UI UTILS
+// --- UI EFFECTS (GOLD DUST, TOAST, MODALS) ---
+function initGoldDust() {
+    const cvs = document.getElementById('gold-dust-layer');
+    const ctx = cvs.getContext('2d');
+    cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+    const p = Array(25).fill().map(() => ({ x: Math.random() * cvs.width, y: Math.random() * cvs.height, s: Math.random() * 0.4 + 0.1 }));
+    function anim() {
+        ctx.clearRect(0, 0, cvs.width, cvs.height);
+        ctx.fillStyle = "rgba(199, 106, 58, 0.3)";
+        p.forEach(f => {
+            ctx.beginPath(); ctx.arc(f.x, f.y, 1, 0, Math.PI * 2); ctx.fill();
+            f.y -= f.s; if (f.y < 0) f.y = cvs.height;
+        });
+        requestAnimationFrame(anim);
+    }
+    anim();
+}
 function openQuickView(id) {
-    const p = CATALOG.find(x => x.id === id);
-    if(!p) return;
+    const p = DB_PRODUCTS.find(x => x.id === id);
+    if (!p) return;
     document.getElementById('qv-img').src = p.img;
     document.getElementById('qv-cat').innerText = p.cat;
     document.getElementById('qv-name').innerText = p.name;
     document.getElementById('qv-price').innerText = `S/ ${p.price.toFixed(2)}`;
-    document.getElementById('qv-desc').innerText = p.desc || "Sin descripción disponible.";
+    document.getElementById('qv-desc').innerText = p.desc;
     document.getElementById('quick-view-modal').classList.add('active');
 }
 function closeQuickView() { document.getElementById('quick-view-modal').classList.remove('active'); }
@@ -214,8 +268,9 @@ function showToast(msg) {
     setTimeout(() => t.style.bottom = "-100px", 2500);
 }
 function toggleFaq(el) { el.classList.toggle('active'); }
+function handleSmartFilter() { renderInventory(); }
 function renderPills() {
-    const cats = ["Todas", ...new Set(CATALOG.map(p => p.cat).filter(Boolean))];
+    const cats = ["Todas", ...new Set(DB_PRODUCTS.map(p => p.cat).filter(Boolean))];
     document.getElementById('category-pills-render').innerHTML = cats.map(c => 
         `<div class="pill-item" onclick="filterByCat(this, '${c}')">${c}</div>`
     ).join('');
@@ -224,43 +279,17 @@ function filterByCat(el, c) {
     document.querySelectorAll('.pill-item').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
     const grid = document.getElementById('main-grid');
-    const filtered = (c === "Todas") ? CATALOG : CATALOG.filter(p => p.cat === c);
-    // Renderizado simple para filtro
+    const filtered = (c === "Todas") ? DB_PRODUCTS : DB_PRODUCTS.filter(p => p.cat === c);
     grid.innerHTML = filtered.map(p => `
         <div class="card-item">
             <div class="card-img-container" onclick="openQuickView('${p.id}')"><img src="${p.img}"></div>
-            <div style="flex:1;"><h4 style="font-size:0.9rem; margin:4px 0;">${p.name}</h4></div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                <span class="price-tag">S/ ${p.price.toFixed(2)}</span>
-                <button class="btn-add" onclick="addToCart('${p.id}')"><i class="fas fa-plus"></i></button>
+            <div style="flex:1;">
+                <span style="font-size:0.7rem; color:var(--jst-gold); font-weight:800;">${p.cat}</span>
+                <h4 style="font-size:1rem; margin:5px 0;">${p.name}</h4>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:900; font-size:1.3rem;">S/ ${p.price.toFixed(2)}</span>
+                <button class="cart-trigger" onclick="addItemToCart('${p.id}')"><i class="fas fa-plus"></i></button>
             </div>
         </div>`).join('');
-}
-function renderSuggestions() {
-    const ids = cart.map(x => x.id);
-    const sug = CATALOG.filter(p => !ids.includes(p.id) && p.stock > 0).slice(0, 4);
-    if(sug.length > 0 && cart.length > 0) {
-        document.getElementById('suggestions-area').style.display = 'block';
-        document.getElementById('suggestions-render').innerHTML = sug.map(s => `
-            <div class="mini-sug" onclick="addToCart('${s.id}')" style="min-width:110px; cursor:pointer;">
-                <img src="${s.img}" style="width:100%; height:80px; object-fit:cover; border-radius:10px;">
-                <div style="font-size:0.7rem; font-weight:800; margin-top:5px;">S/ ${s.price}</div>
-            </div>`).join('');
-    } else { document.getElementById('suggestions-area').style.display = 'none'; }
-}
-function initGoldDust() {
-    const cvs = document.getElementById('gold-dust-layer');
-    const ctx = cvs.getContext('2d');
-    cvs.width = window.innerWidth; cvs.height = window.innerHeight;
-    const parts = Array(25).fill().map(() => ({ x: Math.random()*cvs.width, y: Math.random()*cvs.height, s: Math.random()*0.4+0.1 }));
-    function anim() {
-        ctx.clearRect(0,0,cvs.width,cvs.height);
-        ctx.fillStyle = "rgba(199, 106, 58, 0.3)";
-        parts.forEach(p => {
-            ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI*2); ctx.fill();
-            p.y -= p.s; if(p.y < 0) p.y = cvs.height;
-        });
-        requestAnimationFrame(anim);
-    }
-    anim();
 }
