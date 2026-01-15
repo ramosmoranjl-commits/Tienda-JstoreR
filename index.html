@@ -1,55 +1,692 @@
-<!-- Updated index.html with geolocation and interactive GPS map functionality -->
-<!DOCTYPE html>
-<html lang="en">
+﻿<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda JstoreR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#fdfaf7">
+    
+    <title>JstoreR · Ultimate Experience</title>
+    <meta name="description" content="La experiencia de compra definitiva. Geolocalización satelital, catálogo de lujo y envíos verificados.">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="JstoreR · Catálogo 2026">
+    <meta property="og:image" content="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png">
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <!-- Leaflet.js CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css" />
+    <style>
+        /* ==========================================================================
+           1. CORE DESIGN SYSTEM (APPLE-GRADE CSS)
+           ========================================================================== */
+        :root {
+            /* Paleta de Colores "Luxury Ivy" */
+            --bg-body: #fdfaf7;
+            --bg-card: #ffffff;
+            --text-main: #111827;
+            --text-muted: #64748b;
+            --accent-gold: #c76a3a;      /* Tono cobre/oro elegante */
+            --accent-green: #10b981;     /* Éxito / WhatsApp */
+            --accent-error: #ef4444;
+            --shadow-soft: 0 10px 40px -10px rgba(0,0,0,0.08);
+            --shadow-hover: 0 20px 50px -12px rgba(199, 106, 58, 0.25);
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+            --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Reset & Base */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        body { font-family: var(--font-body); background-color: var(--bg-body); color: var(--text-main); overflow-x: hidden; }
+        
+        /* Scrollbar oculta para limpieza visual */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        /* ==========================================================================
+           2. HEADER & NAVIGATION
+           ========================================================================== */
+        .header-glass {
+            position: sticky; top: 0; z-index: 1000;
+            background: rgba(253, 250, 247, 0.85);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+        }
+        .nav-inner {
+            max-width: 1400px; margin: 0 auto; padding: 15px 25px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .brand-logo {
+            font-family: var(--font-display); font-size: 1.8rem; font-weight: 900;
+            color: var(--accent-gold); text-decoration: none; letter-spacing: -0.5px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .brand-logo span { color: var(--text-main); }
+        
+        /* Cart Trigger con Micro-interacción */
+        .cart-btn {
+            position: relative; cursor: pointer; background: white; width: 50px; height: 50px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--shadow-soft); transition: transform 0.3s var(--ease-elastic);
+        }
+        .cart-btn:hover { transform: scale(1.1) rotate(5deg); }
+        .cart-badge {
+            position: absolute; top: -2px; right: -2px; background: var(--text-main); color: white;
+            font-size: 0.75rem; font-weight: 700; width: 22px; height: 22px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; border: 2px solid white;
+        }
+
+        /* ==========================================================================
+           3. HERO SECTION & FILTERS
+           ========================================================================== */
+        .hero-section {
+            text-align: center; padding: 120px 20px 60px;
+            background: radial-gradient(circle at 50% 0%, rgba(199, 106, 58, 0.08), transparent 70%);
+        }
+        .hero-title {
+            font-family: var(--font-display); font-size: clamp(3rem, 8vw, 5rem);
+            line-height: 1; margin-bottom: 20px; animation: fadeInUp 1s ease;
+        }
+        .hero-subtitle {
+            font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 40px;
+            animation: fadeInUp 1s ease 0.2s backwards;
+        }
+
+        /* Buscador Flotante */
+        .search-dock {
+            max-width: 600px; margin: 0 auto 40px; position: relative;
+            animation: fadeInUp 1s ease 0.4s backwards;
+        }
+        .search-input {
+            width: 100%; padding: 22px 60px; border-radius: 100px; border: 1px solid rgba(0,0,0,0.05);
+            background: white; font-size: 1.1rem; box-shadow: var(--shadow-soft);
+            transition: 0.3s;
+        }
+        .search-input:focus { outline: none; border-color: var(--accent-gold); box-shadow: var(--shadow-hover); }
+        .search-icon { position: absolute; left: 25px; top: 50%; transform: translateY(-50%); color: var(--accent-gold); }
+
+        /* Categorías (Pills) */
+        .category-scroll {
+            display: flex; gap: 12px; overflow-x: auto; padding: 10px 25px 30px;
+            justify-content: center; mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+        }
+        .cat-pill {
+            padding: 12px 28px; background: white; border-radius: 50px; font-weight: 600;
+            font-size: 0.95rem; color: var(--text-muted); cursor: pointer; white-space: nowrap;
+            border: 1px solid rgba(0,0,0,0.04); transition: 0.3s; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .cat-pill.active, .cat-pill:hover {
+            background: var(--text-main); color: white; transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        /* ==========================================================================
+           4. PRODUCT GRID
+           ========================================================================== */
+        .grid-layout {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 40px; max-width: 1400px; margin: 0 auto; padding: 20px 25px 100px;
+        }
+        .product-card {
+            background: white; border-radius: 24px; padding: 20px; position: relative;
+            transition: 0.4s var(--ease-elastic); border: 1px solid rgba(0,0,0,0.02);
+        }
+        .product-card:hover { transform: translateY(-15px) scale(1.02); box-shadow: var(--shadow-hover); z-index: 10; }
+        
+        .img-wrapper {
+            width: 100%; aspect-ratio: 1; border-radius: 18px; overflow: hidden;
+            margin-bottom: 20px; background: #f8fafc; position: relative;
+        }
+        .img-wrapper img {
+            width: 100%; height: 100%; object-fit: cover; transition: 0.8s;
+            mix-blend-mode: multiply; /* Truco para quitar fondos blancos si los hay */
+        }
+        .product-card:hover .img-wrapper img { transform: scale(1.15); }
+
+        .card-info h3 { font-size: 1.1rem; margin-bottom: 5px; font-weight: 700; }
+        .card-info .price { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
+        .card-info .category { font-size: 0.85rem; color: var(--accent-gold); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+
+        .btn-add {
+            width: 100%; margin-top: 15px; padding: 18px; background: var(--text-main); color: white;
+            border: none; border-radius: 16px; font-weight: 700; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: 0.3s;
+        }
+        .btn-add:hover { background: var(--accent-gold); padding-left: 25px; padding-right: 25px; }
+
+        /* ==========================================================================
+           5. CART SIDEBAR & CHECKOUT FLOW
+           ========================================================================== */
+        .sidebar-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
+            z-index: 4999; opacity: 0; pointer-events: none; transition: 0.5s;
+        }
+        .sidebar-overlay.active { opacity: 1; pointer-events: all; }
+
+        .cart-sidebar {
+            position: fixed; top: 0; right: -100%; width: 100%; max-width: 500px; height: 100%;
+            background: var(--bg-card); z-index: 5000; transition: 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+            display: flex; flex-direction: column; box-shadow: -10px 0 50px rgba(0,0,0,0.1);
+        }
+        .cart-sidebar.active { right: 0; }
+
+        .cart-header {
+            padding: 30px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .cart-title { font-family: var(--font-display); font-size: 2rem; }
+        .close-cart { background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--text-muted); }
+
+        /* Multi-step Logic in CSS */
+        .cart-content-wrapper { flex: 1; position: relative; overflow: hidden; }
+        .step-container {
+            position: absolute; width: 100%; height: 100%; padding: 30px;
+            overflow-y: auto; transition: 0.5s ease; display: flex; flex-direction: column;
+        }
+        /* Posiciones de los pasos */
+        #step-1 { transform: translateX(0); }
+        #step-2 { transform: translateX(100%); }
+        
+        /* Cuando estamos en checkout */
+        .cart-sidebar.checkout-mode #step-1 { transform: translateX(-100%); }
+        .cart-sidebar.checkout-mode #step-2 { transform: translateX(0); }
+
+        /* Cart Items */
+        .cart-item { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; animation: slideIn 0.3s ease; }
+        .cart-item img { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; }
+        .cart-item-details { flex: 1; }
+        .btn-remove { color: var(--accent-error); background: #fee2e2; border: none; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; }
+
+        /* ==========================================================================
+           6. MAP & GEO-LOCATION STYLES (THE NEW CORE)
+           ========================================================================== */
+        .geo-box {
+            background: #f8fafc; border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            border: 2px dashed #e2e8f0; text-align: center;
+        }
+        
+        .btn-locate {
+            background: #dcfce7; color: #166534; border: 1px solid #166534; width: 100%;
+            padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-bottom: 15px; transition: 0.3s;
+        }
+        .btn-locate:hover { background: #bbf7d0; transform: scale(1.02); }
+        .btn-locate i { animation: pulse 1.5s infinite; }
+
+        #map-frame {
+            height: 0; opacity: 0; border-radius: 16px; overflow: hidden; transition: 0.5s;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1); margin-bottom: 10px;
+        }
+        #map-frame.active { height: 250px; opacity: 1; margin-bottom: 15px; border: 1px solid #cbd5e1; }
+        #map { width: 100%; height: 100%; }
+
+        .address-display {
+            background: white; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px;
+            font-size: 0.9rem; color: var(--text-main); text-align: left; display: none;
+        }
+        .address-display.visible { display: block; animation: slideIn 0.4s; }
+
+        /* Form Inputs */
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); }
+        .form-input {
+            width: 100%; padding: 16px; border: 1px solid #e2e8f0; border-radius: 12px;
+            font-family: inherit; transition: 0.3s;
+        }
+        .form-input:focus { border-color: var(--accent-gold); outline: none; box-shadow: 0 0 0 4px rgba(199, 106, 58, 0.1); }
+
+        .btn-final {
+            margin-top: auto; width: 100%; padding: 20px; background: var(--accent-green);
+            color: white; border: none; border-radius: 16px; font-size: 1.1rem; font-weight: 800;
+            cursor: pointer; display: flex; justify-content: center; items: center; gap: 10px;
+        }
+
+        /* ==========================================================================
+           7. ANIMATIONS & EXTRAS
+           ========================================================================== */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+        /* Canvas Polvo de Oro */
+        #gold-dust { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.8rem; }
+            .grid-layout { grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; }
+            .cart-sidebar { max-width: 100%; }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to Tienda JstoreR</h1>
+
+    <canvas id="gold-dust"></canvas>
+
+    <header class="header-glass">
+        <nav class="nav-inner">
+            <a href="#" class="brand-logo">
+                <i class="fa-solid fa-gem" style="color:var(--accent-gold);"></i>
+                JSTORE<span>R</span>
+            </a>
+            <div class="cart-btn" onclick="app.toggleCart()">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <div class="cart-badge" id="cart-count">0</div>
+            </div>
+        </nav>
     </header>
-    <main>
-        <!-- Cart Section -->
-        <section id="cart">
-            <h2>Your Cart</h2>
-            <div id="map" style="height: 400px;"></div>
-            <button id="locateBtn">Use My Location</button>
-        </section>
-    </main>
 
-    <!-- Leaflet.js Script -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <section class="hero-section">
+        <h1 class="hero-title">Elite Selection <span style="color:var(--accent-gold);">2026</span></h1>
+        <p class="hero-subtitle">Ingeniería de lujo al alcance de un clic. Envíos geolocalizados a todo el país.</p>
+        
+        <div class="search-dock">
+            <i class="fa-solid fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Buscar Rolex, Gucci, iPhone..." onkeyup="app.filterProducts(this.value)">
+        </div>
+
+        <div class="category-scroll" id="category-container">
+            </div>
+    </section>
+
+    <main class="grid-layout" id="product-grid">
+        </main>
+
+    <div class="sidebar-overlay" id="overlay" onclick="app.toggleCart()"></div>
+    <div class="cart-sidebar" id="cart-sidebar">
+        
+        <div class="cart-header">
+            <h2 class="cart-title">Tu Bolsa</h2>
+            <button class="close-cart" onclick="app.toggleCart()">×</button>
+        </div>
+
+        <div class="cart-content-wrapper">
+            
+            <div class="step-container" id="step-1">
+                <div id="cart-items-container" style="flex:1;">
+                    <div style="text-align:center; margin-top:50px; color:#cbd5e1;">
+                        <i class="fa-solid fa-basket-shopping" style="font-size:3rem; margin-bottom:10px;"></i>
+                        <p>Tu bolsa está vacía</p>
+                    </div>
+                </div>
+                
+                <div style="border-top: 1px dashed #e2e8f0; padding-top: 20px;">
+                    <div style="display:flex; justify-content:space-between; font-size:1.4rem; font-weight:800; margin-bottom:20px;">
+                        <span>Total</span>
+                        <span id="cart-total-display">S/ 0.00</span>
+                    </div>
+                    <button class="btn-add" style="justify-content:center;" onclick="app.goToCheckout()">
+                        Procesar Compra <i class="fa-solid fa-arrow-right" style="margin-left:10px;"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="step-container" id="step-2">
+                <button onclick="app.backToCart()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; margin-bottom:20px; display:flex; align-items:center; gap:5px;">
+                    <i class="fa-solid fa-arrow-left"></i> Volver a productos
+                </button>
+                
+                <h3 style="font-family:var(--font-display); font-size:1.5rem; margin-bottom:20px;">Datos de Envío</h3>
+
+                <div class="form-group">
+                    <label class="form-label">Nombre Completo</label>
+                    <input type="text" id="input-name" class="form-input" placeholder="Ej. Juan Pérez">
+                </div>
+
+                <div class="geo-box">
+                    <label class="form-label" style="margin-bottom:10px;">Ubicación de Entrega</label>
+                    
+                    <button class="btn-locate" onclick="geo.detectLocation()">
+                        <i class="fa-solid fa-location-dot"></i> Usar mi ubicación actual
+                    </button>
+                    
+                    <div id="map-frame">
+                        <div id="map"></div>
+                    </div>
+
+                    <div id="address-result" class="address-display">
+                        <i class="fa-solid fa-map-pin" style="color:var(--accent-gold);"></i> 
+                        <span id="address-text">Esperando ubicación...</span>
+                    </div>
+                    
+                    <input type="text" id="input-address-manual" class="form-input" placeholder="O escribe tu dirección manualmente..." style="margin-top:10px;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Método de Pago</label>
+                    <select id="input-payment" class="form-input">
+                        <option value="Yape/Plin">Yape o Plin</option>
+                        <option value="Transferencia BCP">Transferencia BCP</option>
+                        <option value="Contra Entrega">Pago Contra Entrega</option>
+                    </select>
+                </div>
+
+                <button class="btn-final" onclick="app.finalizeOrder()">
+                    <i class="fa-brands fa-whatsapp" style="font-size:1.3rem;"></i> Confirmar Pedido
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Initialize the map
-        var map = L.map('map').setView([0, 0], 2);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+        /* ==========================================================================
+           JAVASCRIPT "MONOLITH" ARCHITECTURE
+           ========================================================================== */
+        
+        // --- 1. DATOS (BASE DE DATOS SIMULADA) ---
+        const DB = [
+            { id: 101, name: "Rolex Submariner Gold", price: 45900, cat: "Relojes", img: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=600&auto=format" },
+            { id: 102, name: "MacBook Pro M3 Max", price: 12500, cat: "Tecnología", img: "https://images.unsplash.com/photo-1517336714731-489689fd1ca4?q=80&w=600&auto=format" },
+            { id: 103, name: "Louis Vuitton Keepall", price: 8200, cat: "Bolsos", img: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=600&auto=format" },
+            { id: 104, name: "Nike Air Jordan 1 High", price: 1800, cat: "Calzado", img: "https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=600&auto=format" },
+            { id: 105, name: "Sony WH-1000XM5", price: 1400, cat: "Audio", img: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?q=80&w=600&auto=format" },
+            { id: 106, name: "Gucci Loafers Leather", price: 3500, cat: "Calzado", img: "https://images.unsplash.com/photo-1533867617858-e7b97e060509?q=80&w=600&auto=format" },
+            { id: 107, name: "Ray-Ban Aviator Classic", price: 680, cat: "Accesorios", img: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=600&auto=format" },
+            { id: 108, name: "iPhone 15 Pro Max", price: 6200, cat: "Tecnología", img: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=600&auto=format" },
+            { id: 109, name: "Chanel No. 5", price: 950, cat: "Perfumes", img: "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=600&auto=format" },
+            { id: 110, name: "Herman Miller Aeron", price: 5500, cat: "Hogar", img: "https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?q=80&w=600&auto=format" }
+        ];
 
-        // Event listener for the locate button
-        document.getElementById('locateBtn').addEventListener('click', function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var lat = position.coords.latitude;
-                    var lon = position.coords.longitude;
-                    map.setView([lat, lon], 13);
-                    L.marker([lat, lon]).addTo(map)
-                        .bindPopup('You are here!')
-                        .openPopup();
-                }, function() {
-                    alert('Geolocation failed.');
+        // --- 2. GESTOR DE GEOLOCALIZACIÓN (GEO MODULE) ---
+        const geo = {
+            map: null,
+            marker: null,
+            lat: null,
+            lng: null,
+            address: "",
+            mapLink: "",
+
+            initMap: function() {
+                if (this.map) return; // Ya inicializado
+                // Coordenadas default (Lima)
+                this.lat = -12.046374; 
+                this.lng = -77.042793;
+
+                this.map = L.map('map').setView([this.lat, this.lng], 13);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap'
+                }).addTo(this.map);
+
+                this.marker = L.marker([this.lat, this.lng], {draggable: true}).addTo(this.map);
+
+                // Evento: Al mover el pin manualmente
+                this.marker.on('dragend', (e) => {
+                    const pos = e.target.getLatLng();
+                    this.updatePosition(pos.lat, pos.lng);
                 });
-            } else {
-                alert('Geolocation is not supported by your browser.');
+            },
+
+            detectLocation: function() {
+                const btn = document.querySelector('.btn-locate');
+                btn.innerHTML = '<i class="fa-solid fa-satellite-dish fa-spin"></i> Conectando satélite...';
+                
+                document.getElementById('map-frame').classList.add('active');
+                
+                // Asegurar que el mapa se renderice bien al hacerse visible
+                setTimeout(() => { 
+                    if(!this.map) this.initMap(); 
+                    this.map.invalidateSize(); 
+                }, 300);
+
+                if (!navigator.geolocation) {
+                    alert("Tu navegador no soporta GPS.");
+                    btn.innerHTML = '<i class="fa-solid fa-xmark"></i> Error GPS';
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        this.updatePosition(lat, lng);
+                        
+                        btn.innerHTML = '<i class="fa-solid fa-check"></i> Ubicación Localizada';
+                        btn.style.background = "#dcfce7";
+                        btn.style.borderColor = "#166534";
+                    },
+                    (error) => {
+                        console.error(error);
+                        btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Acceso denegado. Usa el mapa manual.';
+                        btn.style.background = "#fee2e2";
+                        btn.style.color = "#ef4444";
+                    },
+                    { enableHighAccuracy: true }
+                );
+            },
+
+            updatePosition: function(lat, lng) {
+                this.lat = lat;
+                this.lng = lng;
+                this.mapLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+
+                // Mover mapa y marcador
+                this.map.setView([lat, lng], 16);
+                this.marker.setLatLng([lat, lng]);
+
+                // Reverse Geocoding (Obtener dirección escrita)
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+                .then(r => r.json())
+                .then(data => {
+                    this.address = data.display_name;
+                    const display = document.getElementById('address-result');
+                    const text = document.getElementById('address-text');
+                    const manualInput = document.getElementById('input-address-manual');
+                    
+                    display.classList.add('visible');
+                    text.innerText = this.address;
+                    manualInput.value = this.address; // Llenar el input manual también
+                })
+                .catch(e => console.log("Error geocoding:", e));
             }
-        });
+        };
+
+        // --- 3. LÓGICA DE TIENDA (APP MODULE) ---
+        const app = {
+            cart: [],
+            
+            init: function() {
+                this.renderCategories();
+                this.renderProducts(DB);
+                this.initGoldDust();
+            },
+
+            renderCategories: function() {
+                const cats = ['Todos', ...new Set(DB.map(p => p.cat))];
+                const container = document.getElementById('category-container');
+                container.innerHTML = cats.map(c => 
+                    `<div class="cat-pill ${c === 'Todos' ? 'active' : ''}" onclick="app.filterCategory('${c}', this)">${c}</div>`
+                ).join('');
+            },
+
+            renderProducts: function(list) {
+                const grid = document.getElementById('product-grid');
+                grid.innerHTML = list.map(p => `
+                    <div class="product-card">
+                        <div class="img-wrapper"><img src="${p.img}" alt="${p.name}"></div>
+                        <div class="card-info">
+                            <div class="category">${p.cat}</div>
+                            <h3>${p.name}</h3>
+                            <div class="price">S/ ${p.price.toLocaleString()}</div>
+                        </div>
+                        <button class="btn-add" onclick="app.addToCart(${p.id})">
+                            Agregar <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                `).join('');
+            },
+
+            filterCategory: function(cat, el) {
+                document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+                el.classList.add('active');
+                if(cat === 'Todos') this.renderProducts(DB);
+                else this.renderProducts(DB.filter(p => p.cat === cat));
+            },
+
+            filterProducts: function(query) {
+                const q = query.toLowerCase();
+                const filtered = DB.filter(p => p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q));
+                this.renderProducts(filtered);
+            },
+
+            addToCart: function(id) {
+                const product = DB.find(p => p.id === id);
+                this.cart.push(product);
+                this.updateCartUI();
+                this.toggleCart(true); // Abrir carrito al agregar
+            },
+
+            removeFromCart: function(index) {
+                this.cart.splice(index, 1);
+                this.updateCartUI();
+            },
+
+            updateCartUI: function() {
+                const countBadge = document.getElementById('cart-count');
+                const container = document.getElementById('cart-items-container');
+                const totalDisplay = document.getElementById('cart-total-display');
+                
+                countBadge.innerText = this.cart.length;
+                
+                const total = this.cart.reduce((acc, item) => acc + item.price, 0);
+                totalDisplay.innerText = `S/ ${total.toLocaleString()}`;
+
+                if(this.cart.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align:center; margin-top:50px; color:#cbd5e1;">
+                            <i class="fa-solid fa-basket-shopping" style="font-size:3rem; margin-bottom:10px;"></i>
+                            <p>Tu bolsa está vacía</p>
+                        </div>`;
+                } else {
+                    container.innerHTML = this.cart.map((item, i) => `
+                        <div class="cart-item">
+                            <img src="${item.img}">
+                            <div class="cart-item-details">
+                                <div style="font-weight:700; font-size:0.9rem;">${item.name}</div>
+                                <div style="color:var(--text-muted); font-size:0.8rem;">${item.cat}</div>
+                                <div style="color:var(--accent-gold); font-weight:700;">S/ ${item.price.toLocaleString()}</div>
+                            </div>
+                            <button class="btn-remove" onclick="app.removeFromCart(${i})"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `).join('');
+                }
+            },
+
+            toggleCart: function(forceOpen = null) {
+                const sidebar = document.getElementById('cart-sidebar');
+                const overlay = document.getElementById('overlay');
+                
+                if (forceOpen === true) {
+                    sidebar.classList.add('active');
+                    overlay.classList.add('active');
+                } else if (forceOpen === false) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                } else {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                }
+            },
+
+            goToCheckout: function() {
+                if(this.cart.length === 0) return alert("Agrega productos primero.");
+                document.getElementById('cart-sidebar').classList.add('checkout-mode');
+                // Inicializar mapa un momento después para que la animación CSS termine
+                setTimeout(() => geo.initMap(), 500);
+            },
+
+            backToCart: function() {
+                document.getElementById('cart-sidebar').classList.remove('checkout-mode');
+            },
+
+            finalizeOrder: function() {
+                const name = document.getElementById('input-name').value;
+                const manualAddr = document.getElementById('input-address-manual').value;
+                const payment = document.getElementById('input-payment').value;
+                
+                if(!name || !manualAddr) {
+                    alert("Por favor completa tu nombre y dirección.");
+                    return;
+                }
+
+                // Construcción del Mensaje WA
+                let msg = `*NUEVA ORDEN WEB (JSTORE-R)*\n`;
+                msg += `--------------------------------\n`;
+                msg += `👤 *Cliente:* ${name}\n`;
+                msg += `📍 *Dirección:* ${manualAddr}\n`;
+                if(geo.mapLink) msg += `🗺️ *GPS Exacto:* ${geo.mapLink}\n`;
+                msg += `💳 *Pago:* ${payment}\n`;
+                msg += `--------------------------------\n`;
+                msg += `*PEDIDO:*\n`;
+                
+                this.cart.forEach(p => {
+                    msg += `• ${p.name} - S/ ${p.price}\n`;
+                });
+                
+                const total = this.cart.reduce((a, b) => a + b.price, 0);
+                msg += `\n💰 *TOTAL A PAGAR: S/ ${total.toLocaleString()}*`;
+
+                window.open(`https://wa.me/51932508670?text=${encodeURIComponent(msg)}`, '_blank');
+            },
+
+            // EFECTO POLVO DE ORO (Canvas)
+            initGoldDust: function() {
+                const canvas = document.getElementById('gold-dust');
+                const ctx = canvas.getContext('2d');
+                let width, height, particles = [];
+
+                function resize() {
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = window.innerHeight;
+                }
+
+                function createParticles() {
+                    particles = [];
+                    for (let i = 0; i < 40; i++) {
+                        particles.push({
+                            x: Math.random() * width,
+                            y: Math.random() * height,
+                            size: Math.random() * 2,
+                            speedY: Math.random() * 0.5 + 0.1,
+                            speedX: Math.random() * 0.4 - 0.2
+                        });
+                    }
+                }
+
+                function animate() {
+                    ctx.clearRect(0, 0, width, height);
+                    ctx.fillStyle = "rgba(199, 106, 58, 0.4)"; // Color Oro
+                    
+                    particles.forEach(p => {
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        p.y -= p.speedY; // Flotar hacia arriba
+                        p.x += p.speedX;
+                        
+                        if (p.y < 0) p.y = height;
+                        if (p.x > width) p.x = 0;
+                        if (p.x < 0) p.x = width;
+                    });
+                    requestAnimationFrame(animate);
+                }
+
+                window.addEventListener('resize', resize);
+                resize();
+                createParticles();
+                animate();
+            }
+        };
+
+        // INICIAR APP
+        document.addEventListener('DOMContentLoaded', () => app.init());
+
     </script>
 </body>
 </html>
