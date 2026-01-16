@@ -15,11 +15,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 
     <style>
         /* ==========================================================================
-           1. ESTILOS GENERALES
+           1. ESTILOS GENERALES (Dark Mode Premium)
            ========================================================================== */
         :root {
             --bg-body: #0b0f19;
@@ -131,15 +132,27 @@
         .gps-btn { width: 100%; padding: 14px; background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px dashed #34d399; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; transition: 0.3s; margin-bottom: 10px; }
         .gps-btn:hover { background: rgba(16, 185, 129, 0.2); }
         
-        #map-frame { height: 0; transition: 0.4s; overflow: hidden; border-radius: 10px; margin-top: 5px; opacity: 0.5; position: relative; border: 2px solid #374151; }
-        #map-frame.active { height: 280px; opacity: 1; border-color: var(--accent-gold); }
+        #map-frame { height: 0; transition: 0.4s; overflow: hidden; border-radius: 10px; margin-top: 5px; opacity: 0.5; position: relative; border: 1px solid #374151; }
+        #map-frame.active { height: 350px; opacity: 1; border-color: var(--accent-gold); }
         
-        /* MAP STYLES - STANDARD OSM (High Contrast) */
-        .leaflet-container { font-family: var(--font-body) !important; background: #ddd !important; }
-        .leaflet-popup-content-wrapper { background: var(--bg-card); color: white; border: 1px solid var(--accent-gold); border-radius: 8px; }
-        .leaflet-popup-tip { background: var(--accent-gold); }
-        .leaflet-bar a { background-color: var(--bg-panel); color: white; border-bottom: 1px solid #444; }
-        .leaflet-bar a:hover { background-color: var(--accent-gold); color: black; }
+        /* MAPBOX CUSTOM MARKERS */
+        .marker-origin {
+            background-image: url('https://res.cloudinary.com/djpp4pwh8/image/upload/v1768128894/1001127115_kxjcfn.png');
+            background-size: cover;
+            width: 40px; height: 40px; border-radius: 50%;
+            border: 2px solid #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+            cursor: pointer;
+        }
+        .marker-dest {
+            color: #d4af37;
+            font-size: 30px;
+            cursor: move;
+            text-shadow: 0 0 10px black;
+        }
+        .mapboxgl-popup-content { background: var(--bg-card); color: white; border: 1px solid var(--accent-gold); border-radius: 8px; padding: 10px; font-family: var(--font-body); }
+        .mapboxgl-popup-tip { border-top-color: var(--accent-gold); border-bottom-color: var(--accent-gold); }
+        .mapboxgl-ctrl-bottom-right { display: none; } /* Ocultar logo para estética limpia (Opcional según TOS) */
 
         .price-summary-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-muted); }
         .price-summary-row.total { font-size: 1.2rem; color: white; font-weight: 700; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 12px; margin-top: 12px; }
@@ -331,11 +344,13 @@
         <div style="text-align:center; color:#444; margin-top:40px;">© 2026 JstoreR Official.</div>
     </footer>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const SHEET_ID = "1z083WrKeOiakV7TegSuc7mzmx5JAPtmAFPHGulHga6w";
         const TARGET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
         const CSV_URL = 'https://corsproxy.io/?' + encodeURIComponent(TARGET_URL);
+        
+        // --- CONFIGURACIÓN DE MAPBOX ---
+        mapboxgl.accessToken = "pk.eyJ1IjoianN0b3JlciIsImEiOiJjbWtoZ3o0eXowazJqM2pxMjJsZGNzanBzIn0.-7Ml_9KDQCzhGYqkiJdKzA";
         
         // --- COORDENADAS EXACTAS (Jr. Cuzco 626) ---
         const STORE_LOC = { lat: -12.051800, lng: -77.028500 };
@@ -366,37 +381,67 @@
             return rows;
         }
 
-        // --- GEO ENGINE V66 (MAPA CLARO + ESRI/GOOGLE-LIKE SEARCH) ---
+        // --- GEO ENGINE V77 PRO (PURE MAPBOX NATIVE) ---
         const geo = {
-            map: null, marker: null,
-            LIMA_TRAFFIC_FACTOR: 1.40, // Factor de Corrección Lima
+            map: null, destMarker: null,
+            LIMA_TRAFFIC_FACTOR: 1.40,
 
-            initMap: function(lat, lng, zoom = 14) {
-                if(!this.map) {
-                    document.getElementById('map-frame').classList.add('active');
-                    this.map = L.map('map').setView([lat, lng], zoom);
-                    
-                    // --- MAPA ESTÁNDAR (COLORIDO / ALTO CONTRASTE) ---
-                    // Usamos el estándar de OSM que tiene mejor contraste con tu fondo oscuro
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '© OpenStreetMap contributors'
-                    }).addTo(this.map);
-                    
-                    // Origen
-                    const iconOrigin = L.divIcon({className: 'custom-icon', html: '<i class="fa-solid fa-store" style="color:#d4af37; font-size:24px; text-shadow:2px 2px 2px black;"></i>', iconSize: [24,24]});
-                    L.marker([STORE_LOC.lat, STORE_LOC.lng], {icon: iconOrigin}).addTo(this.map)
-                     .bindPopup("<b>JstoreR (Origen)</b>").openPopup();
+            initMap: function(centerLng, centerLat, zoom = 14) {
+                const container = document.getElementById('map-frame');
+                container.classList.add('active');
 
-                    // Evento Clic en Mapa
-                    this.map.on('click', (e) => {
-                        this.updateMarker(e.latlng.lat, e.latlng.lng);
-                    });
-                } else {
-                    this.map.setView([lat, lng], zoom);
+                // Si ya existe el mapa, solo volamos hacia allá
+                if(this.map) {
+                    this.map.flyTo({ center: [centerLng, centerLat], zoom: zoom, pitch: 50 });
+                    return;
                 }
+
+                // Crear Mapa Nativo 3D
+                this.map = new mapboxgl.Map({
+                    container: 'map',
+                    style: 'mapbox://styles/mapbox/navigation-night-v1', // ESTILO PREMIUM NEÓN
+                    center: [centerLng, centerLat],
+                    zoom: zoom,
+                    pitch: 45, // Inclinación 3D
+                    bearing: 0,
+                    antialias: true
+                });
+
+                // Controles de Navegación
+                this.map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+                // Marcador de Origen (Personalizado)
+                const elOrigin = document.createElement('div');
+                elOrigin.className = 'marker-origin';
+                new mapboxgl.Marker(elOrigin)
+                    .setLngLat([STORE_LOC.lng, STORE_LOC.lat])
+                    .setPopup(new mapboxgl.Popup({offset: 25}).setHTML('<b>JstoreR (Origen)</b>'))
+                    .addTo(this.map);
+
+                // Evento Clic en Mapa
+                this.map.on('click', (e) => {
+                    this.updateMarker(e.lngLat.lat, e.lngLat.lng);
+                });
+
+                // Asegurar renderizado correcto al abrir
+                this.map.on('load', () => {
+                    this.map.resize();
+                    // Preparar capa para la ruta dorada
+                    this.map.addSource('route', {
+                        'type': 'geojson',
+                        'data': { 'type': 'Feature', 'properties': {}, 'geometry': { 'type': 'LineString', 'coordinates': [] } }
+                    });
+                    this.map.addLayer({
+                        'id': 'route',
+                        'type': 'line',
+                        'source': 'route',
+                        'layout': { 'line-join': 'round', 'line-cap': 'round' },
+                        'paint': { 'line-color': '#d4af37', 'line-width': 4, 'line-dasharray': [2, 2] }
+                    });
+                });
             },
 
-            // GPS Automático
+            // GPS Automático (Con animación de vuelo)
             startTracking: function() {
                 const btn = document.querySelector('.gps-btn');
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Obteniendo GPS...';
@@ -404,13 +449,13 @@
                 if(!navigator.geolocation) { alert("GPS no soportado"); return; }
                 
                 navigator.geolocation.getCurrentPosition(pos => {
-                    this.initMap(pos.coords.latitude, pos.coords.longitude, 16);
+                    this.initMap(pos.coords.longitude, pos.coords.latitude, 16);
                     this.updateMarker(pos.coords.latitude, pos.coords.longitude);
                     btn.innerHTML = '<i class="fa-solid fa-check"></i> GPS Detectado';
                 }, () => { alert("Error GPS"); btn.innerHTML = 'Reintentar GPS'; }, {enableHighAccuracy:true});
             },
 
-            // --- MOTOR DE BÚSQUEDA HÍBRIDO (ESRI + NOMINATIM) ---
+            // --- BUSCADOR NATIVO MAPBOX (ULTRA RÁPIDO) ---
             searchAddress: function() {
                 const query = document.getElementById('map-search-input').value;
                 if(!query) return alert("Escribe una dirección (Ej: Av. San Luis 2276)");
@@ -418,51 +463,27 @@
                 const btn = document.querySelector('.map-search-btn');
                 btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
 
-                // INTENTO 1: Usar ArcGIS (Esri) - El mejor para números en Perú
-                // Usamos una URL especial que permite buscar "SingleLine" sin token para uso público simple
-                const esriUrl = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine=${encodeURIComponent(query + ", Lima, Peru")}&maxLocations=1&outFields=Match_addr,Addr_type`;
+                const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxgl.accessToken}&country=pe&limit=1&types=address,poi`;
 
-                fetch(esriUrl)
+                fetch(url)
                     .then(r => r.json())
                     .then(data => {
-                        if(data.candidates && data.candidates.length > 0) {
-                            // ÉXITO CON ESRI
-                            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
-                            const lat = data.candidates[0].location.y;
-                            const lng = data.candidates[0].location.x;
-                            const foundAddr = data.candidates[0].address;
+                        btn.innerHTML = '<i class="fa-solid fa-search"></i>';
+                        if(data.features && data.features.length > 0) {
+                            const [lng, lat] = data.features[0].center;
+                            const foundAddr = data.features[0].place_name;
                             
-                            this.initMap(lat, lng, 17); // Zoom más cercano
+                            this.initMap(lng, lat, 17);
                             this.updateMarker(lat, lng);
-                            document.getElementById('cust-address').value = foundAddr; // Llenar el campo
+                            document.getElementById('cust-address').value = foundAddr; 
                         } else {
-                            // SI ESRI FALLA, INTENTAR NOMINATIM (OSM)
-                            console.log("Esri falló, intentando OSM...");
-                            this.searchFallback(query);
+                            alert("No encontramos esa dirección exacta. Intenta mover el PIN en el mapa.");
                         }
                     })
                     .catch(() => {
-                        this.searchFallback(query);
+                        btn.innerHTML = '<i class="fa-solid fa-times"></i>';
+                        alert("Error de conexión con Mapbox.");
                     });
-            },
-
-            searchFallback: function(query) {
-                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ", Lima, Peru")}`;
-                fetch(url).then(r=>r.json()).then(data => {
-                    document.querySelector('.map-search-btn').innerHTML = '<i class="fa-solid fa-search"></i>';
-                    if(data && data.length > 0) {
-                        const lat = parseFloat(data[0].lat);
-                        const lng = parseFloat(data[0].lon);
-                        this.initMap(lat, lng, 15);
-                        this.updateMarker(lat, lng);
-                        document.getElementById('cust-address').value = data[0].display_name.split(',')[0]; 
-                    } else {
-                        alert("No encontramos esa dirección exacta. Intenta mover el PIN en el mapa manualmente.");
-                    }
-                }).catch(()=> {
-                    document.querySelector('.map-search-btn').innerHTML = '<i class="fa-solid fa-times"></i>';
-                    alert("Error de conexión con el mapa.");
-                });
             },
 
             // Actualizar Marcador y Cálculos
@@ -470,24 +491,48 @@
                 document.getElementById('geo-lat').value = lat;
                 document.getElementById('geo-lng').value = lng;
 
-                if(this.marker) this.map.removeLayer(this.marker);
-                
-                // Marcador arrastrable
-                this.marker = L.marker([lat, lng], {draggable: true}).addTo(this.map);
-                this.marker.bindPopup("<b>📍 Destino</b><br>Confirma tu ubicación exacta").openPopup();
+                // Crear o Mover Marcador de Destino
+                if(this.destMarker) {
+                    this.destMarker.setLngLat([lng, lat]);
+                } else {
+                    const elDest = document.createElement('div');
+                    elDest.innerHTML = '<i class="fa-solid fa-location-dot"></i>';
+                    elDest.className = 'marker-dest';
+                    
+                    this.destMarker = new mapboxgl.Marker(elDest, {draggable: true})
+                        .setLngLat([lng, lat])
+                        .setPopup(new mapboxgl.Popup({offset: 25}).setHTML('<b>Destino</b><br>Arrástrame'))
+                        .addTo(this.map);
+                    
+                    this.destMarker.on('dragend', () => {
+                        const pos = this.destMarker.getLngLat();
+                        this.updateMarker(pos.lat, pos.lng);
+                    });
+                }
 
-                // Recalcular al terminar de arrastrar
-                this.marker.on('dragend', (event) => {
-                    const pos = event.target.getLatLng();
-                    this.updateMarker(pos.lat, pos.lng);
-                });
+                // DIBUJAR RUTA ORO (Línea Recta visual)
+                if(this.map.getSource('route')) {
+                    const routeGeoJSON = {
+                        'type': 'Feature',
+                        'properties': {},
+                        'geometry': {
+                            'type': 'LineString',
+                            'coordinates': [
+                                [STORE_LOC.lng, STORE_LOC.lat],
+                                [lng, lat]
+                            ]
+                        }
+                    };
+                    this.map.getSource('route').setData(routeGeoJSON);
+                }
 
-                // Dibujar ruta
-                if(this.routeLine) this.map.removeLayer(this.routeLine);
-                this.routeLine = L.polyline([[STORE_LOC.lat, STORE_LOC.lng], [lat, lng]], {color: '#d4af37', dashArray: '5, 10'}).addTo(this.map);
-                this.map.fitBounds(this.routeLine.getBounds(), {padding:[50,50]});
+                // Ajustar cámara para ver toda la ruta
+                const bounds = new mapboxgl.LngLatBounds();
+                bounds.extend([STORE_LOC.lng, STORE_LOC.lat]);
+                bounds.extend([lng, lat]);
+                this.map.fitBounds(bounds, { padding: 100, maxZoom: 16 });
 
-                // Cálculos Matemáticos
+                // CÁLCULOS MATEMÁTICOS (LÓGICA DE NEGOCIO)
                 const linearDist = this.getDist(STORE_LOC.lat, STORE_LOC.lng, lat, lng);
                 const realDist = linearDist * this.LIMA_TRAFFIC_FACTOR;
                 
