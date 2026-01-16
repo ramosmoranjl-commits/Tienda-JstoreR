@@ -442,7 +442,11 @@
                 // Cálculos Matemáticos
                 const linearDist = this.getDist(STORE_LOC.lat, STORE_LOC.lng, lat, lng);
                 const realDist = linearDist * this.LIMA_TRAFFIC_FACTOR;
-                const cost = realDist * 2.00;
+                
+                // --- LOGICA DE TARIFA MÍNIMA 6 SOLES ---
+                let cost = realDist * 2.00;
+                if (cost < 6.00) { cost = 6.00; }
+                // ---------------------------------------
 
                 document.getElementById('shipping-info').style.display = 'block';
                 document.getElementById('dist-txt').innerText = realDist.toFixed(2) + " km (Ruta aprox)";
