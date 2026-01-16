@@ -19,7 +19,7 @@
 
     <style>
         /* ==========================================================================
-           1. DESIGN TOKENS & RESET
+           1. ESTILOS GENERALES
            ========================================================================== */
         :root {
             --bg-body: #0b0f19;
@@ -131,11 +131,11 @@
         .gps-btn { width: 100%; padding: 14px; background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px dashed #34d399; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; transition: 0.3s; margin-bottom: 10px; }
         .gps-btn:hover { background: rgba(16, 185, 129, 0.2); }
         
-        #map-frame { height: 0; transition: 0.4s; overflow: hidden; border-radius: 10px; margin-top: 5px; opacity: 0.5; position: relative; }
-        #map-frame.active { height: 250px; border: 1px solid var(--accent-gold); opacity: 1; }
+        #map-frame { height: 0; transition: 0.4s; overflow: hidden; border-radius: 10px; margin-top: 5px; opacity: 0.5; position: relative; border: 2px solid #374151; }
+        #map-frame.active { height: 280px; opacity: 1; border-color: var(--accent-gold); }
         
-        /* Custom Map Styles for Dark Mode */
-        .leaflet-container { font-family: var(--font-body) !important; background: #111 !important; }
+        /* MAP STYLES - STANDARD OSM (High Contrast) */
+        .leaflet-container { font-family: var(--font-body) !important; background: #ddd !important; }
         .leaflet-popup-content-wrapper { background: var(--bg-card); color: white; border: 1px solid var(--accent-gold); border-radius: 8px; }
         .leaflet-popup-tip { background: var(--accent-gold); }
         .leaflet-bar a { background-color: var(--bg-panel); color: white; border-bottom: 1px solid #444; }
@@ -272,7 +272,7 @@
                     <p style="font-size:0.8rem; color:gray; margin-bottom:10px;"><i class="fa-solid fa-store"></i> Origen: <strong>Jr. Cuzco 626, Lima</strong></p>
                     
                     <div class="map-search-grid">
-                        <input type="text" id="map-search-input" class="map-search-input" placeholder="Buscar dirección (Ej: Av. San Luis 2276)">
+                        <input type="text" id="map-search-input" class="map-search-input" placeholder="Dirección exacta (Ej: Av. San Luis 2276)">
                         <button class="map-search-btn" onclick="geo.searchAddress()"><i class="fa-solid fa-search"></i></button>
                     </div>
 
@@ -292,7 +292,7 @@
                     <input type="hidden" id="calc-ship-final" value="0">
                 </div>
 
-                <input type="text" id="cust-address" class="form-input" placeholder="Referencia exacta (Piso, Dpto, Nro...)">
+                <input type="text" id="cust-address" class="form-input" placeholder="Referencia adicional (Piso, Color de casa...)">
                 <select id="cust-pay" class="form-input">
                     <option value="Yape/Plin">Yape / Plin</option>
                     <option value="BCP">Transferencia BCP</option>
@@ -366,7 +366,7 @@
             return rows;
         }
 
-        // --- GEO ENGINE V66 (DARK MATTER + ESRI GEOCODING) ---
+        // --- GEO ENGINE V66 (MAPA CLARO + ESRI/GOOGLE-LIKE SEARCH) ---
         const geo = {
             map: null, marker: null,
             LIMA_TRAFFIC_FACTOR: 1.40, // Factor de Corrección Lima
@@ -376,13 +376,14 @@
                     document.getElementById('map-frame').classList.add('active');
                     this.map = L.map('map').setView([lat, lng], zoom);
                     
-                    // --- AQUÍ ESTÁ LA MAGIA: CAMBIO A MAPA OSCURO (CARTODB) ---
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                    // --- MAPA ESTÁNDAR (COLORIDO / ALTO CONTRASTE) ---
+                    // Usamos el estándar de OSM que tiene mejor contraste con tu fondo oscuro
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
                     }).addTo(this.map);
                     
                     // Origen
-                    const iconOrigin = L.divIcon({className: 'custom-icon', html: '<i class="fa-solid fa-store" style="color:#d4af37; font-size:24px;"></i>', iconSize: [24,24]});
+                    const iconOrigin = L.divIcon({className: 'custom-icon', html: '<i class="fa-solid fa-store" style="color:#d4af37; font-size:24px; text-shadow:2px 2px 2px black;"></i>', iconSize: [24,24]});
                     L.marker([STORE_LOC.lat, STORE_LOC.lng], {icon: iconOrigin}).addTo(this.map)
                      .bindPopup("<b>JstoreR (Origen)</b>").openPopup();
 
@@ -403,46 +404,44 @@
                 if(!navigator.geolocation) { alert("GPS no soportado"); return; }
                 
                 navigator.geolocation.getCurrentPosition(pos => {
-                    this.initMap(pos.coords.latitude, pos.coords.longitude, 14);
+                    this.initMap(pos.coords.latitude, pos.coords.longitude, 16);
                     this.updateMarker(pos.coords.latitude, pos.coords.longitude);
                     btn.innerHTML = '<i class="fa-solid fa-check"></i> GPS Detectado';
                 }, () => { alert("Error GPS"); btn.innerHTML = 'Reintentar GPS'; }, {enableHighAccuracy:true});
             },
 
-            // --- NUEVO BUSCADOR MEJORADO (USANDO ESRI/ARCGIS) ---
+            // --- MOTOR DE BÚSQUEDA HÍBRIDO (ESRI + NOMINATIM) ---
             searchAddress: function() {
                 const query = document.getElementById('map-search-input').value;
-                if(!query) return alert("Escribe una dirección (Ej: Av. Arequipa 1500)");
+                if(!query) return alert("Escribe una dirección (Ej: Av. San Luis 2276)");
                 
                 const btn = document.querySelector('.map-search-btn');
                 btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
 
-                // Usamos la API pública de Esri (ArcGIS) que sí encuentra numeraciones
-                const esriUrl = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine=${encodeURIComponent(query + ", Lima, Peru")}&maxLocations=1`;
+                // INTENTO 1: Usar ArcGIS (Esri) - El mejor para números en Perú
+                // Usamos una URL especial que permite buscar "SingleLine" sin token para uso público simple
+                const esriUrl = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine=${encodeURIComponent(query + ", Lima, Peru")}&maxLocations=1&outFields=Match_addr,Addr_type`;
 
                 fetch(esriUrl)
                     .then(r => r.json())
                     .then(data => {
-                        btn.innerHTML = '<i class="fa-solid fa-search"></i>';
-                        
                         if(data.candidates && data.candidates.length > 0) {
-                            // ÉXITO: Esri encontró la dirección exacta o interpolada
+                            // ÉXITO CON ESRI
+                            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
                             const lat = data.candidates[0].location.y;
                             const lng = data.candidates[0].location.x;
-                            const addressFound = data.candidates[0].address;
-
-                            this.initMap(lat, lng, 16);
-                            this.updateMarker(lat, lng);
+                            const foundAddr = data.candidates[0].address;
                             
-                            // Actualizamos el campo visual con la dirección encontrada
-                            document.getElementById('cust-address').value = addressFound;
+                            this.initMap(lat, lng, 17); // Zoom más cercano
+                            this.updateMarker(lat, lng);
+                            document.getElementById('cust-address').value = foundAddr; // Llenar el campo
                         } else {
-                            // FALLBACK: Si Esri falla, intentamos el método antiguo (Nominatim)
+                            // SI ESRI FALLA, INTENTAR NOMINATIM (OSM)
+                            console.log("Esri falló, intentando OSM...");
                             this.searchFallback(query);
                         }
                     })
                     .catch(() => {
-                        // Si falla la red, fallback
                         this.searchFallback(query);
                     });
             },
@@ -458,8 +457,11 @@
                         this.updateMarker(lat, lng);
                         document.getElementById('cust-address').value = data[0].display_name.split(',')[0]; 
                     } else {
-                        alert("No encontramos esa numeración exacta. Por favor mueve el PIN en el mapa manualmente.");
+                        alert("No encontramos esa dirección exacta. Intenta mover el PIN en el mapa manualmente.");
                     }
+                }).catch(()=> {
+                    document.querySelector('.map-search-btn').innerHTML = '<i class="fa-solid fa-times"></i>';
+                    alert("Error de conexión con el mapa.");
                 });
             },
 
@@ -498,13 +500,7 @@
                 document.getElementById('dist-txt').innerText = realDist.toFixed(2) + " km (Ruta aprox)";
                 document.getElementById('ship-base-txt').innerText = "S/ " + cost.toFixed(2);
                 document.getElementById('calc-ship-base').value = cost.toFixed(2);
-
-                // Reverse Geocoding (Nombre de calle) - Usamos Nominatim para esto que es suficiente
-                fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
-                    .then(r=>r.json()).then(d => {
-                         if(d.display_name) document.getElementById('cust-address').value = d.display_name;
-                    });
-
+                
                 app.updateCheckoutTotals();
             },
 
