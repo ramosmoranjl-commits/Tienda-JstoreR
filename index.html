@@ -87,7 +87,8 @@
         .product-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; transition: 0.4s; position: relative; }
         .product-card:hover { transform: translateY(-8px); border-color: rgba(212, 175, 55, 0.4); box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5); }
         .card-image-wrapper { position: relative; width: 100%; aspect-ratio: 1; background: #000; overflow: hidden; cursor: pointer; }
-        .product-img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s ease; }
+        /* CLOUDINARY: object-fit: contain para respetar el c_pad */
+        .product-img { width: 100%; height: 100%; object-fit: contain; transition: 0.6s ease; }
         .product-card:hover .product-img { transform: scale(1.1); }
         .stock-badge { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; z-index: 2; border: 1px solid rgba(255,255,255,0.1); }
         .card-info { padding: 20px; flex: 1; display: flex; flex-direction: column; }
@@ -152,7 +153,7 @@
         }
         .mapboxgl-popup-content { background: var(--bg-card); color: white; border: 1px solid var(--accent-gold); border-radius: 8px; padding: 10px; font-family: var(--font-body); }
         .mapboxgl-popup-tip { border-top-color: var(--accent-gold); border-bottom-color: var(--accent-gold); }
-        .mapboxgl-ctrl-bottom-right { display: none; } /* Ocultar logo para estética limpia (Opcional según TOS) */
+        .mapboxgl-ctrl-bottom-right { display: none; }
 
         .price-summary-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-muted); }
         .price-summary-row.total { font-size: 1.2rem; color: white; font-weight: 700; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 12px; margin-top: 12px; }
@@ -189,6 +190,8 @@
         #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--bg-panel); border: 1px solid var(--accent-gold); padding: 12px 30px; border-radius: 50px; color: var(--accent-gold); font-weight: 700; z-index: 5000; opacity: 0; transition: 0.3s; pointer-events: none; }
         #toast.show { opacity: 1; transform: translateX(-50%) translateY(-20px); }
         #gold-dust { position: fixed; inset: 0; pointer-events: none; z-index: 100; mix-blend-mode: screen; }
+        
+        .error-box { grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444; border: 1px dashed #ef4444; border-radius: 10px; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -218,7 +221,7 @@
     <main class="catalog-section">
         <div class="grid-layout" id="catalog-mount">
             <div style="grid-column:1/-1; text-align:center; padding:50px; color:gray;">
-                <i class="fa-solid fa-circle-notch fa-spin fa-3x" style="color:var(--accent-gold)"></i><br><br>Sincronizando Catálogo...
+                <i class="fa-solid fa-circle-notch fa-spin fa-3x" style="color:var(--accent-gold)"></i><br><br>Cargando productos desde Excel...
             </div>
         </div>
     </main>
@@ -345,72 +348,41 @@
     </footer>
 
     <script>
-        const SHEET_ID = "1z083WrKeOiakV7TegSuc7mzmx5JAPtmAFPHGulHga6w";
-        const TARGET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
-        const CSV_URL = 'https://corsproxy.io/?' + encodeURIComponent(TARGET_URL);
-        
-        // --- CONFIGURACIÓN DE MAPBOX ---
+        // ==========================================
+        //  👇 PEGA AQUÍ TU LINK DE GOOGLE SHEETS (CSV) 👇
+        // ==========================================
+        const GOOGLE_SHEET_URL = "PEGAR_AQUI_TU_ENLACE_CSV";
+
+        // CREDENCIALES MAPBOX
         mapboxgl.accessToken = "pk.eyJ1IjoianN0b3JlciIsImEiOiJjbWtoZ3o0eXowazJqM2pxMjJsZGNzanBzIn0.-7Ml_9KDQCzhGYqkiJdKzA";
         
-        // --- COORDENADAS EXACTAS (Jr. Cuzco 626) ---
+        // --- INICIO DE LÓGICA ---
         const STORE_LOC = { lat: -12.051800, lng: -77.028500 };
         const FREE_SHIPPING_THRESHOLD = 350.00;
 
-        function parseCSV(text) {
-            const rows = [];
-            let row = [];
-            let inQuote = false;
-            let currentCell = '';
-            for (let i = 0; i < text.length; i++) {
-                const char = text[i];
-                const nextChar = text[i+1];
-                if (char === '"') {
-                    if (inQuote && nextChar === '"') { currentCell += '"'; i++; } 
-                    else { inQuote = !inQuote; }
-                } else if (char === ',' && !inQuote) {
-                    row.push(currentCell.trim()); currentCell = '';
-                } else if ((char === '\n' || char === '\r') && !inQuote) {
-                    if (currentCell || row.length > 0) row.push(currentCell.trim());
-                    if (row.length > 0) rows.push(row);
-                    row = []; currentCell = '';
-                    if (char === '\r' && nextChar === '\n') i++;
-                } else { currentCell += char; }
-            }
-            if (currentCell || row.length > 0) row.push(currentCell.trim());
-            if (row.length > 0) rows.push(row);
-            return rows;
-        }
-
-        // --- GEO ENGINE V77 PRO (PURE MAPBOX NATIVE) ---
         const geo = {
-            map: null, destMarker: null,
-            LIMA_TRAFFIC_FACTOR: 1.40,
+            map: null, destMarker: null, LIMA_TRAFFIC_FACTOR: 1.40,
 
             initMap: function(centerLng, centerLat, zoom = 14) {
                 const container = document.getElementById('map-frame');
                 container.classList.add('active');
-
-                // Si ya existe el mapa, solo volamos hacia allá
                 if(this.map) {
                     this.map.flyTo({ center: [centerLng, centerLat], zoom: zoom, pitch: 50 });
                     return;
                 }
+                if (typeof mapboxgl === 'undefined') return alert("El mapa no pudo cargar.");
 
-                // Crear Mapa Nativo 3D
                 this.map = new mapboxgl.Map({
                     container: 'map',
-                    style: 'mapbox://styles/mapbox/navigation-night-v1', // ESTILO PREMIUM NEÓN
+                    style: 'mapbox://styles/mapbox/navigation-night-v1',
                     center: [centerLng, centerLat],
                     zoom: zoom,
-                    pitch: 45, // Inclinación 3D
+                    pitch: 45,
                     bearing: 0,
                     antialias: true
                 });
-
-                // Controles de Navegación
                 this.map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-                // Marcador de Origen (Personalizado)
+                
                 const elOrigin = document.createElement('div');
                 elOrigin.className = 'marker-origin';
                 new mapboxgl.Marker(elOrigin)
@@ -418,36 +390,18 @@
                     .setPopup(new mapboxgl.Popup({offset: 25}).setHTML('<b>JstoreR (Origen)</b>'))
                     .addTo(this.map);
 
-                // Evento Clic en Mapa
-                this.map.on('click', (e) => {
-                    this.updateMarker(e.lngLat.lat, e.lngLat.lng);
-                });
-
-                // Asegurar renderizado correcto al abrir
+                this.map.on('click', (e) => { this.updateMarker(e.lngLat.lat, e.lngLat.lng); });
                 this.map.on('load', () => {
                     this.map.resize();
-                    // Preparar capa para la ruta dorada
-                    this.map.addSource('route', {
-                        'type': 'geojson',
-                        'data': { 'type': 'Feature', 'properties': {}, 'geometry': { 'type': 'LineString', 'coordinates': [] } }
-                    });
-                    this.map.addLayer({
-                        'id': 'route',
-                        'type': 'line',
-                        'source': 'route',
-                        'layout': { 'line-join': 'round', 'line-cap': 'round' },
-                        'paint': { 'line-color': '#d4af37', 'line-width': 4, 'line-dasharray': [2, 2] }
-                    });
+                    this.map.addSource('route', { 'type': 'geojson', 'data': { 'type': 'Feature', 'properties': {}, 'geometry': { 'type': 'LineString', 'coordinates': [] } } });
+                    this.map.addLayer({ 'id': 'route', 'type': 'line', 'source': 'route', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#d4af37', 'line-width': 4, 'line-dasharray': [2, 2] } });
                 });
             },
 
-            // GPS Automático (Con animación de vuelo)
             startTracking: function() {
                 const btn = document.querySelector('.gps-btn');
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Obteniendo GPS...';
-                
                 if(!navigator.geolocation) { alert("GPS no soportado"); return; }
-                
                 navigator.geolocation.getCurrentPosition(pos => {
                     this.initMap(pos.coords.longitude, pos.coords.latitude, 16);
                     this.updateMarker(pos.coords.latitude, pos.coords.longitude);
@@ -455,97 +409,54 @@
                 }, () => { alert("Error GPS"); btn.innerHTML = 'Reintentar GPS'; }, {enableHighAccuracy:true});
             },
 
-            // --- BUSCADOR NATIVO MAPBOX (ULTRA RÁPIDO) ---
             searchAddress: function() {
                 const query = document.getElementById('map-search-input').value;
-                if(!query) return alert("Escribe una dirección (Ej: Av. San Luis 2276)");
-                
+                if(!query) return alert("Escribe una dirección");
                 const btn = document.querySelector('.map-search-btn');
                 btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
-
                 const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxgl.accessToken}&country=pe&limit=1&types=address,poi`;
-
-                fetch(url)
-                    .then(r => r.json())
-                    .then(data => {
-                        btn.innerHTML = '<i class="fa-solid fa-search"></i>';
-                        if(data.features && data.features.length > 0) {
-                            const [lng, lat] = data.features[0].center;
-                            const foundAddr = data.features[0].place_name;
-                            
-                            this.initMap(lng, lat, 17);
-                            this.updateMarker(lat, lng);
-                            document.getElementById('cust-address').value = foundAddr; 
-                        } else {
-                            alert("No encontramos esa dirección exacta. Intenta mover el PIN en el mapa.");
-                        }
-                    })
-                    .catch(() => {
-                        btn.innerHTML = '<i class="fa-solid fa-times"></i>';
-                        alert("Error de conexión con Mapbox.");
-                    });
+                fetch(url).then(r => r.json()).then(data => {
+                    btn.innerHTML = '<i class="fa-solid fa-search"></i>';
+                    if(data.features && data.features.length > 0) {
+                        const [lng, lat] = data.features[0].center;
+                        const foundAddr = data.features[0].place_name;
+                        this.initMap(lng, lat, 17);
+                        this.updateMarker(lat, lng);
+                        document.getElementById('cust-address').value = foundAddr; 
+                    } else { alert("No encontramos esa dirección."); }
+                }).catch(() => { btn.innerHTML = '<i class="fa-solid fa-times"></i>'; alert("Error de conexión."); });
             },
 
-            // Actualizar Marcador y Cálculos
             updateMarker: function(lat, lng) {
                 document.getElementById('geo-lat').value = lat;
                 document.getElementById('geo-lng').value = lng;
-
-                // Crear o Mover Marcador de Destino
                 if(this.destMarker) {
                     this.destMarker.setLngLat([lng, lat]);
                 } else {
                     const elDest = document.createElement('div');
                     elDest.innerHTML = '<i class="fa-solid fa-location-dot"></i>';
                     elDest.className = 'marker-dest';
-                    
                     this.destMarker = new mapboxgl.Marker(elDest, {draggable: true})
                         .setLngLat([lng, lat])
                         .setPopup(new mapboxgl.Popup({offset: 25}).setHTML('<b>Destino</b><br>Arrástrame'))
                         .addTo(this.map);
-                    
-                    this.destMarker.on('dragend', () => {
-                        const pos = this.destMarker.getLngLat();
-                        this.updateMarker(pos.lat, pos.lng);
-                    });
+                    this.destMarker.on('dragend', () => { const pos = this.destMarker.getLngLat(); this.updateMarker(pos.lat, pos.lng); });
                 }
-
-                // DIBUJAR RUTA ORO (Línea Recta visual)
                 if(this.map.getSource('route')) {
-                    const routeGeoJSON = {
-                        'type': 'Feature',
-                        'properties': {},
-                        'geometry': {
-                            'type': 'LineString',
-                            'coordinates': [
-                                [STORE_LOC.lng, STORE_LOC.lat],
-                                [lng, lat]
-                            ]
-                        }
-                    };
-                    this.map.getSource('route').setData(routeGeoJSON);
+                    this.map.getSource('route').setData({ 'type': 'Feature', 'properties': {}, 'geometry': { 'type': 'LineString', 'coordinates': [[STORE_LOC.lng, STORE_LOC.lat], [lng, lat]] } });
                 }
-
-                // Ajustar cámara para ver toda la ruta
-                const bounds = new mapboxgl.LngLatBounds();
-                bounds.extend([STORE_LOC.lng, STORE_LOC.lat]);
-                bounds.extend([lng, lat]);
+                const bounds = new mapboxgl.LngLatBounds(); bounds.extend([STORE_LOC.lng, STORE_LOC.lat]); bounds.extend([lng, lat]);
                 this.map.fitBounds(bounds, { padding: 100, maxZoom: 16 });
 
-                // CÁLCULOS MATEMÁTICOS (LÓGICA DE NEGOCIO)
                 const linearDist = this.getDist(STORE_LOC.lat, STORE_LOC.lng, lat, lng);
                 const realDist = linearDist * this.LIMA_TRAFFIC_FACTOR;
-                
-                // --- LOGICA DE TARIFA MÍNIMA 6 SOLES ---
                 let cost = realDist * 2.00;
                 if (cost < 6.00) { cost = 6.00; }
-                // ---------------------------------------
 
                 document.getElementById('shipping-info').style.display = 'block';
                 document.getElementById('dist-txt').innerText = realDist.toFixed(2) + " km (Ruta aprox)";
                 document.getElementById('ship-base-txt').innerText = "S/ " + cost.toFixed(2);
                 document.getElementById('calc-ship-base').value = cost.toFixed(2);
-                
                 app.updateCheckoutTotals();
             },
 
@@ -559,26 +470,70 @@
 
         const app = {
             data: [], cart: [], filter: 'Todos',
+            
             init: async function() {
                 this.initGoldDust();
+                
                 try {
-                    const res = await fetch(CSV_URL);
-                    const txt = await res.text();
-                    const rawRows = parseCSV(txt); 
-                    const rows = rawRows.slice(1);
-                    this.data = rows.map(r => ({
-                        id: r[0], name: r[1], cat: r[2], 
-                        price: parseFloat((r[3]||'0').replace(/[^0-9.]/g,'')), 
-                        img: r[4], stock: parseInt(r[5]||'0'), desc: r[6]
-                    })).filter(p => p.name);
-                    this.renderPills(); this.renderCatalog();
-                } catch(e) { 
-                    console.error(e);
-                    document.getElementById('catalog-mount').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;">Error de conexión.</div>`;
+                    // Validar Link
+                    if(GOOGLE_SHEET_URL.includes("https://docs.google.com/spreadsheets/d/e/2PACX-1vQOKWE4Wyh_N_pt12iDlXx_garwZHFKRcE19DRoKSa2Cb_v3KoSmcQcJXRS2MdrfB7Bso-DqSXdINSt/pub?gid=0&single=true&output=csv")) {
+                        throw new Error("⚠️ OLVIDASTE PEGAR EL LINK DEL EXCEL EN EL CÓDIGO");
+                    }
+
+                    // Descargar Excel (CSV)
+                    const res = await fetch(GOOGLE_SHEET_URL);
+                    if(!res.ok) throw new Error("Error al descargar Excel");
+                    const text = await res.text();
+                    
+                    this.parseCSV(text);
+                    
+                    document.getElementById('search-input').addEventListener('keyup', ()=>this.renderCatalog());
+                    document.getElementById('product-modal').addEventListener('click', (e)=>{ if(e.target.id === 'product-modal') this.closeModal(); });
+
+                } catch (e) {
+                    document.getElementById('catalog-mount').innerHTML = `
+                        <div class="error-box">
+                            <i class="fa-solid fa-bug fa-3x"></i><br><br>
+                            <strong>ERROR:</strong> ${e.message}<br>
+                            <small>Verifica que el link termine en .csv y sea público</small>
+                        </div>`;
                 }
-                document.getElementById('search-input').addEventListener('keyup', ()=>this.renderCatalog());
-                document.getElementById('product-modal').addEventListener('click', (e)=>{ if(e.target.id === 'product-modal') this.closeModal(); });
             },
+
+            // --- ⚡ OPTIMIZACIÓN CLOUDINARY ⚡ ---
+            optimizeImg: function(url, width = 500) {
+                if (!url) return 'https://via.placeholder.com/300?text=Sin+Foto';
+                // Solo optimiza si es link de Cloudinary
+                if (!url.includes('cloudinary.com')) return url;
+                
+                // Inyectamos los parámetros de optimización
+                // w_ = ancho, h_ = alto, c_pad = rellenar bordes, b_auto = fondo inteligente
+                // q_auto = calidad optima, f_auto = formato moderno (webp/avif)
+                return url.replace('/upload/', `/upload/w_${width},h_${width},c_pad,b_auto,q_auto,f_auto/`);
+            },
+
+            parseCSV: function(csvText) {
+                const rows = csvText.split('\n').slice(1); // Ignorar cabecera
+                this.data = rows.map(row => {
+                    // Separa por comas respetando comillas
+                    const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    if(cols.length < 4) return null; // Fila vacía
+                    
+                    return {
+                        id: cols[0]?.replace(/"/g,'').trim(),
+                        name: cols[1]?.replace(/"/g,'').trim(),
+                        cat: cols[2]?.replace(/"/g,'').trim() || 'Varios',
+                        price: parseFloat(cols[3]?.replace(/"/g,'') || 0),
+                        image: cols[4]?.replace(/"/g,'').trim(),
+                        stock: parseInt(cols[5]?.replace(/"/g,'') || 0),
+                        desc: cols[6]?.replace(/"/g,'').trim()
+                    };
+                }).filter(p => p && p.name); // Limpiar nulos
+                
+                this.renderPills();
+                this.renderCatalog();
+            },
+
             renderPills: function() {
                 const cats = ['Todos', ...new Set(this.data.map(p=>p.cat))];
                 document.getElementById('pills-mount').innerHTML = cats.map(c => 
@@ -586,6 +541,7 @@
                 ).join('');
             },
             setFilter: function(c) { this.filter = c; this.renderPills(); this.renderCatalog(); },
+            
             renderCatalog: function() {
                 const q = document.getElementById('search-input').value.toLowerCase();
                 const items = this.data.filter(p => (this.filter==='Todos'||p.cat===this.filter) && p.name.toLowerCase().includes(q));
@@ -595,20 +551,21 @@
                     <div class="product-card">
                         <div class="card-image-wrapper" onclick="app.openModal('${p.id}')">
                             <span class="stock-badge" style="background:${out?'#ef4444':'rgba(0,0,0,0.7)'}">${out?'AGOTADO':'Stock: '+p.stock}</span>
-                            <img src="${p.img}" class="product-img" onerror="this.src='https://via.placeholder.com/300?text=JstoreR'">
+                            <img src="${this.optimizeImg(p.image, 500)}" class="product-img" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=JstoreR'">
                         </div>
                         <div class="card-info">
                             <div class="card-category">${p.cat}</div>
                             <h3 class="card-title">${p.name}</h3>
                             <div class="card-desc-snippet">${p.desc || ''}</div>
                             <div class="card-bottom">
-                                <span class="card-price">S/ ${p.price}</span>
+                                <span class="card-price">S/ ${p.price.toFixed(2)}</span>
                                 <button class="btn-add-cart" onclick="app.add('${p.id}')" ${out?'disabled':''}><i class="fa-solid fa-plus"></i></button>
                             </div>
                         </div>
                     </div>`;
                 }).join('');
             },
+            
             add: function(id) {
                 const p = this.data.find(x=>x.id===id);
                 const exist = this.cart.find(x=>x.id===id);
@@ -620,6 +577,7 @@
                 }
                 this.renderCart(); this.toast("Agregado al carrito");
             },
+            
             modQty: function(id, d) {
                 const item = this.cart.find(x=>x.id===id);
                 if(!item) return;
@@ -629,6 +587,7 @@
                 else item.qty = n;
                 this.renderCart();
             },
+            
             renderCart: function() {
                 document.getElementById('cart-count').innerText = this.cart.reduce((a,b)=>a+b.qty,0);
                 const sub = this.cart.reduce((a,b)=>a+(b.p.price*b.qty),0);
@@ -659,10 +618,10 @@
                 } else {
                     list.innerHTML = this.cart.map(i => `
                         <div class="cart-row">
-                            <img src="${i.p.img}" style="width:60px; height:60px; object-fit:cover; border-radius:8px;">
+                            <img src="${this.optimizeImg(i.p.image, 100)}" style="width:60px; height:60px; object-fit:contain; border-radius:8px; background:#000;">
                             <div style="flex:1;">
                                 <div style="font-weight:700; font-size:0.9rem;">${i.p.name}</div>
-                                <div style="color:var(--accent-gold);">S/ ${i.p.price}</div>
+                                <div style="color:var(--accent-gold);">S/ ${i.p.price.toFixed(2)}</div>
                                 <div class="qty-control">
                                     <button class="qty-btn" onclick="app.modQty('${i.id}',-1)">-</button>
                                     <span>${i.qty}</span>
@@ -674,11 +633,11 @@
                 }
                 this.updateCheckoutTotals();
             },
+            
             updateCheckoutTotals: function() {
                 const sub = this.cart.reduce((a,b)=>a+(b.p.price*b.qty),0);
                 const baseShip = parseFloat(document.getElementById('calc-ship-base').value) || 0;
                 let finalShip = baseShip;
-                
                 const discRow = document.getElementById('discount-row');
                 const discVal = document.getElementById('discount-val');
                 
@@ -695,18 +654,21 @@
                     document.getElementById('total-txt').innerText = "S/ " + (sub + finalShip).toFixed(2);
                 }
             },
+            
             openModal: function(id) {
                 const p = this.data.find(x=>x.id===id);
-                document.getElementById('m-img').src = p.img;
+                // Imagen grande optimizada (800px)
+                document.getElementById('m-img').src = this.optimizeImg(p.image, 800);
                 document.getElementById('m-cat').innerText = p.cat;
                 document.getElementById('m-title').innerText = p.name;
-                document.getElementById('m-price').innerText = "S/ "+p.price;
+                document.getElementById('m-price').innerText = "S/ "+p.price.toFixed(2);
                 document.getElementById('m-desc').innerText = p.desc;
                 const btn = document.getElementById('m-btn');
                 if(p.stock<=0) { btn.innerText="AGOTADO"; btn.disabled=true; }
                 else { btn.innerText="Agregar al Carrito"; btn.disabled=false; btn.onclick=()=> {this.add(id); this.closeModal();} }
                 document.getElementById('product-modal').classList.add('active');
             },
+            
             closeModal: function() { document.getElementById('product-modal').classList.remove('active'); },
             toggleSidebar: function() { 
                 document.getElementById('sidebar').classList.toggle('active');
