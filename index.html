@@ -347,22 +347,23 @@
     </footer>
 
     <script>
-        // --- TUS CREDENCIALES FINALES DE SUPABASE ---
+        // --- TUS DATOS DE SUPABASE (VERIFICADOS) ---
         const SUPABASE_URL = 'https://imzxubveghxhfgeyciet.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltenh1YnZlZ2h4aGZnZXljaWV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2MDI5ODIsImV4cCI6MjA4NDE3ODk4Mn0.ro9J3cUVUVQfigzsTjh71EU56rG8b2diJ-qlQQ5xvdw';
 
         // --- CREDENCIALES MAPBOX ---
-        mapboxgl.accessToken = "pk.eyJ1IjoianN0b3JlciIsImEiOiJjbWtoZ3o0eXowazJqM2pxMjJsZGNzanBzIn0.-7Ml_9KDQCzhGYqkiJdKzA";
+        const MAPBOX_TOKEN = "pk.eyJ1IjoianN0b3JlciIsImEiOiJjbWtoZ3o0eXowazJqM2pxMjJsZGNzanBzIn0.-7Ml_9KDQCzhGYqkiJdKzA";
         
-        // --- INICIO DE LÓGICA ---
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+        // --- COORDENADAS EXACTAS (Jr. Cuzco 626) ---
         const STORE_LOC = { lat: -12.051800, lng: -77.028500 };
         const FREE_SHIPPING_THRESHOLD = 350.00;
 
+        // Definimos variables globales
+        let supabase;
+        let map;
+
         const geo = {
             map: null, destMarker: null, LIMA_TRAFFIC_FACTOR: 1.40,
-
             initMap: function(centerLng, centerLat, zoom = 14) {
                 const container = document.getElementById('map-frame');
                 container.classList.add('active');
@@ -370,6 +371,13 @@
                     this.map.flyTo({ center: [centerLng, centerLat], zoom: zoom, pitch: 50 });
                     return;
                 }
+                // Verificación de seguridad de Mapbox
+                if (typeof mapboxgl === 'undefined') {
+                    alert("Error: El mapa no pudo cargar. Revisa tu conexión.");
+                    return;
+                }
+                mapboxgl.accessToken = MAPBOX_TOKEN;
+                
                 this.map = new mapboxgl.Map({
                     container: 'map',
                     style: 'mapbox://styles/mapbox/navigation-night-v1',
@@ -395,7 +403,6 @@
                     this.map.addLayer({ 'id': 'route', 'type': 'line', 'source': 'route', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#d4af37', 'line-width': 4, 'line-dasharray': [2, 2] } });
                 });
             },
-
             startTracking: function() {
                 const btn = document.querySelector('.gps-btn');
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Obteniendo GPS...';
@@ -406,13 +413,12 @@
                     btn.innerHTML = '<i class="fa-solid fa-check"></i> GPS Detectado';
                 }, () => { alert("Error GPS"); btn.innerHTML = 'Reintentar GPS'; }, {enableHighAccuracy:true});
             },
-
             searchAddress: function() {
                 const query = document.getElementById('map-search-input').value;
                 if(!query) return alert("Escribe una dirección");
                 const btn = document.querySelector('.map-search-btn');
                 btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
-                const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxgl.accessToken}&country=pe&limit=1&types=address,poi`;
+                const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&country=pe&limit=1&types=address,poi`;
                 fetch(url).then(r => r.json()).then(data => {
                     btn.innerHTML = '<i class="fa-solid fa-search"></i>';
                     if(data.features && data.features.length > 0) {
@@ -424,7 +430,6 @@
                     } else { alert("No encontramos esa dirección."); }
                 }).catch(() => { btn.innerHTML = '<i class="fa-solid fa-times"></i>'; alert("Error de conexión."); });
             },
-
             updateMarker: function(lat, lng) {
                 document.getElementById('geo-lat').value = lat;
                 document.getElementById('geo-lng').value = lng;
@@ -457,7 +462,6 @@
                 document.getElementById('calc-ship-base').value = cost.toFixed(2);
                 app.updateCheckoutTotals();
             },
-
             getDist: function(lat1, lon1, lat2, lon2) {
                 const R = 6371; 
                 const dLat = (lat2-lat1)*Math.PI/180; const dLon = (lon2-lon1)*Math.PI/180;
@@ -471,30 +475,56 @@
             
             init: async function() {
                 this.initGoldDust();
-                // Fetch directo a la base de datos Supabase
-                const { data: dbProducts, error } = await supabase.from('products').select('*');
+                
+                try {
+                    // Verificación de seguridad de Supabase
+                    if (typeof window.supabase === 'undefined') {
+                        throw new Error("La librería de Supabase no cargó. Revisa tu conexión o bloqueadores de anuncios.");
+                    }
 
-                if (error) {
-                    console.error('Error Supabase:', error);
-                    document.getElementById('catalog-mount').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;">Error cargando productos.<br>${error.message}</div>`;
-                    return;
+                    // Inicializar cliente
+                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    
+                    // Prueba de conexión
+                    console.log("Conectando a Supabase...");
+                    const { data: dbProducts, error } = await supabase.from('products').select('*');
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    if (!dbProducts || dbProducts.length === 0) {
+                        document.getElementById('catalog-mount').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;">
+                            <i class="fa-solid fa-triangle-exclamation fa-3x" style="color:orange"></i><br><br>
+                            Conexión Exitosa, pero la tabla está vacía.<br>Sube productos en Supabase.
+                        </div>`;
+                        return;
+                    }
+
+                    // ÉXITO
+                    this.data = dbProducts.map(p => ({
+                        id: p.id,
+                        name: p.name,
+                        cat: p.category, 
+                        price: parseFloat(p.price),
+                        img: p.image,    
+                        stock: parseInt(p.stock),
+                        desc: p.description 
+                    }));
+
+                    this.renderPills(); 
+                    this.renderCatalog();
+
+                } catch (e) {
+                    console.error('ERROR FATAL:', e);
+                    document.getElementById('catalog-mount').innerHTML = `
+                        <div style="grid-column:1/-1;text-align:center;padding:30px; border:1px solid red; border-radius:10px; background:rgba(255,0,0,0.1);">
+                            <i class="fa-solid fa-bug fa-3x" style="color:red"></i><br><br>
+                            <strong>ERROR DE CARGA:</strong><br>${e.message || e}<br><br>
+                            <small style="color:#aaa">Si el error dice "relation not found", verifica que tu tabla en Supabase se llame exactamente <strong>products</strong> (en minúscula).</small>
+                        </div>`;
                 }
-                if (!dbProducts || dbProducts.length === 0) {
-                     document.getElementById('catalog-mount').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;">La base de datos está vacía.<br>Agrega productos en Supabase.</div>`;
-                     return;
-                }
 
-                this.data = dbProducts.map(p => ({
-                    id: p.id,
-                    name: p.name,
-                    cat: p.category, 
-                    price: parseFloat(p.price),
-                    img: p.image,    
-                    stock: parseInt(p.stock),
-                    desc: p.description 
-                }));
-
-                this.renderPills(); this.renderCatalog();
                 document.getElementById('search-input').addEventListener('keyup', ()=>this.renderCatalog());
                 document.getElementById('product-modal').addEventListener('click', (e)=>{ if(e.target.id === 'product-modal') this.closeModal(); });
             },
