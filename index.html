@@ -18,6 +18,8 @@
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
     <style>
         /* ==========================================================================
            1. ESTILOS GENERALES (Dark Mode Premium)
@@ -152,7 +154,7 @@
         }
         .mapboxgl-popup-content { background: var(--bg-card); color: white; border: 1px solid var(--accent-gold); border-radius: 8px; padding: 10px; font-family: var(--font-body); }
         .mapboxgl-popup-tip { border-top-color: var(--accent-gold); border-bottom-color: var(--accent-gold); }
-        .mapboxgl-ctrl-bottom-right { display: none; } /* Ocultar logo para estética limpia (Opcional según TOS) */
+        .mapboxgl-ctrl-bottom-right { display: none; }
 
         .price-summary-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-muted); }
         .price-summary-row.total { font-size: 1.2rem; color: white; font-weight: 700; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 12px; margin-top: 12px; }
@@ -218,7 +220,7 @@
     <main class="catalog-section">
         <div class="grid-layout" id="catalog-mount">
             <div style="grid-column:1/-1; text-align:center; padding:50px; color:gray;">
-                <i class="fa-solid fa-circle-notch fa-spin fa-3x" style="color:var(--accent-gold)"></i><br><br>Sincronizando Catálogo...
+                <i class="fa-solid fa-circle-notch fa-spin fa-3x" style="color:var(--accent-gold)"></i><br><br>Cargando productos desde Supabase...
             </div>
         </div>
     </main>
@@ -345,72 +347,44 @@
     </footer>
 
     <script>
-        const SHEET_ID = "1z083WrKeOiakV7TegSuc7mzmx5JAPtmAFPHGulHga6w";
-        const TARGET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
-        const CSV_URL = 'https://corsproxy.io/?' + encodeURIComponent(TARGET_URL);
+        // --- COPIA ESTO DESDE TU PROYECTO SUPABASE ---
+        // 1. Ve a Project Settings (engranaje) -> API
+        // 2. Project URL va aqui:
+        const SUPABASE_URL = 'https://imzxubveghxhfgeyciet.supabase.co'; 
         
-        // --- CONFIGURACIÓN DE MAPBOX ---
+        // 3. Project API Key (anon public) va aqui:
+        const SUPABASE_KEY = 'sb_publishable_0cRWipBTH2MjGm7_uHSkWQ_MNjUlJ2h';
+
+        // --- CREDENCIALES MAPBOX ---
         mapboxgl.accessToken = "pk.eyJ1IjoianN0b3JlciIsImEiOiJjbWtoZ3o0eXowazJqM2pxMjJsZGNzanBzIn0.-7Ml_9KDQCzhGYqkiJdKzA";
         
-        // --- COORDENADAS EXACTAS (Jr. Cuzco 626) ---
+        // --- INICIO DE LÓGICA ---
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         const STORE_LOC = { lat: -12.051800, lng: -77.028500 };
         const FREE_SHIPPING_THRESHOLD = 350.00;
 
-        function parseCSV(text) {
-            const rows = [];
-            let row = [];
-            let inQuote = false;
-            let currentCell = '';
-            for (let i = 0; i < text.length; i++) {
-                const char = text[i];
-                const nextChar = text[i+1];
-                if (char === '"') {
-                    if (inQuote && nextChar === '"') { currentCell += '"'; i++; } 
-                    else { inQuote = !inQuote; }
-                } else if (char === ',' && !inQuote) {
-                    row.push(currentCell.trim()); currentCell = '';
-                } else if ((char === '\n' || char === '\r') && !inQuote) {
-                    if (currentCell || row.length > 0) row.push(currentCell.trim());
-                    if (row.length > 0) rows.push(row);
-                    row = []; currentCell = '';
-                    if (char === '\r' && nextChar === '\n') i++;
-                } else { currentCell += char; }
-            }
-            if (currentCell || row.length > 0) row.push(currentCell.trim());
-            if (row.length > 0) rows.push(row);
-            return rows;
-        }
-
-        // --- GEO ENGINE V77 PRO (PURE MAPBOX NATIVE) ---
         const geo = {
-            map: null, destMarker: null,
-            LIMA_TRAFFIC_FACTOR: 1.40,
+            map: null, destMarker: null, LIMA_TRAFFIC_FACTOR: 1.40,
 
             initMap: function(centerLng, centerLat, zoom = 14) {
                 const container = document.getElementById('map-frame');
                 container.classList.add('active');
-
-                // Si ya existe el mapa, solo volamos hacia allá
                 if(this.map) {
                     this.map.flyTo({ center: [centerLng, centerLat], zoom: zoom, pitch: 50 });
                     return;
                 }
-
-                // Crear Mapa Nativo 3D
                 this.map = new mapboxgl.Map({
                     container: 'map',
-                    style: 'mapbox://styles/mapbox/navigation-night-v1', // ESTILO PREMIUM NEÓN
+                    style: 'mapbox://styles/mapbox/navigation-night-v1',
                     center: [centerLng, centerLat],
                     zoom: zoom,
-                    pitch: 45, // Inclinación 3D
+                    pitch: 45,
                     bearing: 0,
                     antialias: true
                 });
-
-                // Controles de Navegación
                 this.map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-                // Marcador de Origen (Personalizado)
+                
                 const elOrigin = document.createElement('div');
                 elOrigin.className = 'marker-origin';
                 new mapboxgl.Marker(elOrigin)
@@ -418,36 +392,18 @@
                     .setPopup(new mapboxgl.Popup({offset: 25}).setHTML('<b>JstoreR (Origen)</b>'))
                     .addTo(this.map);
 
-                // Evento Clic en Mapa
-                this.map.on('click', (e) => {
-                    this.updateMarker(e.lngLat.lat, e.lngLat.lng);
-                });
-
-                // Asegurar renderizado correcto al abrir
+                this.map.on('click', (e) => { this.updateMarker(e.lngLat.lat, e.lngLat.lng); });
                 this.map.on('load', () => {
                     this.map.resize();
-                    // Preparar capa para la ruta dorada
-                    this.map.addSource('route', {
-                        'type': 'geojson',
-                        'data': { 'type': 'Feature', 'properties': {}, 'geometry': { 'type': 'LineString', 'coordinates': [] } }
-                    });
-                    this.map.addLayer({
-                        'id': 'route',
-                        'type': 'line',
-                        'source': 'route',
-                        'layout': { 'line-join': 'round', 'line-cap': 'round' },
-                        'paint': { 'line-color': '#d4af37', 'line-width': 4, 'line-dasharray': [2, 2] }
-                    });
+                    this.map.addSource('route', { 'type': 'geojson', 'data': { 'type': 'Feature', 'properties': {}, 'geometry': { 'type': 'LineString', 'coordinates': [] } } });
+                    this.map.addLayer({ 'id': 'route', 'type': 'line', 'source': 'route', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#d4af37', 'line-width': 4, 'line-dasharray': [2, 2] } });
                 });
             },
 
-            // GPS Automático (Con animación de vuelo)
             startTracking: function() {
                 const btn = document.querySelector('.gps-btn');
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Obteniendo GPS...';
-                
                 if(!navigator.geolocation) { alert("GPS no soportado"); return; }
-                
                 navigator.geolocation.getCurrentPosition(pos => {
                     this.initMap(pos.coords.longitude, pos.coords.latitude, 16);
                     this.updateMarker(pos.coords.latitude, pos.coords.longitude);
@@ -455,97 +411,54 @@
                 }, () => { alert("Error GPS"); btn.innerHTML = 'Reintentar GPS'; }, {enableHighAccuracy:true});
             },
 
-            // --- BUSCADOR NATIVO MAPBOX (ULTRA RÁPIDO) ---
             searchAddress: function() {
                 const query = document.getElementById('map-search-input').value;
-                if(!query) return alert("Escribe una dirección (Ej: Av. San Luis 2276)");
-                
+                if(!query) return alert("Escribe una dirección");
                 const btn = document.querySelector('.map-search-btn');
                 btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
-
                 const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxgl.accessToken}&country=pe&limit=1&types=address,poi`;
-
-                fetch(url)
-                    .then(r => r.json())
-                    .then(data => {
-                        btn.innerHTML = '<i class="fa-solid fa-search"></i>';
-                        if(data.features && data.features.length > 0) {
-                            const [lng, lat] = data.features[0].center;
-                            const foundAddr = data.features[0].place_name;
-                            
-                            this.initMap(lng, lat, 17);
-                            this.updateMarker(lat, lng);
-                            document.getElementById('cust-address').value = foundAddr; 
-                        } else {
-                            alert("No encontramos esa dirección exacta. Intenta mover el PIN en el mapa.");
-                        }
-                    })
-                    .catch(() => {
-                        btn.innerHTML = '<i class="fa-solid fa-times"></i>';
-                        alert("Error de conexión con Mapbox.");
-                    });
+                fetch(url).then(r => r.json()).then(data => {
+                    btn.innerHTML = '<i class="fa-solid fa-search"></i>';
+                    if(data.features && data.features.length > 0) {
+                        const [lng, lat] = data.features[0].center;
+                        const foundAddr = data.features[0].place_name;
+                        this.initMap(lng, lat, 17);
+                        this.updateMarker(lat, lng);
+                        document.getElementById('cust-address').value = foundAddr; 
+                    } else { alert("No encontramos esa dirección."); }
+                }).catch(() => { btn.innerHTML = '<i class="fa-solid fa-times"></i>'; alert("Error de conexión."); });
             },
 
-            // Actualizar Marcador y Cálculos
             updateMarker: function(lat, lng) {
                 document.getElementById('geo-lat').value = lat;
                 document.getElementById('geo-lng').value = lng;
-
-                // Crear o Mover Marcador de Destino
                 if(this.destMarker) {
                     this.destMarker.setLngLat([lng, lat]);
                 } else {
                     const elDest = document.createElement('div');
                     elDest.innerHTML = '<i class="fa-solid fa-location-dot"></i>';
                     elDest.className = 'marker-dest';
-                    
                     this.destMarker = new mapboxgl.Marker(elDest, {draggable: true})
                         .setLngLat([lng, lat])
                         .setPopup(new mapboxgl.Popup({offset: 25}).setHTML('<b>Destino</b><br>Arrástrame'))
                         .addTo(this.map);
-                    
-                    this.destMarker.on('dragend', () => {
-                        const pos = this.destMarker.getLngLat();
-                        this.updateMarker(pos.lat, pos.lng);
-                    });
+                    this.destMarker.on('dragend', () => { const pos = this.destMarker.getLngLat(); this.updateMarker(pos.lat, pos.lng); });
                 }
-
-                // DIBUJAR RUTA ORO (Línea Recta visual)
                 if(this.map.getSource('route')) {
-                    const routeGeoJSON = {
-                        'type': 'Feature',
-                        'properties': {},
-                        'geometry': {
-                            'type': 'LineString',
-                            'coordinates': [
-                                [STORE_LOC.lng, STORE_LOC.lat],
-                                [lng, lat]
-                            ]
-                        }
-                    };
-                    this.map.getSource('route').setData(routeGeoJSON);
+                    this.map.getSource('route').setData({ 'type': 'Feature', 'properties': {}, 'geometry': { 'type': 'LineString', 'coordinates': [[STORE_LOC.lng, STORE_LOC.lat], [lng, lat]] } });
                 }
-
-                // Ajustar cámara para ver toda la ruta
-                const bounds = new mapboxgl.LngLatBounds();
-                bounds.extend([STORE_LOC.lng, STORE_LOC.lat]);
-                bounds.extend([lng, lat]);
+                const bounds = new mapboxgl.LngLatBounds(); bounds.extend([STORE_LOC.lng, STORE_LOC.lat]); bounds.extend([lng, lat]);
                 this.map.fitBounds(bounds, { padding: 100, maxZoom: 16 });
 
-                // CÁLCULOS MATEMÁTICOS (LÓGICA DE NEGOCIO)
                 const linearDist = this.getDist(STORE_LOC.lat, STORE_LOC.lng, lat, lng);
                 const realDist = linearDist * this.LIMA_TRAFFIC_FACTOR;
-                
-                // --- LOGICA DE TARIFA MÍNIMA 6 SOLES ---
                 let cost = realDist * 2.00;
                 if (cost < 6.00) { cost = 6.00; }
-                // ---------------------------------------
 
                 document.getElementById('shipping-info').style.display = 'block';
                 document.getElementById('dist-txt').innerText = realDist.toFixed(2) + " km (Ruta aprox)";
                 document.getElementById('ship-base-txt').innerText = "S/ " + cost.toFixed(2);
                 document.getElementById('calc-ship-base').value = cost.toFixed(2);
-                
                 app.updateCheckoutTotals();
             },
 
@@ -559,26 +472,37 @@
 
         const app = {
             data: [], cart: [], filter: 'Todos',
+            
             init: async function() {
                 this.initGoldDust();
-                try {
-                    const res = await fetch(CSV_URL);
-                    const txt = await res.text();
-                    const rawRows = parseCSV(txt); 
-                    const rows = rawRows.slice(1);
-                    this.data = rows.map(r => ({
-                        id: r[0], name: r[1], cat: r[2], 
-                        price: parseFloat((r[3]||'0').replace(/[^0-9.]/g,'')), 
-                        img: r[4], stock: parseInt(r[5]||'0'), desc: r[6]
-                    })).filter(p => p.name);
-                    this.renderPills(); this.renderCatalog();
-                } catch(e) { 
-                    console.error(e);
-                    document.getElementById('catalog-mount').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;">Error de conexión.</div>`;
+                // Fetch directo a la base de datos Supabase
+                const { data: dbProducts, error } = await supabase.from('products').select('*');
+
+                if (error) {
+                    console.error('Error Supabase:', error);
+                    document.getElementById('catalog-mount').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;">Error cargando productos.<br>${error.message}</div>`;
+                    return;
                 }
+                if (!dbProducts || dbProducts.length === 0) {
+                     document.getElementById('catalog-mount').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;">La base de datos está vacía.<br>Agrega productos en Supabase.</div>`;
+                     return;
+                }
+
+                this.data = dbProducts.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    cat: p.category, 
+                    price: parseFloat(p.price),
+                    img: p.image,    
+                    stock: parseInt(p.stock),
+                    desc: p.description 
+                }));
+
+                this.renderPills(); this.renderCatalog();
                 document.getElementById('search-input').addEventListener('keyup', ()=>this.renderCatalog());
                 document.getElementById('product-modal').addEventListener('click', (e)=>{ if(e.target.id === 'product-modal') this.closeModal(); });
             },
+
             renderPills: function() {
                 const cats = ['Todos', ...new Set(this.data.map(p=>p.cat))];
                 document.getElementById('pills-mount').innerHTML = cats.map(c => 
@@ -602,7 +526,7 @@
                             <h3 class="card-title">${p.name}</h3>
                             <div class="card-desc-snippet">${p.desc || ''}</div>
                             <div class="card-bottom">
-                                <span class="card-price">S/ ${p.price}</span>
+                                <span class="card-price">S/ ${p.price.toFixed(2)}</span>
                                 <button class="btn-add-cart" onclick="app.add('${p.id}')" ${out?'disabled':''}><i class="fa-solid fa-plus"></i></button>
                             </div>
                         </div>
@@ -662,7 +586,7 @@
                             <img src="${i.p.img}" style="width:60px; height:60px; object-fit:cover; border-radius:8px;">
                             <div style="flex:1;">
                                 <div style="font-weight:700; font-size:0.9rem;">${i.p.name}</div>
-                                <div style="color:var(--accent-gold);">S/ ${i.p.price}</div>
+                                <div style="color:var(--accent-gold);">S/ ${i.p.price.toFixed(2)}</div>
                                 <div class="qty-control">
                                     <button class="qty-btn" onclick="app.modQty('${i.id}',-1)">-</button>
                                     <span>${i.qty}</span>
@@ -678,7 +602,6 @@
                 const sub = this.cart.reduce((a,b)=>a+(b.p.price*b.qty),0);
                 const baseShip = parseFloat(document.getElementById('calc-ship-base').value) || 0;
                 let finalShip = baseShip;
-                
                 const discRow = document.getElementById('discount-row');
                 const discVal = document.getElementById('discount-val');
                 
@@ -700,7 +623,7 @@
                 document.getElementById('m-img').src = p.img;
                 document.getElementById('m-cat').innerText = p.cat;
                 document.getElementById('m-title').innerText = p.name;
-                document.getElementById('m-price').innerText = "S/ "+p.price;
+                document.getElementById('m-price').innerText = "S/ "+p.price.toFixed(2);
                 document.getElementById('m-desc').innerText = p.desc;
                 const btn = document.getElementById('m-btn');
                 if(p.stock<=0) { btn.innerText="AGOTADO"; btn.disabled=true; }
